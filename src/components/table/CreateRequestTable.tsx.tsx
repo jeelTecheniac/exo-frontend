@@ -1,0 +1,679 @@
+import { useState, useEffect, useRef, ChangeEvent } from "react";
+import Typography from "../../lib/components/atoms/Typography";
+import { CrossRedIcon, RightGreenIcon } from "../../icons";
+
+export interface TableHeader {
+  content: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+}
+
+interface TableProps {
+  children: React.ReactNode;
+}
+
+interface TableHeaderProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface TableBodyProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface TableRowProps {
+  children: React.ReactNode;
+}
+
+interface TableCellProps {
+  children: React.ReactNode;
+  className?: string;
+  isHeader?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
+}
+
+// Mock Table components
+export const Table: React.FC<TableProps> = ({ children }) => (
+  <table className="w-full border-collapse" role="grid">
+    {children}
+  </table>
+);
+
+export const TableHeader: React.FC<TableHeaderProps> = ({
+  children,
+  className,
+}) => <thead className={className}>{children}</thead>;
+
+export const TableBody: React.FC<TableBodyProps> = ({
+  children,
+  className,
+}) => <tbody className={className}>{children}</tbody>;
+
+export const TableRow: React.FC<TableRowProps> = ({ children }) => (
+  <tr>{children}</tr>
+);
+
+export const TableCell: React.FC<TableCellProps> = ({
+  children,
+  className,
+  isHeader = false,
+  onClick,
+}) => {
+  const Tag = isHeader ? "th" : "td";
+  return (
+    <Tag
+      className={className}
+      onClick={onClick}
+      {...(isHeader ? { scope: "col" } : {})}
+    >
+      {children}
+    </Tag>
+  );
+};
+
+export interface Order {
+  id: number;
+  label: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  taxRate: number;
+  taxAmount: number;
+  vatIncluded: number;
+  financialAuthority: string;
+}
+
+type SortOrder = "asc" | "desc" | null;
+
+const CreateRequestTable = ({
+  data,
+  onDataChange,
+}: {
+  data: Order[];
+  onDataChange?: (newData: Order[]) => void;
+}) => {
+  const [tableData, setTableData] = useState<Order[]>(data);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<Order>>({});
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+  // Ref for the dropdown menu container
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  // Handle outside click to close dropdown menu
+  useEffect(() => {
+    const handleClickOutside = (event: Event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
+  const calculateTaxAndVat = (formData: Partial<Order>) => {
+    const quantity = formData.quantity || 0;
+    const unitPrice = formData.unitPrice || 0;
+    const taxRate = formData.taxRate || 0;
+    const total = quantity * unitPrice;
+    const taxAmount = total * (taxRate / 100);
+    const vatIncluded = total + taxAmount;
+
+    return { total, taxAmount: Math.round(taxAmount * 100) / 100, vatIncluded };
+  };
+
+  const handleIncrement = (orderId: number) => {
+    setTableData((prev) =>
+      prev.map((order) => {
+        if (order.id === orderId) {
+          const newQuantity = Math.min(order.quantity + 1, 7);
+          const total = newQuantity * order.unitPrice;
+          const taxAmount = total * (order.taxRate / 100);
+          const vatIncluded = total + taxAmount;
+          return {
+            ...order,
+            quantity: newQuantity,
+            total,
+            taxAmount,
+            vatIncluded,
+          };
+        }
+        return order;
+      })
+    );
+
+    if (editingId === orderId) {
+      setEditFormData((prev) => {
+        const newQuantity = Math.min((prev.quantity || 1) + 1, 7);
+        const { total, taxAmount, vatIncluded } = calculateTaxAndVat({
+          ...prev,
+          quantity: newQuantity,
+        });
+        return {
+          ...prev,
+          quantity: newQuantity,
+          total,
+          taxAmount,
+          vatIncluded,
+        };
+      });
+    }
+  };
+
+  const handleDecrement = (orderId: number) => {
+    setTableData((prev) =>
+      prev.map((order) => {
+        if (order.id === orderId) {
+          const newQuantity = Math.max(order.quantity - 1, 1);
+          const total = newQuantity * order.unitPrice;
+          const taxAmount = total * (order.taxRate / 100);
+          const vatIncluded = total + taxAmount;
+          return {
+            ...order,
+            quantity: newQuantity,
+            total,
+            taxAmount,
+            vatIncluded,
+          };
+        }
+        return order;
+      })
+    );
+
+    if (editingId === orderId) {
+      setEditFormData((prev) => {
+        const newQuantity = Math.max((prev.quantity || 1) - 1, 1);
+        const { total, taxAmount, vatIncluded } = calculateTaxAndVat({
+          ...prev,
+          quantity: newQuantity,
+        });
+        return {
+          ...prev,
+          quantity: newQuantity,
+          total,
+          taxAmount,
+          vatIncluded,
+        };
+      });
+    }
+  };
+
+  const handleMenuToggle = (orderId: number) => {
+    setOpenMenuId(openMenuId === orderId ? null : orderId);
+  };
+
+  const handleEdit = (order: Order) => {
+    setEditingId(order.id);
+    setEditFormData({ ...order });
+    setOpenMenuId(null);
+  };
+
+  const handleSaveEdit = (orderId: number) => {
+    setTableData((prev) => {
+      const newData = prev.map((order) => {
+        if (order.id === orderId) {
+          const { total, taxAmount, vatIncluded } =
+            calculateTaxAndVat(editFormData);
+          return {
+            ...order,
+            label: editFormData.label || order.label,
+            quantity: editFormData.quantity || order.quantity,
+            unitPrice: editFormData.unitPrice ?? order.unitPrice,
+            total,
+            taxRate: editFormData.taxRate ?? order.taxRate,
+            taxAmount,
+            vatIncluded,
+            financialAuthority:
+              editFormData.financialAuthority || order.financialAuthority,
+          };
+        }
+        return order;
+      });
+      onDataChange?.(newData); // Notify parent of changes
+      return newData;
+    });
+
+    setEditingId(null);
+    setEditFormData({});
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditFormData({});
+  };
+
+  const handleDelete = (orderId: number) => {
+    if (window.confirm("Are you sure you want to delete this record?")) {
+      setTableData((prev) => prev.filter((order) => order.id !== orderId));
+      setSelectedRows((prev) => prev.filter((id) => id !== orderId));
+    }
+    setOpenMenuId(null);
+  };
+
+  const handleInputChange = (field: keyof Order, value: string | number) => {
+    let parsedValue: string | number = value;
+    if (
+      [
+        "quantity",
+        "unitPrice",
+        "taxRate",
+        "total",
+        "taxAmount",
+        "vatIncluded",
+      ].includes(field)
+    ) {
+      parsedValue = value === "" ? 0 : parseFloat(value as string);
+      if (isNaN(parsedValue)) parsedValue = 0;
+    }
+
+    setEditFormData((prev) => {
+      const updatedFormData = { ...prev, [field]: parsedValue };
+      const { total, taxAmount, vatIncluded } =
+        calculateTaxAndVat(updatedFormData);
+      return { ...updatedFormData, total, taxAmount, vatIncluded };
+    });
+  };
+
+  const handleQuantitySort = () => {
+    let newSortOrder: SortOrder;
+    if (sortOrder === null || sortOrder === "desc") {
+      newSortOrder = "asc";
+    } else {
+      newSortOrder = "desc";
+    }
+
+    setSortOrder(newSortOrder);
+
+    const sortedData = [...tableData].sort((a, b) => {
+      if (newSortOrder === "asc") {
+        return a.quantity - b.quantity;
+      } else {
+        return b.quantity - b.quantity;
+      }
+    });
+
+    setTableData(sortedData);
+  };
+
+  const getSortIcon = () => {
+    if (sortOrder === "asc") {
+      return "↑";
+    } else if (sortOrder === "desc") {
+      return "↓";
+    }
+    return "↕️";
+  };
+
+  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setSelectedRows(tableData.map((order) => order.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleSelectRow = (orderId: number) => {
+    setSelectedRows((prev) => {
+      if (prev.includes(orderId)) {
+        return prev.filter((id) => id !== orderId);
+      } else {
+        return [...prev, orderId];
+      }
+    });
+  };
+
+  const tableHeader: TableHeader[] = [
+    {
+      content: (
+        <input
+          type="checkbox"
+          checked={selectedRows.length === tableData.length}
+          onChange={handleSelectAll}
+          className="w-4 h-4 rounded border-secondary-30 text-blue-600 focus:ring-blue-500"
+          aria-label="Select all rows"
+        />
+      ),
+      className: "w-10", // Fixed width for checkbox
+    },
+    {
+      content: <div>Sr No</div>,
+      className: "w-16",
+    },
+    {
+      content: <div>Label</div>,
+      className: "min-w-[120px]",
+    },
+    {
+      content: (
+        <div className="flex items-center gap-1">
+          Quantity
+          <span className="text-xs">{getSortIcon()}</span>
+        </div>
+      ),
+      onClick: handleQuantitySort,
+      className: "w-24",
+    },
+    {
+      content: <div>Unit Price</div>,
+      className: "w-28",
+    },
+    {
+      content: <div>Total</div>,
+      className: "w-24",
+    },
+    {
+      content: <div>Tax Rate</div>,
+      className: "w-24",
+    },
+    {
+      content: <div>Tax Amount</div>,
+      className: "w-28",
+    },
+    {
+      content: <div>VAT Included</div>,
+      className: "w-28",
+    },
+    {
+      content: <div>Financial Authority</div>,
+      className: "min-w-[140px]",
+    },
+    {
+      content: <div>Actions</div>,
+      className: "w-20",
+    },
+  ];
+
+  return (
+    <div className="relative rounded-lg border border-secondary-30 bg-white ">
+      <div className="relative">
+        <Table>
+          <TableHeader className="border-b border-gray-100 bg-secondary-10 rounded-lg">
+            <TableRow>
+              {tableHeader.map((header, index) => {
+                return (
+                  <TableCell
+                    key={index}
+                    isHeader
+                    className="px-5 py-4 font-semibold text-secondary-50 text-left text-sm cursor-pointer"
+                    onClick={header.onClick}
+                  >
+                    {header.content}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          </TableHeader>
+
+          <TableBody className="divide-y divide-gray-100">
+            {tableData.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell className="px-5 py-4 w-10">
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.includes(order.id)}
+                    onChange={() => handleSelectRow(order.id)}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    aria-label={`Select row ${order.id}`}
+                  />
+                </TableCell>
+                <TableCell className="px-5 py-4 text-gray-500 text-sm">
+                  {order.id}
+                </TableCell>
+                <TableCell className="px-5 py-4 sm:px-6">
+                  {editingId === order.id ? (
+                    <div className="flex flex-col gap-1">
+                      <input
+                        type="text"
+                        value={editFormData.label ?? ""}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          handleInputChange("label", e.target.value)
+                        }
+                        className="block w-full px-2 py-1 text-sm rounded-md bg-secondary-10 focus:border focus:outline-none border-secondary-30"
+                        placeholder="Add Label"
+                        aria-label="Label"
+                      />
+                    </div>
+                  ) : (
+                    <span className="block font-medium text-secondary-100 text-sm">
+                      {order.label}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-500 text-sm">
+                  {editingId === order.id ? (
+                    <div className="flex items-center border border-secondary-30 rounded-md overflow-hidden">
+                      <button
+                        onClick={() => handleDecrement(order.id)}
+                        className="w-8 h-8 flex items-center justify-center bg-white text-secondary-50 border-r border-secondary-30 hover:bg-gray-100 transition-colors focus:outline-none"
+                        aria-label="Decrease quantity"
+                      >
+                        -
+                      </button>
+                      <div className="w-12 text-center font-medium bg-secondary-10 px-2 py-1 text-secondary-100 text-sm">
+                        {editFormData.quantity ?? order.quantity}
+                      </div>
+                      <button
+                        onClick={() => handleIncrement(order.id)}
+                        className="w-8 h-8 flex items-center justify-center bg-white text-secondary-50 border-l border-secondary-30 hover:bg-gray-100 transition-colors focus:outline-none"
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="font-medium text-secondary-100">
+                      {order.quantity}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-5 py-4 sm:px-6">
+                  {editingId === order.id ? (
+                    <div className="flex flex-col gap-1">
+                      <input
+                        type="text"
+                        value={editFormData.unitPrice ?? ""}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          handleInputChange("unitPrice", e.target.value)
+                        }
+                        className="block w-full px-2 py-1 text-sm rounded-md bg-secondary-10 focus:border focus:outline-none border-secondary-30"
+                        placeholder="Add Price"
+                        aria-label="Unit Price"
+                      />
+                    </div>
+                  ) : (
+                    <span className="block font-medium text-secondary-100 text-sm">
+                      {order.unitPrice}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-5 py-4 sm:px-6">
+                  {editingId === order.id ? (
+                    <div className="bg-secondary-10 border border-dotted border-secondary-30 w-full cursor-not-allowed">
+                      <Typography
+                        size="sm"
+                        weight="normal"
+                        className="text-secondary-30"
+                      >
+                        Not-allowed
+                      </Typography>
+                    </div>
+                  ) : (
+                    <span className="block font-medium text-secondary-100 text-sm">
+                      {order.total}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-5 py-4 sm:px-6">
+                  {editingId === order.id ? (
+                    <div className="flex flex-col gap-1">
+                      <input
+                        type="text"
+                        value={editFormData.taxRate ?? ""}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          handleInputChange("taxRate", e.target.value)
+                        }
+                        className="block w-full px-2 py-1 text-sm rounded-md bg-secondary-10 focus:border focus:outline-none border-secondary-30"
+                        placeholder="Add Tax Rate"
+                        aria-label="Tax Rate"
+                      />
+                    </div>
+                  ) : (
+                    <span className="block font-medium text-secondary-100 text-sm">
+                      {order.taxRate}%
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-5 py-4 sm:px-6">
+                  {editingId === order.id ? (
+                    <div className="bg-secondary-10 border border-dotted border-secondary-30 w-full cursor-not-allowed">
+                      <Typography
+                        size="sm"
+                        weight="normal"
+                        className="text-secondary-30"
+                      >
+                        Not-allowed
+                      </Typography>
+                    </div>
+                  ) : (
+                    <span className="block font-medium text-secondary-100 text-sm">
+                      {order.taxAmount}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-5 py-4 sm:px-6">
+                  {editingId === order.id ? (
+                    <div className="bg-secondary-10 border border-dotted border-secondary-30 w-full cursor-not-allowed">
+                      <Typography
+                        size="sm"
+                        weight="normal"
+                        className="text-secondary-30"
+                      >
+                        Not-allowed
+                      </Typography>
+                    </div>
+                  ) : (
+                    <span className="block font-medium text-secondary-100 text-sm">
+                      {order.vatIncluded}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-5 py-4 sm:px-6">
+                  {editingId === order.id ? (
+                    <div className="flex flex-col gap-1">
+                      <select
+                        value={editFormData.financialAuthority ?? ""}
+                        onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                          handleInputChange(
+                            "financialAuthority",
+                            e.target.value
+                          )
+                        }
+                        className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white"
+                        aria-label="Financial Authority"
+                      >
+                        <option value="DGDA">DGDA</option>
+                        <option value="DGI">DGI</option>
+                        <option value="DGRAD">DGRAD</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <span className="block font-medium text-secondary-100 text-sm">
+                      {order.financialAuthority}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-500 text-sm">
+                  {editingId === order.id ? (
+                    <div className="flex items-center space-x-4">
+                      <RightGreenIcon
+                        onClick={() => handleSaveEdit(order.id)}
+                        width={24}
+                        height={24}
+                        className="cursor-pointer"
+                      />
+
+                      <CrossRedIcon
+                        onClick={handleCancelEdit}
+                        width={24}
+                        height={24}
+                        className="cursor-pointer"
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="relative"
+                      ref={openMenuId === order.id ? menuRef : null}
+                    >
+                      <button
+                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                          e.stopPropagation();
+                          handleMenuToggle(order.id);
+                        }}
+                        className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                        aria-label="Open actions menu"
+                        aria-haspopup="true"
+                        aria-expanded={openMenuId === order.id}
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                        </svg>
+                      </button>
+                      {openMenuId === order.id && (
+                        <div
+                          className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+                          role="menu"
+                        >
+                          <button
+                            onClick={(
+                              e: React.MouseEvent<HTMLButtonElement>
+                            ) => {
+                              e.stopPropagation();
+                              handleEdit(order);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            role="menuitem"
+                            aria-label="Edit row"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={(
+                              e: React.MouseEvent<HTMLButtonElement>
+                            ) => {
+                              e.stopPropagation();
+                              handleDelete(order.id);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
+                            role="menuitem"
+                            aria-label="Delete row"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+};
+
+export default CreateRequestTable;

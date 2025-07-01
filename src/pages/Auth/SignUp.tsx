@@ -1,0 +1,46 @@
+import LanguageSwitchLayout from "./LanguageSwitchLayout";
+import AuthLayout from "./AuthLayout";
+import Features from "../../components/Features";
+import Typography from "../../lib/components/atoms/Typography";
+import SignUpForm from "../../components/SignUpForm";
+import { useTranslation } from "react-i18next";
+import TermsConditionModal from "../../components/modal/TermsConditionModal";
+import { useModal } from "../../hooks/useModal";
+
+const SignUp = () => {
+  const { t } = useTranslation();
+  const { isOpen, openModal, closeModal } = useModal();
+
+  return (
+    <AuthLayout>
+      <div className="flex">
+        <div className="w-full">
+          <div className="px-[20px] flex flex-col justify-center gap-10 mt-5 lg:px-[100px]">
+            <LanguageSwitchLayout />
+            <div>
+              <SignUpForm />
+            </div>
+            <div className="text-center mb-2 lg:mb-0" onClick={openModal}>
+              <Typography
+                className="text-secondary-60"
+                size="base"
+                weight="normal"
+              >
+                {t("by_signing_up_to_create_an_account_i_accept_company")}
+              </Typography>
+              <span className="text-primary-150 text-base font-semibold cursor-pointer">
+                {t("terms_of_use_privacy_policy")}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="w-full hidden lg:block">
+          <Features />
+        </div>
+        <TermsConditionModal isOpen={isOpen} onClose={closeModal} />
+      </div>
+    </AuthLayout>
+  );
+};
+
+export default SignUp;
