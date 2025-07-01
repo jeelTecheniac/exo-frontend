@@ -25,7 +25,7 @@ export default function App() {
     <>
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
-          <ToastContainer />
+          <ToastContainer className="z-100" />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/sign-in" element={<SignIn />} />

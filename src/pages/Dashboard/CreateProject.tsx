@@ -15,7 +15,9 @@ import { useModal } from "../../hooks/useModal";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import localStorageService from "../../services/local.service";
-import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import projectService from "../../services/project.service";
+import { toast } from "react-toastify";
 
 export interface UserData {
   id: number;
@@ -189,7 +191,7 @@ const CreateProject = () => {
   };
 
   const updateProjectData = (data: Partial<ProjectData>) => {
-    setProjectData({ ...projectData, ...data });
+    setProjectData((projectData) => ({ ...projectData, ...data }));
     if (currentStep === 0) {
       const newValidation = { ...fieldValidation };
       Object.keys(data).forEach((key) => {
@@ -217,6 +219,19 @@ const CreateProject = () => {
     console.log("Saving as draft:", projectData);
     // Save draft logic
   };
+
+  const createProjectMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await projectService.createProject(data);
+    },
+    onSuccess: (res) => {
+      openModal();          
+    },
+    onError: (error) => {
+      console.error("Error during project creation:", error);
+      return toast.error("Failed to create project.");
+    },
+  });
 
   const handleSubmit = async () => {
     const filesId = projectData.files.map((file) => file.id);
@@ -252,21 +267,7 @@ const CreateProject = () => {
       status: "publish",
       document_ids: [...filesId, ...contractFilesID].join(","),
     };
-    console.log(data, "formatted data");
-    try {
-      await axios.post(
-        "https://exotrack.makuta.cash/api/V1/project/create",
-        data,
-        {
-          headers: {
-            VAuthorization: `Bearer ${userData?.token || ""}`,
-          },
-        }
-      );
-      openModal();
-    } catch (error) {
-      console.log(error, "error");
-    }
+    createProjectMutation.mutate(data);
   };
 
   return (

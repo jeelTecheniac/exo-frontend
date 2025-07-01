@@ -37,7 +37,7 @@ class ApiBaseService {
 
         if (accessToken) {
           // Configure this as per your backend requirements
-          config.headers.Authorization = `Bearer ${accessToken}`;
+          config.headers['VAuthorization'] = `Bearer ${accessToken}`;
         }
 
         return config;

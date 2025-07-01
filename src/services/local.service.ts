@@ -23,7 +23,8 @@ class LocalStorageService {
   }
 
   getAccessToken() {
-    return window ? localStorage.getItem(this.ACCESS_TOKEN_KEY) : null;
+    const token = window ? localStorage.getItem(this.ACCESS_TOKEN_KEY) : null;
+    return token ? JSON.parse(token) : token;
   }
 
   setAccessToken(data: string) {

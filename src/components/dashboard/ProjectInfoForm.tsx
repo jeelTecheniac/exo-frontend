@@ -9,9 +9,11 @@ import UploadFile, { UploadedFile } from "../common/UploadFile";
 import { TrashIcon } from "../../icons";
 import { USFlag, CDFFlag } from "../../icons";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
 import localStorageService from "../../services/local.service";
 import { UserData } from "../../pages/Dashboard/CreateProject";
+import projectService from "../../services/project.service";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 interface ProjectInfoFormProps {
   projectData: any;
@@ -45,6 +47,16 @@ interface ValidationErrors {
   amount?: string;
   beginDate?: string;
   endDate?: string;
+}
+
+interface UploadResponse {
+  id: string;
+  url: string;
+}
+
+interface UploadArgs {
+  file: File;
+  onProgress: (percent: number) => void;
 }
 
 const ProjectInfoForm = ({
@@ -271,67 +283,74 @@ const ProjectInfoForm = ({
     );
   };
 
-  const handleUploadFile = async (file: any, onProgress: any) => {
-    console.log(userData, "userData");
 
+  const fileUploadMutation = async ({
+    file,
+    onProgress,
+  }: UploadArgs): Promise<UploadResponse> => {
+    console.log("Inside mutation file:", file);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("type", "document");
     formData.append("object_type", "project");
 
-    try {
-      const response = await axios.post(
-        "https://exotrack.makuta.cash/api/V1/project/upload-file",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            VAuthorization: `Bearer ${userData?.token || ""}`,
-          },
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const percent = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              onProgress(percent);
-            }
-          },
+    const response = await projectService.uploadFile(formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress: (event: ProgressEvent) => {
+        if (event.total) {
+          const percent = Math.round((event.loaded * 100) / event.total);
+          onProgress(percent);
         }
-      );
+      },
+    });
 
-      // Adjust these keys if your API returns different names
-      return {
-        id: response.data.data?.id || Date.now().toString(),
-        url: response.data.data?.url || "",
-      };
-    } catch (error: any) {
-      console.log(error, "error");
-      throw new Error("Upload failed");
-    }
+    return {
+      id: response.data.data?.id ?? Date.now().toString(),
+      url: response.data.data?.url ?? "",
+    };
   };
-  // const handleDeleteFile = async (fileId: string) => {
-  //   console.log("in delete file", fileId);
 
-  //   try {
-  //     const response = await axios.post(
-  //       "https://exotrack.makuta.cash/api/V1/project/delete-file",
-  //       {
-  //         id: fileId,
-  //       },
-  //       {
-  //         headers: {
-  //           VAuthorization: `Bearer ${userData?.token || ""}`,
-  //         },
-  //       }
-  //     );
-  //     return {
-  //       data: response.data,
-  //     };
-  //   } catch (error: any) {
-  //     console.log(error, "error");
-  //     throw new Error("Upload failed");
-  //   }
-  // };
+  const uploadMutation = useMutation({
+    mutationFn: fileUploadMutation,
+    onSuccess: (data) => {
+      toast.success("File uploaded successfully!");
+      console.log("Upload result:", data);
+    },
+    onError: (error: any) => {
+      toast.error("Failed to upload file.");
+    },
+  });
+
+  const handleUploadFile = async (file: any, onProgress: any) => {
+    console.log(file, "file");
+    const response = await uploadMutation.mutateAsync({ file, onProgress });
+    return response;
+  };
+
+  const removeFileMutation = useMutation({
+    mutationFn: async (id: any) => {
+      await projectService.removeFile(id);
+      return {status:true}
+    },
+    onSuccess: (data) => {
+      toast.success("File removed successfully!");      
+    },
+    onError: (error: any) => {
+      toast.error("Failed to remove file.");
+    },
+  });
+  
+  const handleDeleteFile = async (fileId:string)=>{
+    const response = await removeFileMutation.mutateAsync(fileId);
+    if (response.status) {
+      const filteredFiles = projectData.files.filter((file:any)=>file.id!==fileId)
+      updateProjectData({ files: filteredFiles });
+      return {status:true}
+    }
+  }
+  
   return (
     <div>
       <div className="mb-6">
@@ -622,7 +641,7 @@ const ProjectInfoForm = ({
             onFilesSelect={handleFilesSelect}
             files={projectData.files}
             onUploadFile={handleUploadFile}
-            // onDeleteFile={handleDeleteFile}
+            onDeleteFile={handleDeleteFile}
           />
         </div>
       </div>

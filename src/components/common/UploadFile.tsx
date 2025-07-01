@@ -11,7 +11,7 @@ interface FileUploadProps {
     file: File,
     onProgress: (percent: number) => void
   ) => Promise<{ id: string; url: string }>;
-  onDeleteFile?: (fileId: string) => Promise<void>;
+  onDeleteFile?: (fileId: string) => Promise<any>;
   maxSize?: number; // in MB
   acceptedFormats?: string[];
   maxFiles?: number;
@@ -25,6 +25,7 @@ const UploadFile: React.FC<FileUploadProps> = ({
   acceptedFormats = [".pdf", ".doc", ".docx", ".txt", ".png"],
   maxFiles = 5,
   files,
+  onDeleteFile
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<UploadedFile[]>([]);
@@ -33,6 +34,7 @@ const UploadFile: React.FC<FileUploadProps> = ({
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
     {}
   );
+  const [removingFile, setRemovingFile] = useState<boolean>(false);
 
   useEffect(() => {
     if (files) setSelectedFiles(files);
@@ -116,6 +118,14 @@ const UploadFile: React.FC<FileUploadProps> = ({
     inputRef.current?.click();
   };
 
+  const removeFile = async (data: any) => {
+    setRemovingFile(true)
+    const response=await onDeleteFile?.(data.id)
+    if(response.status){
+      setRemovingFile(false)
+    }
+  };
+
   return (
     <div className="w-full">
       <div
@@ -132,8 +142,7 @@ const UploadFile: React.FC<FileUploadProps> = ({
           e.preventDefault();
         }}
         onDrop={handleDrop}
-        onClick={handleBoxClick}
-      >
+        onClick={handleBoxClick}>
         <input
           ref={inputRef}
           type="file"
@@ -149,8 +158,7 @@ const UploadFile: React.FC<FileUploadProps> = ({
           fill="none"
           stroke="#94a3b8"
           xmlns="http://www.w3.org/2000/svg"
-          className="mb-4"
-        >
+          className="mb-4">
           <path
             d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"
             stroke="currentColor"
@@ -270,12 +278,13 @@ const UploadFile: React.FC<FileUploadProps> = ({
                     </p>
                   </div>
                 </div>
-                {/* <button
+                <button
                   onClick={async (e) => {
                     e.stopPropagation();
                     await removeFile(file);
                   }}
-                  className="text-red-500 hover:text-red-600 rounded-full p-1 hover:bg-red-50"
+                  className="text-red-500 hover:text-red-600 rounded-full p-1 hover:bg-red-50 disabled:text-red-400"
+                  disabled={removingFile}
                 >
                   <svg
                     width="20"
@@ -298,66 +307,63 @@ const UploadFile: React.FC<FileUploadProps> = ({
                       strokeLinecap="round"
                     />
                   </svg>
-                </button> */}
+                </button>
               </div>
             ))}
-          {Array.from(uploadingFiles).map((fileName, index) => {
-            const file = selectedFiles.find((f) => f.file.name === fileName);
-            const progress = uploadProgress[fileName] || 0;
-            return (
-              file && (
-                <div
-                  key={`uploading-${index}`}
-                  className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
-                >
-                  <div className="flex items-center flex-grow">
-                    <div className="flex-grow mr-4">
-                      <p className="text-sm font-medium text-gray-800">
-                        {t("uploading")} {file.file.name}...
-                      </p>
-                      <div className="w-full h-[6px] bg-blue-100 rounded-full mt-1">
-                        <div
-                          className="h-full bg-blue-600 rounded-full transition-all duration-200"
-                          style={{ width: `${progress}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* <button
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      await removeFile(file);
-                    }}
-                    className="text-red-500 hover:text-red-600 rounded-full p-1 hover:bg-red-50 flex-shrink-0"
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="9"
-                        fill="currentColor"
-                        fillOpacity="0.1"
-                      />
-                      <path
-                        d="M16 8L8 16M8 8L16 16"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button> */}
-                </div>
-              )
-            );
-          })}
         </div>
       )}
+      {[...uploadingFiles].length > 0 &&
+        [...uploadingFiles].map((fileName, index) => {
+          const file = fileName;
+          const progress = uploadProgress[fileName] || 0;
+          return (
+            file && (
+              <div
+                key={`uploading-${index}`}
+                className="flex items-center justify-between mt-4 p-3 bg-white border border-gray-200 rounded-lg">
+                <div className="flex items-center flex-grow">
+                  <div className="flex-grow mr-4">
+                    <p className="text-sm font-medium text-gray-800">
+                      {t("uploading")} {file}...
+                    </p>
+                    <div className="w-full h-[6px] bg-blue-100 rounded-full mt-1">
+                      <div
+                        className="h-full bg-blue-600 rounded-full transition-all duration-200"
+                        style={{ width: `${progress}%` }}></div>
+                    </div>
+                  </div>
+                </div>
+                {/* <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    // await removeFile(file);
+                  }}
+                  className="text-red-500 hover:text-red-600 rounded-full p-1 hover:bg-red-50 flex-shrink-0">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="9"
+                      fill="currentColor"
+                      fillOpacity="0.1"
+                    />
+                    <path
+                      d="M16 8L8 16M8 8L16 16"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button> */}
+              </div>
+            )
+          );
+        })}
     </div>
   );
 };
