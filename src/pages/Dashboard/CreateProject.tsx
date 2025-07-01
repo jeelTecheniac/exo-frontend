@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Typography from "../../lib/components/atoms/Typography";
 import Stepper from "../../components/common/Stepper";
 import ProjectInfoForm from "../../components/dashboard/ProjectInfoForm";
@@ -14,7 +14,6 @@ import CreateProjectConfirmationModal from "../../components/modal/CreateProject
 import { useModal } from "../../hooks/useModal";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
-import localStorageService from "../../services/local.service";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
 import { toast } from "react-toastify";
@@ -112,11 +111,6 @@ const CreateProject = () => {
     { id: 2, title: "Contract Info" },
     { id: 3, title: "Review" },
   ];
-  const [userData, setUserData] = useState<UserData | undefined>();
-  useEffect(() => {
-    const user = localStorageService.getUser() || "";
-    setUserData(JSON.parse(user));
-  }, []);
 
   const { isOpen, openModal, closeModal } = useModal();
 
@@ -224,8 +218,8 @@ const CreateProject = () => {
     mutationFn: async (data: any) => {
       return await projectService.createProject(data);
     },
-    onSuccess: (res) => {
-      openModal();          
+    onSuccess: () => {
+      openModal();
     },
     onError: (error) => {
       console.error("Error during project creation:", error);

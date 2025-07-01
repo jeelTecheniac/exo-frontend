@@ -180,5 +180,9 @@
   "login_successful": "Login successful!",
   "email_is_not_registered": "Email is not registered",
   "password_reset_successful": "Password reset successful!",
-  "loading_user_information": "Loading user information..."
+  "loading_user_information": "Loading user information...",
+  "select_address": "Select Address",
+  "loading": "loading....",
+  "file_uploaded_successfully": "File uploaded successfully!",
+  "request_created": "Request Created"
 }
