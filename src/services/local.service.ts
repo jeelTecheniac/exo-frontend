@@ -6,6 +6,7 @@ class LocalStorageService {
   LANGUAGE = "language";
   LANGUAGE_PREVIEW_URL = "imagePreviewUrl";
   CLIENT_VIEW = "clientView";
+  PROJECT_ID = "projectId";
 
   getLanguage() {
     if (typeof window !== "undefined" && window.localStorage) {
@@ -96,6 +97,16 @@ class LocalStorageService {
     if (window) {
       localStorage.removeItem(this.CLIENT_VIEW);
     }
+  }
+  setProjectId(data: boolean) {
+    const stringData = JSON.stringify(data);
+    localStorage.setItem(this.PROJECT_ID, stringData);
+  }
+  getProjectId() {
+    return localStorage.getItem(this.PROJECT_ID);
+  }
+  removeProjectId() {
+    localStorage.removeItem(this.PROJECT_ID);
   }
 }
 

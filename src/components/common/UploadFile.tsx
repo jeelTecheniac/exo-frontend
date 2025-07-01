@@ -1,7 +1,7 @@
 import { t } from "i18next";
 import { useState, useRef, useEffect } from "react";
 export interface UploadedFile {
-  file: File;
+  file: File | undefined;
   id: string;
   url: string;
 }
@@ -25,7 +25,7 @@ const UploadFile: React.FC<FileUploadProps> = ({
   acceptedFormats = [".pdf", ".doc", ".docx", ".txt", ".png"],
   maxFiles = 5,
   files,
-  onDeleteFile
+  onDeleteFile,
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<UploadedFile[]>([]);
@@ -119,10 +119,10 @@ const UploadFile: React.FC<FileUploadProps> = ({
   };
 
   const removeFile = async (data: any) => {
-    setRemovingFile(true)
-    const response=await onDeleteFile?.(data.id)
-    if(response.status){
-      setRemovingFile(false)
+    setRemovingFile(true);
+    const response = await onDeleteFile?.(data.id);
+    if (response.status) {
+      setRemovingFile(false);
     }
   };
 
@@ -142,7 +142,8 @@ const UploadFile: React.FC<FileUploadProps> = ({
           e.preventDefault();
         }}
         onDrop={handleDrop}
-        onClick={handleBoxClick}>
+        onClick={handleBoxClick}
+      >
         <input
           ref={inputRef}
           type="file"
@@ -158,7 +159,8 @@ const UploadFile: React.FC<FileUploadProps> = ({
           fill="none"
           stroke="#94a3b8"
           xmlns="http://www.w3.org/2000/svg"
-          className="mb-4">
+          className="mb-4"
+        >
           <path
             d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"
             stroke="currentColor"
@@ -208,7 +210,7 @@ const UploadFile: React.FC<FileUploadProps> = ({
       {selectedFiles.length > 0 && (
         <div className="mt-4 space-y-2">
           {selectedFiles
-            .filter((file) => !uploadingFiles.has(file.file.name))
+            .filter((file) => file.file && !uploadingFiles.has(file.file.name))
             .map((file, index) => (
               <div
                 key={index}
@@ -271,10 +273,11 @@ const UploadFile: React.FC<FileUploadProps> = ({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-800">
-                      {file.file.name}
+                      {file.file && file.file.name}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {(file.file.size / (1024 * 1024)).toFixed(2)}MB
+                      {file.file && (file.file.size / (1024 * 1024)).toFixed(2)}
+                      MB
                     </p>
                   </div>
                 </div>
@@ -320,7 +323,8 @@ const UploadFile: React.FC<FileUploadProps> = ({
             file && (
               <div
                 key={`uploading-${index}`}
-                className="flex items-center justify-between mt-4 p-3 bg-white border border-gray-200 rounded-lg">
+                className="flex items-center justify-between mt-4 p-3 bg-white border border-gray-200 rounded-lg"
+              >
                 <div className="flex items-center flex-grow">
                   <div className="flex-grow mr-4">
                     <p className="text-sm font-medium text-gray-800">
@@ -329,7 +333,8 @@ const UploadFile: React.FC<FileUploadProps> = ({
                     <div className="w-full h-[6px] bg-blue-100 rounded-full mt-1">
                       <div
                         className="h-full bg-blue-600 rounded-full transition-all duration-200"
-                        style={{ width: `${progress}%` }}></div>
+                        style={{ width: `${progress}%` }}
+                      ></div>
                     </div>
                   </div>
                 </div>
