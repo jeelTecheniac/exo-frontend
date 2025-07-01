@@ -6,8 +6,10 @@ import DatePicker from "../../lib/components/atoms/DatePicker";
 import UploadFile, { UploadedFile } from "../common/UploadFile";
 import { useTranslation } from "react-i18next";
 import localStorageService from "../../services/local.service";
-import axios from "axios";
 import { UserData } from "../../pages/Dashboard/CreateProject";
+import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
+import projectService from "../../services/project.service";
 
 interface ContactInfoFormProps {
   projectData: any;
@@ -30,6 +32,15 @@ interface ValidationErrors {
   signingDate?: string;
 }
 
+interface UploadResponse {
+  id: string;
+  url: string;
+}
+
+interface UploadArgs {
+  file: File;
+  onProgress: (percent: number) => void;
+}
 const ContactInfoForm = ({
   projectData,
   updateProjectData,
@@ -185,42 +196,70 @@ const ContactInfoForm = ({
     );
   };
 
-  const handleUploadFile = async (file: any, onProgress: any) => {
+  const fileUploadMutation = async ({
+    file,
+    onProgress,
+  }: UploadArgs): Promise<UploadResponse> => {
+    console.log("Inside mutation file:", file);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("type", "document");
     formData.append("object_type", "project");
 
-    try {
-      const response = await axios.post(
-        "https://exotrack.makuta.cash/api/V1/project/upload-file",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            VAuthorization: `Bearer ${userData?.token || ""}`,
-          },
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const percent = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              onProgress(percent);
-            }
-          },
+    const response = await projectService.uploadFile(formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress: (event: ProgressEvent) => {
+        if (event.total) {
+          const percent = Math.round((event.loaded * 100) / event.total);
+          onProgress(percent);
         }
-      );
+      },
+    });
 
-      // Adjust these keys if your API returns different names
-      return {
-        id: response.data.data?.id || Date.now().toString(),
-        url: response.data.data?.url || "",
-      };
-    } catch (error: any) {
-      console.log(error, "error");
-      throw new Error("Upload failed");
-    }
+    return {
+      id: response.data.data?.id ?? Date.now().toString(),
+      url: response.data.data?.url ?? "",
+    };
   };
+
+  const uploadMutation = useMutation({
+    mutationFn: fileUploadMutation,
+    onSuccess: (data) => {
+      toast.success("File uploaded successfully!");
+    },
+    onError: (error: any) => {
+      toast.error("Failed to upload file.");
+    },
+  });
+
+  const handleUploadFile = async (file: any, onProgress: any) => {
+    const response = await uploadMutation.mutateAsync({ file, onProgress });
+    return response;
+  };
+
+    const removeFileMutation = useMutation({
+    mutationFn: async (id: any) => {
+      await projectService.removeFile(id);
+      return {status:true}
+    },
+    onSuccess: (data) => {
+      toast.success("File removed successfully!");
+      
+    },
+    onError: (error: any) => {
+      toast.error("Failed to remove file.");
+    },
+  });
+  console.log(projectData)
+  const handleDeleteFile = async (fileId:string)=>{
+    const response = await removeFileMutation.mutateAsync(fileId);
+    if (response.status) {
+      const filteredFiles = projectData.contractFiles.filter((file:any)=>file.id!==fileId)
+      updateProjectData({ contractFiles: filteredFiles });
+    }
+  }
 
   return (
     <div>
@@ -388,6 +427,7 @@ const ContactInfoForm = ({
             onFilesSelect={handleFilesSelect}
             files={projectData.contractFiles}
             onUploadFile={handleUploadFile}
+            onDeleteFile={handleDeleteFile}
           />
         </div>
       </div>
