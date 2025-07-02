@@ -9,8 +9,7 @@ import UploadFile, { UploadedFile } from "../common/UploadFile";
 import { TrashIcon } from "../../icons";
 import { USFlag, CDFFlag } from "../../icons";
 import { useTranslation } from "react-i18next";
-import localStorageService from "../../services/local.service";
-import { UserData } from "../../pages/Dashboard/CreateProject";
+
 import projectService from "../../services/project.service";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -49,12 +48,12 @@ interface ValidationErrors {
   endDate?: string;
 }
 
-interface UploadResponse {
+export interface UploadResponse {
   id: string;
   url: string;
 }
 
-interface UploadArgs {
+export interface UploadArgs {
   file: File;
   onProgress: (percent: number) => void;
 }
@@ -98,11 +97,6 @@ const ProjectInfoForm = ({
     addressId: 0,
     field: null,
   });
-  const [userData, setUserData] = useState<UserData | undefined>();
-  useEffect(() => {
-    const user = localStorageService.getUser() || "";
-    setUserData(JSON.parse(user));
-  }, []);
 
   const currencyOptions = [
     {
@@ -283,7 +277,6 @@ const ProjectInfoForm = ({
     );
   };
 
-
   const fileUploadMutation = async ({
     file,
     onProgress,
@@ -318,13 +311,12 @@ const ProjectInfoForm = ({
       toast.success("File uploaded successfully!");
       console.log("Upload result:", data);
     },
-    onError: (error: any) => {
+    onError: () => {
       toast.error("Failed to upload file.");
     },
   });
 
   const handleUploadFile = async (file: any, onProgress: any) => {
-    console.log(file, "file");
     const response = await uploadMutation.mutateAsync({ file, onProgress });
     return response;
   };
@@ -332,25 +324,27 @@ const ProjectInfoForm = ({
   const removeFileMutation = useMutation({
     mutationFn: async (id: any) => {
       await projectService.removeFile(id);
-      return {status:true}
+      return { status: true };
     },
-    onSuccess: (data) => {
-      toast.success("File removed successfully!");      
+    onSuccess: () => {
+      toast.success("File removed successfully!");
     },
-    onError: (error: any) => {
+    onError: () => {
       toast.error("Failed to remove file.");
     },
   });
-  
-  const handleDeleteFile = async (fileId:string)=>{
+
+  const handleDeleteFile = async (fileId: string) => {
     const response = await removeFileMutation.mutateAsync(fileId);
     if (response.status) {
-      const filteredFiles = projectData.files.filter((file:any)=>file.id!==fileId)
+      const filteredFiles = projectData.files.filter(
+        (file: any) => file.id !== fileId
+      );
       updateProjectData({ files: filteredFiles });
-      return {status:true}
+      return { status: true };
     }
-  }
-  
+  };
+
   return (
     <div>
       <div className="mb-6">

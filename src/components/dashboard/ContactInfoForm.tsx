@@ -5,8 +5,7 @@ import Label from "../../lib/components/atoms/Label";
 import DatePicker from "../../lib/components/atoms/DatePicker";
 import UploadFile, { UploadedFile } from "../common/UploadFile";
 import { useTranslation } from "react-i18next";
-import localStorageService from "../../services/local.service";
-import { UserData } from "../../pages/Dashboard/CreateProject";
+
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
@@ -57,11 +56,6 @@ const ContactInfoForm = ({
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const { t } = useTranslation();
-  const [userData, setUserData] = useState<UserData | undefined>();
-  useEffect(() => {
-    const user = localStorageService.getUser() || "";
-    setUserData(JSON.parse(user));
-  }, []);
 
   const positions = [
     "Project Manager",
@@ -226,10 +220,10 @@ const ContactInfoForm = ({
 
   const uploadMutation = useMutation({
     mutationFn: fileUploadMutation,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("File uploaded successfully!");
     },
-    onError: (error: any) => {
+    onError: () => {
       toast.error("Failed to upload file.");
     },
   });
@@ -239,27 +233,28 @@ const ContactInfoForm = ({
     return response;
   };
 
-    const removeFileMutation = useMutation({
+  const removeFileMutation = useMutation({
     mutationFn: async (id: any) => {
       await projectService.removeFile(id);
-      return {status:true}
+      return { status: true };
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("File removed successfully!");
-      
     },
-    onError: (error: any) => {
+    onError: () => {
       toast.error("Failed to remove file.");
     },
   });
-  console.log(projectData)
-  const handleDeleteFile = async (fileId:string)=>{
+  console.log(projectData);
+  const handleDeleteFile = async (fileId: string) => {
     const response = await removeFileMutation.mutateAsync(fileId);
     if (response.status) {
-      const filteredFiles = projectData.contractFiles.filter((file:any)=>file.id!==fileId)
+      const filteredFiles = projectData.contractFiles.filter(
+        (file: any) => file.id !== fileId
+      );
       updateProjectData({ contractFiles: filteredFiles });
     }
-  }
+  };
 
   return (
     <div>

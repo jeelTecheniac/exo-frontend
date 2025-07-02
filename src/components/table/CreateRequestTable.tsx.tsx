@@ -393,7 +393,7 @@ const CreateRequestTable = ({
   ];
 
   return (
-    <div className="relative rounded-lg border border-secondary-30 bg-white ">
+    <div className="relative rounded-lg border border-secondary-30 bg-white">
       <div className="relative">
         <Table>
           <TableHeader className="border-b border-gray-100 bg-secondary-10 rounded-lg">

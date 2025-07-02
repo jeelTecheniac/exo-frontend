@@ -176,5 +176,9 @@
   "password_reset_successful": "Réinitialisation du mot de passe réussie !",
   "loading_user_information": "Loading user information...",
   "email_updated_successfully": "E-mail mis à jour avec succès",
-  "email_update_error": "Erreur lors de la mise à jour de l'e-mail"
+  "email_update_error": "Erreur lors de la mise à jour de l'e-mail",
+  "select_address": "Select Address",
+  "loading": "loading....",
+  "file_uploaded_successfully": "File uploaded successfully!",
+  "request_created": "Request Created"
 }

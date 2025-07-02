@@ -5,8 +5,7 @@ import Label from "../lib/components/atoms/Label";
 import Password from "../lib/components/atoms/Password";
 import Typography from "../lib/components/atoms/Typography";
 import Button from "../lib/components/atoms/Button";
-import TextDivider from "../lib/components/atoms/TextDivider";
-import { AppleLogo, GoogleLogo } from "../icons";
+
 import PhoneInput from "../lib/components/atoms/PhoneInput";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";

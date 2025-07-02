@@ -182,5 +182,9 @@
   "password_reset_successful": "Password reset successful!",
   "loading_user_information": "Loading user information...",
   "email_updated_successfully":"Email updated successfully",
-  "email_update_error":"Error during Email update"
+  "email_update_error":"Error during Email update",
+  "select_address": "Select Address",
+  "loading": "loading....",
+  "file_uploaded_successfully": "File uploaded successfully!",
+  "request_created": "Request Created"
 }
