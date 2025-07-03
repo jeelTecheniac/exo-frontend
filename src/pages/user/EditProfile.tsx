@@ -117,7 +117,7 @@ const EditProfile = () => {
             <Security userData={profile && profile.data} />
           )}
         </div>
-        <LogoutModal isOpen={isOpenLogoutModal} onClose={closeLogoutModal} />
+        <LogoutModal isOpen={isOpenLogoutModal} onClose={closeLogoutModal} userData={userData} />
       </div>
     </AppLayout>
   );

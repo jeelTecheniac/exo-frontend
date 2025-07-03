@@ -84,12 +84,12 @@ const Security = ({userData}:UserInformationProps) => {
       console.log("Email updated successfully:", res);
       setChangeEmailFields(initialChangeEmailFields)
       // Add success notification here
-      toast.success(t("email_updated_successfully"));
+      // toast.success(t("email_updated_successfully"));
     },
     onError: (error) => {
       console.error("Error during Email update:", error);
       // Add error notification here
-      toast.error(t("email_update_error"));
+      // toast.error(t("email_update_error"));
     },
   });
   const verifyOTP=async()=>{
