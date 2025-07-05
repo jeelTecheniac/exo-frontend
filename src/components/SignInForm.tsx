@@ -18,6 +18,7 @@ import localStorageService from "../services/local.service";
 const SignInForm = () => {
   const navigate = useNavigate();
   const [remember, setRemember] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const { t } = useTranslation();
   const [passwordStrength, setPasswordStrength] = useState<
     "week" | "acceptable" | "strong" | ""
@@ -25,17 +26,22 @@ const SignInForm = () => {
 
   const signInMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await authService.signIn(data);
+      setLoading(true)
+      const res= await authService.signIn(data);
+      setLoading(false);
+      return res
     },
     onSuccess: (res) => {
       localStorageService.setUser(JSON.stringify(res.data.data));
       localStorageService.setAccessToken(JSON.stringify(res.data.data.token));
-      toast.success(t("login_successful"));
-      navigate("/");
+      // toast.success(t("login_successful"));
+      setLoading(false);
+      navigate("/list-project");
     },
     onError: (error) => {
+      setLoading(false);
       console.error("Error during sign in:", error);
-      return toast.error(t("sign_in_error"));
+      // return toast.error(t("sign_in_error"));
     },
   });
 
@@ -183,6 +189,7 @@ const SignInForm = () => {
             className="py-3 mt-4"
             type="submit"
             disable={!formik.isValid}
+            loading={loading}
           >
             {t("login")}
           </Button>

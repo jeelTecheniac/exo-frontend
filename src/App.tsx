@@ -28,16 +28,18 @@ export default function App() {
           <ToastContainer className="z-100" />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/edit-project/:projectId" element={<Home />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/otp-verification" element={<OtpVerification />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/edit-profile" element={<EditProfile />} />
-            <Route path="/add-request" element={<AddRequest />} />
-            <Route path="/list-record" element={<ListDashBoard />} />
-            <Route path="/project-details" element={<ProjectDetails />} />
-            <Route path="/request-details" element={<TestRequestDetails />} />
+            <Route path="/add-request/:projectId" element={<AddRequest />} />
+            <Route path="/edit-request/:requestId" element={<AddRequest />} />
+            <Route path="/list-project" element={<ListDashBoard />} />
+            <Route path="/project-details/:projectId" element={<ProjectDetails />} />
+            <Route path="/request-details/:requestId" element={<TestRequestDetails />} />
             <Route path="/filter-data" element={<TestFilterData />} />
 
             <Route path="/help" element={<Help />} />

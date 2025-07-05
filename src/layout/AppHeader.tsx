@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useSidebar } from "../context/SidebarContext";
 import NotificationDropdown from "../components/header/NotificationDropdown";
 import { Logo } from "../icons";
@@ -11,6 +11,9 @@ import { useTranslation } from "react-i18next";
 
 const AppHeader: React.FC = () => {
   const { t } = useTranslation();
+  const navigate=useNavigate()
+  const {pathname}=useLocation();
+  
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, toggleMobileSidebar } = useSidebar();
@@ -48,13 +51,15 @@ const AppHeader: React.FC = () => {
           <div className="lg:flex gap-4 hidden">
             <Button
               variant="outline"
-              className="border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 hover:text-primary-150 hover:bg-primary-10 rounded-lg"
+              className={`border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 ${pathname==='/list-project'?"hover:bg-primary-10":"hover:text-primary-150"} hover:bg-primary-10 rounded-lg`}
+              onClick={()=>navigate("/list-project")}
             >
               {t("dashboard")}
             </Button>
             <Button
               variant="outline"
-              className="border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 hover:text-primary-150 hover:bg-primary-10 rounded-lg"
+              className={`border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 hover:text-primary-150 hover:bg-primary-10 rounded-lg`}
+              onClick={()=>navigate("/help")}
             >
               {t("help")}
             </Button>

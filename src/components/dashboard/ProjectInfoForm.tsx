@@ -24,6 +24,7 @@ interface ProjectInfoFormProps {
     amount: boolean;
     beginDate: boolean;
     endDate: boolean;
+    financeBy?: boolean;
   };
 }
 
@@ -46,6 +47,7 @@ interface ValidationErrors {
   amount?: string;
   beginDate?: string;
   endDate?: string;
+  financeBy?:string
 }
 
 export interface UploadResponse {
@@ -64,6 +66,7 @@ const ProjectInfoForm = ({
   highlightErrors = false,
   fieldErrors = {
     projectName: false,
+    financeBy:false,
     projectReference: false,
     amount: false,
     beginDate: false,
@@ -124,6 +127,7 @@ const ProjectInfoForm = ({
         amount: true,
         beginDate: true,
         endDate: true,
+        financeBy:true
       });
 
       validate("projectName", projectData.projectName || "");
@@ -131,6 +135,7 @@ const ProjectInfoForm = ({
       validate("amount", projectData.amount || "");
       validate("beginDate", projectData.beginDate || "");
       validate("endDate", projectData.endDate || "");
+      validate("financeBy", projectData.financeBy || "");
     }
   }, [highlightErrors]);
 
@@ -142,6 +147,13 @@ const ProjectInfoForm = ({
         newErrors.projectName = `${t("project_name_is_required")}`;
       } else {
         delete newErrors.projectName;
+      }
+    }
+    if (name === "financeBy") {
+      if (!value.trim()) {
+        newErrors.financeBy = `${t("finance_by_is_required")}`;
+      } else {
+        delete newErrors.financeBy;
       }
     }
 
@@ -308,11 +320,11 @@ const ProjectInfoForm = ({
   const uploadMutation = useMutation({
     mutationFn: fileUploadMutation,
     onSuccess: (data) => {
-      toast.success("File uploaded successfully!");
+      // toast.success("File uploaded successfully!");
       console.log("Upload result:", data);
     },
     onError: () => {
-      toast.error("Failed to upload file.");
+      // toast.error("Failed to upload file.");
     },
   });
 
@@ -327,10 +339,10 @@ const ProjectInfoForm = ({
       return { status: true };
     },
     onSuccess: () => {
-      toast.success("File removed successfully!");
+      // toast.success("File removed successfully!");
     },
     onError: () => {
-      toast.error("Failed to remove file.");
+      // toast.error("Failed to remove file.");
     },
   });
 
@@ -349,7 +361,7 @@ const ProjectInfoForm = ({
     <div>
       <div className="mb-6">
         <Typography size="lg" weight="semibold" className="text-secondary-100">
-          {t("project_info")}
+          {t("call_for_tenders")}
         </Typography>
         <Typography size="base" weight="normal" className="text-secondary-60">
           {t("enter_key_details_about_your_project_to_continue")}
@@ -373,6 +385,25 @@ const ProjectInfoForm = ({
           {shouldShowError("projectName") && (
             <p className="mt-1 text-sm text-red-500">
               {errors.projectName || t("project_name_is_required")}
+            </p>
+          )}
+        </div>
+        <div>
+          <Label htmlFor="financeBy">
+            {t("finance_by")} <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="financeBy"
+            name="financeBy"
+            placeholder={t("finance_by")}
+            value={projectData.financeBy}
+            onChange={handleInputChange}
+            onBlur={() => handleBlur("financeBy")}
+            error={shouldShowError("financeBy")}
+          />
+          {shouldShowError("financeBy") && (
+            <p className="mt-1 text-sm text-red-500">
+              {errors.financeBy || t("finance_by_is_required")}
             </p>
           )}
         </div>
@@ -426,7 +457,7 @@ const ProjectInfoForm = ({
             </Label>
             <DatePicker
               id="beginDate"
-              defaultDate={projectData.beginDate}
+              defaultDate={new Date(projectData.beginDate)}
               onChange={(selectedDates: Date[]) =>
                 handleDateChange("beginDate", selectedDates[0])
               }
@@ -450,7 +481,7 @@ const ProjectInfoForm = ({
             </Label>
             <DatePicker
               id="endDate"
-              defaultDate={projectData.endDate}
+              defaultDate={new Date(projectData.endDate)}
               onChange={(selectedDates: Date[]) =>
                 handleDateChange("endDate", selectedDates[0])
               }

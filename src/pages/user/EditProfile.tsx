@@ -17,9 +17,9 @@ import Security from "../../components/user/Security";
 import LogoutModal from "../../components/modal/LogoutModal";
 import { useModal } from "../../hooks/useModal";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { UserData } from "../Dashboard/CreateProject";
 import localStorageService from "../../services/local.service";
+import authService from "../../services/auth.service";
 
 const EditProfile = () => {
   const { t } = useTranslation();
@@ -43,14 +43,7 @@ const EditProfile = () => {
     queryKey: ["userProfile", userData?.token],
     enabled: isTokenAvailable,
     queryFn: async () => {
-      const res = await axios.get(
-        "https://exotrack.makuta.cash/api/V1/profile",
-        {
-          headers: {
-            VAuthorization: `Bearer ${userData?.token || ""}`,
-          },
-        }
-      );
+      const res = await authService.getProfile()
       return res.data;
     },
   });
@@ -72,8 +65,8 @@ const EditProfile = () => {
             {t("edit_profile")}
           </Typography>
           <ProfileHeader
-            email="pratik@mailinator.com"
-            name="Pratik Patel"
+            email={profile&&profile.data.email||""}
+            name={profile&&`${profile.data.first_name} ${profile.data.last_name}`||""}
             imageUrl="/images/user/thubmnail.png"
           />
         </div>
@@ -121,10 +114,10 @@ const EditProfile = () => {
           {isActiveButton === "info" ? (
             <UserInformation userData={profile && profile.data} />
           ) : (
-            <Security />
+            <Security userData={profile && profile.data} />
           )}
         </div>
-        <LogoutModal isOpen={isOpenLogoutModal} onClose={closeLogoutModal} />
+        <LogoutModal isOpen={isOpenLogoutModal} onClose={closeLogoutModal} userData={userData} />
       </div>
     </AppLayout>
   );

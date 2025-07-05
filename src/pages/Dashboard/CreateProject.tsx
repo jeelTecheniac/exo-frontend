@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Typography from "../../lib/components/atoms/Typography";
 import Stepper from "../../components/common/Stepper";
 import ProjectInfoForm from "../../components/dashboard/ProjectInfoForm";
@@ -17,6 +17,8 @@ import moment from "moment";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
 import { toast } from "react-toastify";
+import localStorageService from "../../services/local.service";
+import { useParams } from "react-router";
 
 export interface UserData {
   id: number;
@@ -47,6 +49,7 @@ interface ProjectData {
   phone: string;
   signingDate: string;
   contractFiles: any[];
+  financeBy:string
 }
 
 interface FieldValidation {
@@ -103,11 +106,15 @@ const CreateProject = () => {
     company: "",
     phone: "",
     signingDate: "",
+    financeBy:"",
     contractFiles: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [newProjectId,setNewProjectId]=useState("")
+  const { projectId } = useParams();
 
   const steps = [
-    { id: 1, title: "Project Info" },
+    { id: 1, title: t("call_for_tenders") },
     { id: 2, title: "Contract Info" },
     { id: 3, title: "Review" },
   ];
@@ -218,12 +225,14 @@ const CreateProject = () => {
     mutationFn: async (data: any) => {
       return await projectService.createProject(data);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       openModal();
+      localStorageService.setProjectId(data.data.data.id);
+      setNewProjectId(data.data.data.id)
     },
     onError: (error) => {
       console.error("Error during project creation:", error);
-      return toast.error("Failed to create project.");
+      // return toast.error("Failed to create project.");
     },
   });
 
@@ -242,7 +251,7 @@ const CreateProject = () => {
         moment(projectData.endDate, "DD-MM-YYYY").format("YYYY-MM-DD") || "",
       description: projectData.description || "",
       signed_by: projectData.contactName || "",
-      finance_by: "Bank",
+      finance_by: projectData.financeBy||"",
       position: projectData.position || "",
       organization: projectData.company || "",
       place: "Testing",
@@ -260,10 +269,64 @@ const CreateProject = () => {
         ) || [],
       status: "publish",
       document_ids: [...filesId, ...contractFilesID].join(","),
-    };
+      ...({project_id:projectId})
+    };    
     createProjectMutation.mutate(data);
   };
 
+   const fetchProject = async (projectId: string) => {
+     setLoading(true);
+     try {
+       const data = await projectService.getProjectDetails(projectId);       
+       const {
+         name,
+         reference,
+         amount,
+         currency,
+         begin_date,
+         end_date,
+         description,
+         address,
+         date_of_signing,
+         organization,
+         project_name,
+         finance_by,
+       } = data;
+       setProjectData({
+         projectName: project_name || "",
+         projectReference: reference,
+         amount: amount,
+         currency: currency,
+         beginDate: begin_date,
+         endDate: end_date,
+         description: description,
+         addresses: address,
+         files: [],
+         contactName: name,
+         position: "",
+         company: organization,
+         phone: "",
+         financeBy: finance_by,
+         signingDate: date_of_signing,
+         contractFiles: [],
+       });
+     } catch (err: any) {
+       console.error(err);
+     } finally {
+       setLoading(false);
+     }
+   };
+
+   useEffect(() => {
+     if (projectId) {
+       console.log(projectId, "editProjectData");
+       setIsOpenStepperForm(true);
+       fetchProject(projectId);
+     } else {
+       setLoading(false);
+     }
+   }, [projectId]);
+   if (loading) return <>loading...</>;
   return (
     <div className="bg-secondary-5 h-full p-4 md:p-6">
       <div className="max-w-[900px] mx-auto">
@@ -357,7 +420,7 @@ const CreateProject = () => {
           </div>
         )}
       </div>
-      <CreateProjectConfirmationModal isOpen={isOpen} onClose={closeModal} />
+      <CreateProjectConfirmationModal isOpen={isOpen} onClose={closeModal} projectId={newProjectId}/>
     </div>
   );
 };

@@ -82,6 +82,11 @@ export interface Order {
   taxAmount: number;
   vatIncluded: number;
   financialAuthority: string;
+  unit_price?:number;
+  tax_rate?:number;
+  tax_amount?:number;
+  vat_included?:number;
+  financial_authority?:string
 }
 
 type SortOrder = "asc" | "desc" | null;
@@ -89,9 +94,13 @@ type SortOrder = "asc" | "desc" | null;
 const CreateRequestTable = ({
   data,
   onDataChange,
+  isEditable=true,
+  showActions=true,
 }: {
   data: Order[];
-  onDataChange?: (newData: Order[]) => void;
+  onDataChange?: (newData: Order[],) => void;
+  isEditable?:boolean
+  showActions?:boolean
 }) => {
   const [tableData, setTableData] = useState<Order[]>(data);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -386,15 +395,19 @@ const CreateRequestTable = ({
       content: <div>Financial Authority</div>,
       className: "min-w-[140px]",
     },
-    {
-      content: <div>Actions</div>,
-      className: "w-20",
-    },
+    ...(showActions
+      ? [
+          {
+            content: <div>Actions</div>,
+            className: "w-20",
+          },
+        ]
+      : []),
   ];
 
   return (
     <div className="relative rounded-lg border border-secondary-30 bg-white">
-      <div className="relative">
+      <div className="relative overflow-x-auto">
         <Table>
           <TableHeader className="border-b border-gray-100 bg-secondary-10 rounded-lg">
             <TableRow>
@@ -414,19 +427,19 @@ const CreateRequestTable = ({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100">
-            {tableData.map((order) => (
-              <TableRow key={order.id}>
+            {tableData.map((order,index) => (
+              <TableRow key={index}>
                 <TableCell className="px-5 py-4 w-10">
                   <input
                     type="checkbox"
-                    checked={selectedRows.includes(order.id)}
-                    onChange={() => handleSelectRow(order.id)}
+                    checked={selectedRows.includes(order.id||index+1)}
+                    onChange={() => handleSelectRow(order.id||index+1)}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    aria-label={`Select row ${order.id}`}
+                    aria-label={`Select row ${order.id||index+1}`}
                   />
                 </TableCell>
                 <TableCell className="px-5 py-4 text-gray-500 text-sm">
-                  {order.id}
+                  {order.id||index+1}
                 </TableCell>
                 <TableCell className="px-5 py-4 sm:px-6">
                   {editingId === order.id ? (
@@ -491,7 +504,7 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.unitPrice}
+                      {order.unitPrice || order.unit_price}
                     </span>
                   )}
                 </TableCell>
@@ -528,7 +541,7 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.taxRate}%
+                      {order.taxRate||order.tax_rate}%
                     </span>
                   )}
                 </TableCell>
@@ -545,7 +558,7 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.taxAmount}
+                      {order.taxAmount||order.tax_amount}
                     </span>
                   )}
                 </TableCell>
@@ -562,7 +575,7 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.vatIncluded}
+                      {order.vatIncluded||order.vat_included}
                     </span>
                   )}
                 </TableCell>
@@ -587,11 +600,11 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.financialAuthority}
+                      {order.financialAuthority||order.financial_authority}
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-sm">
+                {showActions&&<TableCell className="px-4 py-3 text-gray-500 text-sm">
                   {editingId === order.id ? (
                     <div className="flex items-center space-x-4">
                       <RightGreenIcon
@@ -666,7 +679,7 @@ const CreateRequestTable = ({
                       )}
                     </div>
                   )}
-                </TableCell>
+                </TableCell>}
               </TableRow>
             ))}
           </TableBody>
