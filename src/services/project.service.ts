@@ -37,6 +37,13 @@ class ProjectService extends ApiBaseService {
   async deleteRequest(requestIds:string){
     return await this.authorizedRequest.delete(ApiRoutes.DELETE_REQUEST,{data:{request_ids:requestIds}})
   }
+  async deleteProject(projectIds:string){
+    return await this.authorizedRequest.delete(ApiRoutes.DELETE_PROJECT,{data:{project_ids:projectIds}})
+  }
+  
+  async getAddressList(projectId:string){
+    return await this.authorizedRequest.post(ApiRoutes.ADDRESS_LIST,{project_id: projectId})
+  }
 
 }
 

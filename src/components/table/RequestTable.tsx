@@ -390,7 +390,7 @@ const RequestTable = ({
                                   e: React.MouseEvent<HTMLButtonElement>
                                 ) => {
                                   e.stopPropagation();
-                                  handleEdit(data);
+                                  navigate(`/edit-request/${data.request_id}`)
                                 }}
                                 className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                                 role="menuitem"

@@ -24,6 +24,8 @@ import localStorageService from "../../services/local.service";
 import { useParams } from "react-router";
 import RequestProgress from "../../components/dashboard/ProgressStep";
 import CommentData from "../../components/dashboard/CommentData";
+import { useModal } from "../../hooks/useModal";
+import RequestDetailModal from "../../components/modal/RequestDetailModal";
 interface UserData {
   id: number;
   first_name: string;
@@ -130,15 +132,17 @@ const TestRequestDetails = () => {
   const [userData, setUserData] = useState<UserData | undefined>();
   const [requestData,setRequestData]=useState<RequestDetails|null>(null)
   const [loading, setLoading] = useState(true);
+  const {isOpen:isOpenRequestDetails,closeModal:closeRequestDetails,openModal:openRequestDetails}=useModal();
 
   const { t, i18n } = useTranslation();
   const {requestId} = useParams();
 
   
-  const { data: _requestDetails } =
+  const { data: _requestDetails,isLoading:_requestLoading } =
     useQuery<any>({
       queryKey: [`project-${requestId}-address`],
       enabled: !!requestId && !!userData?.token,
+      refetchOnWindowFocus: false, 
       queryFn: async () => {
         setLoading(true)
         const res = await projectService.requestDetails({
@@ -211,7 +215,7 @@ const TestRequestDetails = () => {
                       className="text-secondary-100">
                       {t("request_details")}
                     </Typography>
-                    <Button variant="outline" className="px-4 py-2 w-fit">
+                    <Button variant="outline" className="px-4 py-2 w-fit" onClick={openRequestDetails}>
                       {t("view_more")}
                     </Button>
                   </div>
@@ -324,6 +328,7 @@ const TestRequestDetails = () => {
           </div>
         </div>
       </AppLayout>
+      <RequestDetailModal isOpen={isOpenRequestDetails} onClose={closeRequestDetails} requestDetails={requestData} />
     </div>
   );
 };

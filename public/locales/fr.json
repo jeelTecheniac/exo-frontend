@@ -63,6 +63,7 @@
   "create_request": "Créer une demande",
   "back_to_dashboard": "Retour au tableau de bord",
   "project_name_is_required": "Le nom du projet est requis",
+  "finance_by_is_required": "Le champ 'Financé par' est requis",
   "project_reference_is_required": "La référence du projet est requise",
   "amount_is_required_and_must_be_greater_than_zero": "Le montant est requis et doit être supérieur à zéro",
   "begin_date_is_required": "La date de début est requise",
@@ -70,6 +71,7 @@
   "project_info": "Informations sur le projet",
   "enter_key_details_about_your_project_to_continue": "Saisissez les informations clés concernant votre projet pour continuer.",
   "project_name": "Nom du projet",
+  "finance_by": "Financé par",
   "renovation_project": "Projet de rénovation",
   "project_reference": "Référence du projet",
   "amount": "Montant",
@@ -180,5 +182,8 @@
   "select_address": "Select Address",
   "loading": "loading....",
   "file_uploaded_successfully": "File uploaded successfully!",
-  "request_created": "Request Created"
+  "request_created": "Request Created",
+  "details":"détails",
+  "request_latter": "Lettre de demande :",
+  "call_for_tenders": "Appel d'offres"
 }

@@ -63,10 +63,28 @@ const Security = ({userData}:UserInformationProps) => {
       otp:otp,
     }));
   };
-  const handelSendOtp = () => {
+  const sendOtpMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const res=await authService.sendOtp(email);
+      return res
+    },
+    onSuccess: () => {
+      toast.success(t("otp_sent_successfully"));
+    },
+    onError: (error: any) => {
+      if (error.status === 412) {
+        return toast.error(t("email_is_already_registered"));
+      }
+      return toast.error(t("otp_send_error"));
+    },
+  });
+  const handelSendOtp = async() => {
     console.log(changeEmialFields,"changeEmialFields")
-    closeEmailModal();
-    openOtpModal();
+    const res=await sendOtpMutation.mutateAsync(changeEmialFields.email);
+    if(res.status===200){
+      closeEmailModal();
+      openOtpModal();
+    }
   };
     const changeEmail = useMutation({
     mutationFn: async (data: ChangeEmailFields) => {

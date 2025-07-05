@@ -23,7 +23,7 @@ import { UserData } from "../../pages/Dashboard/CreateProject.tsx";
 import { UploadArgs, UploadResponse } from "./ProjectInfoForm.tsx";
 import projectService from "../../services/project.service.ts";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 // Type for address data structure
 interface AddressData {
@@ -34,6 +34,18 @@ interface AddressData {
   project_id: string;
   providence: string;
   user_id: number;
+}
+
+interface Entity {
+  financial_authority: string;
+  label: string;
+  quantity: number;
+  status: string;
+  tax_amount: number;
+  tax_rate: number;
+  total: number;
+  unit_price: number;
+  vat_included: number;
 }
 
 // Type for create request payload
@@ -48,37 +60,64 @@ interface CreateRequestPayload {
 const AddRequest = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { requestId,projectId:newProjectId } = useParams();
 
   const [data, setData] = useState<Order[]>([]);
   const [userData, setUserData] = useState<UserData | undefined>();
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [requestLetter, setRequestLetter] = useState("");
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [projectId,setProjectId]=useState<string>("null")
+  const [totals, setTotals] = useState({
+    totalEntity: 0,
+    totalAmount: 0,
+    totalTaxAmount: 0,
+    totalAmountWithTax: 0,
+  });
   useEffect(() => {
     const user = localStorageService.getUser() || "";
     setUserData(JSON.parse(user));
   }, []);
 
-  const projectId =
-    localStorageService.getProjectId() ||null;
+  // let projectId = localStorageService.getProjectId() || null;
 
-  const { data: addressData, isLoading: isLoadingAddresses } = useQuery<any>({
-    queryKey: [`project-${projectId}-address`],
-    enabled: !!projectId && !!userData?.token,
-    queryFn: async () => {
-      const res = await axios.post(
-        "https://exotrack.makuta.cash/api/V1/project/list-address",
-        { project_id: projectId },
-        {
-          headers: {
-            VAuthorization: `Bearer ${userData?.token}`,
-          },
-        }
-      );
-      return res.data;
-    },
-  });
+  // const { data: addressData, isLoading: isLoadingAddresses } = useQuery<any>({
+  //   queryKey: [`project-${projectId}-address`],
+  //   enabled: !!projectId && !!userData?.token,
+  //   queryFn: async () => {
+  //     const res = await axios.post(
+  //       "https://exotrack.makuta.cash/api/V1/project/list-address",
+  //       { project_id: projectId },
+  //       {
+  //         headers: {
+  //           VAuthorization: `Bearer ${userData?.token}`,
+  //         },
+  //       }
+  //     );
+  //     return res.data;
+  //   },
+  // });
+  const {
+  mutate: fetchProjectAddresses,
+  mutateAsync:  fetchProjectAddressesAsync,       
+  data: addressData,                    
+  isPending: isLoadingAddresses
+} = useMutation({
+  mutationFn: async (projectId: string) => {
+    const res = await projectService.getAddressList(projectId)
+    // const res = await axios.post(
+    //   "https://exotrack.makuta.cash/api/V1/project/list-address",
+    //   { project_id: projectId },
+    //   {
+    //     headers: {
+    //       VAuthorization: `Bearer ${userData?.token}`,
+    //     },
+    //   }
+    // );
+    return res.data;
+  },
+});
 
   const recalculateTableData = (tableData: Order[]): Order[] => {
     return tableData.map((row) => {
@@ -96,7 +135,8 @@ const AddRequest = () => {
 
   const handleAddEntity = () => {
     const newOrder: Order = {
-      id: data.length + 1,
+      id: new Date().getTime(),
+      // id: data.length + 1,
       label: "New Item",
       quantity: 1,
       unitPrice: 0,
@@ -109,6 +149,21 @@ const AddRequest = () => {
     setData(recalculateTableData([...data, newOrder]));
   };
 
+  const updateEntitys = (entitys: []) => {
+    const newOrder: Order[] = entitys.map((entity:Entity) => ({
+      id: new Date().getTime(),
+      label: entity.label,
+      quantity: entity.quantity,
+      unitPrice: entity.unit_price,
+      total: entity.total,
+      taxRate: entity.tax_rate,
+      taxAmount: entity.tax_amount,
+      vatIncluded: entity.vat_included,
+      financialAuthority: entity.financial_authority,
+    }));
+    setData(recalculateTableData([...data, ...newOrder]));
+  };
+
   const handleAddressChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedAddress(event.target.value);
   };
@@ -117,16 +172,16 @@ const AddRequest = () => {
     setData(recalculateTableData(newData));
   };
 
-  const totalEntity = data.length;
-  const totalAmount = data.reduce((sum, row) => sum + (row.total || 0), 0);
-  const totalTaxAmount = data.reduce(
-    (sum, row) => sum + (row.taxAmount || 0),
-    0
-  );
-  const totalAmountWithTax = data.reduce(
-    (sum, row) => sum + (row.vatIncluded || 0),
-    0
-  );
+  // const totalEntity = data.length;
+  // const totalAmount = data.reduce((sum, row) => sum + (row.total || 0), 0);
+  // const totalTaxAmount = data.reduce(
+  //   (sum, row) => sum + (row.taxAmount || 0),
+  //   0
+  // );
+  // const totalAmountWithTax = data.reduce(
+  //   (sum, row) => sum + (row.vatIncluded || 0),
+  //   0
+  // );
 
   // --- Create Request Mutation with correct types ---
   const createRequestMutation = useMutation({
@@ -143,7 +198,7 @@ const AddRequest = () => {
     },
     onSuccess: () => {
       // toast.success(t("request_created"));
-      navigate("/");
+      navigate("/list-project");
     },
     onError: () => {
       // toast.error("Failed to upload file.");
@@ -237,27 +292,103 @@ const AddRequest = () => {
     }
   };
 
+  const requestMutaion = useMutation({
+    mutationFn: async (requestId: string) => {
+      const res = await projectService.requestDetails({
+        request_id: requestId,
+      });
+      setIsLoading(false);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      setIsLoading(false);
+    },
+    onError: (error) => {
+      setIsLoading(false);
+      console.error(error);
+    },
+  });
+
+  const getRequestData = async (requestId: string) => {
+    const response = await requestMutaion.mutateAsync(requestId);
+    if (response.status === 200) {
+      const { project_id,request_letter,entities,address } = response.data;
+      updateEntitys(entities)
+      setProjectId(project_id);
+      setRequestLetter(request_letter)
+      const res =await fetchProjectAddressesAsync(project_id);
+      if(res.status===200){        
+        setSelectedAddress(address.address_id)
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (newProjectId && newProjectId !== "") {
+      fetchProjectAddresses(newProjectId);
+      setProjectId(newProjectId);
+    }
+  }, [newProjectId]);
+
+  useEffect(() => {
+    if (requestId && requestId !== "") {
+      getRequestData(requestId);
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!data || data.length === 0) {
+      setTotals({
+        totalEntity: 0,
+        totalAmount: 0,
+        totalTaxAmount: 0,
+        totalAmountWithTax: 0,
+      });
+      return;
+    }
+
+    const totalEntity = data.length;
+    const totalAmount = data.reduce((sum, row) => sum + (row.total || 0), 0);
+
+    const totalTaxAmount = data.reduce(
+      (sum, row) => sum + (row.taxAmount || 0),
+      0
+    );
+
+    const totalAmountWithTax = data.reduce(
+      (sum, row) => sum + (row.vatIncluded || 0),
+      0
+    );
+
+    setTotals({
+      totalEntity,
+      totalAmount,
+      totalTaxAmount,
+      totalAmountWithTax,
+    });
+  }, [data]);
+  if (isLoading) return <h1>Loading...</h1>;
+
   return (
     <AppLayout className="bg-white">
       <div className="px-4 md:px-0">
         <div
           className="flex items-center gap-2 cursor-pointer mb-2"
-          onClick={() => window.history.back()}
-        >
+          onClick={() => window.history.back()}>
           <ArrowLeftIcon width={16} height={16} className="text-primary-150" />
           <Typography
             size="base"
             weight="semibold"
-            className="text-primary-150"
-          >
+            className="text-primary-150">
             {t("back_to_dashboard")}
           </Typography>
         </div>
         <Typography
           size="xl_2"
           weight="extrabold"
-          className="text-secondary-100 text-2xl md:text-3xl"
-        >
+          className="text-secondary-100 text-2xl md:text-3xl">
           {t("create_request")}
         </Typography>
 
@@ -270,8 +401,7 @@ const AddRequest = () => {
             value={selectedAddress}
             onChange={handleAddressChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-30 focus:border-transparent"
-            disabled={isLoadingAddresses}
-          >
+            disabled={isLoadingAddresses}>
             <option value="">
               {isLoadingAddresses ? t("loading") : t("select_address")}
             </option>
@@ -288,6 +418,7 @@ const AddRequest = () => {
           <TextEditor
             placeholder="Write here..."
             maxLength={100}
+            initialValue={requestLetter}
             onChange={(value) => {
               setRequestLetter(value);
             }}
@@ -299,8 +430,7 @@ const AddRequest = () => {
           <Button
             variant="secondary"
             className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center"
-            onClick={handleAddEntity}
-          >
+            onClick={handleAddEntity}>
             <PlusBlueIcon />
             <Typography>{t("add_entity")}</Typography>
           </Button>
@@ -316,22 +446,22 @@ const AddRequest = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mt-3 md:mt-5">
             <DashBoardCard
               icon={<FileVioletIcon width={44} height={44} />}
-              count={totalEntity}
+              count={totals.totalEntity}
               title={t("total_entity")}
             />
             <DashBoardCard
               icon={<UsdGreenIcon width={44} height={44} />}
-              count={totalAmount}
+              count={totals.totalAmount}
               title={t("total_amount")}
             />
             <DashBoardCard
               icon={<UsdVioletIcon width={44} height={44} />}
-              count={totalTaxAmount}
+              count={totals.totalTaxAmount}
               title={t("total_tax_amount")}
             />
             <DashBoardCard
               icon={<UsdOrangeIcon width={44} height={44} />}
-              count={totalAmountWithTax}
+              count={totals.totalAmountWithTax}
               title={t("total_amount_with_tax")}
             />
           </div>
@@ -365,8 +495,7 @@ const AddRequest = () => {
             disable={createRequestMutation.isPending}
             loading={createRequestMutation.isPending}
             variant="primary"
-            className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center"
-          >
+            className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center">
             {t("submit_request")}
           </Button>
         </div>

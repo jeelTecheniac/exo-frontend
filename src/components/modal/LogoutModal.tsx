@@ -7,6 +7,7 @@ import { UserData } from "../../pages/Dashboard/CreateProject";
 import authService from "../../services/auth.service";
 import { useMutation } from "@tanstack/react-query";
 import localStorageService from "../../services/local.service";
+import { useState } from "react";
 
 interface ChangeEmailModalProps {
   isOpen: boolean;
@@ -16,16 +17,21 @@ interface ChangeEmailModalProps {
 
 const LogoutModal = ({ isOpen, onClose,userData }: ChangeEmailModalProps) => {
   const navigate = useNavigate();
+  const [loading,setIsLoading]=useState<boolean>(false)
   const logoutMutatioin=useMutation({
-    mutationFn: async () => {  
+    mutationFn: async () => {
+      setIsLoading(true)  
       const res = await authService.logOutUser()
+      setIsLoading(false);
       return res.data;
     },
     onSuccess: (res) => {
-      console.log(res)
+      console.log(res);
+      setIsLoading(false);
     },
     onError: (error) => {
       console.error(error)
+      setIsLoading(false);
     },
   });
 
@@ -72,6 +78,7 @@ const LogoutModal = ({ isOpen, onClose,userData }: ChangeEmailModalProps) => {
               variant="primary"
               className="w-fit py-3"
               onClick={handelLogoutUser}
+              loading={loading}
             >
               Logout
             </Button>

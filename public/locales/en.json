@@ -69,6 +69,7 @@
   "create_request": "Create Request",
   "back_to_dashboard": "Back to Dashboard",
   "project_name_is_required": "Project name is required",
+  "finance_by_is_required": "Finance By is required",
   "project_reference_is_required": "Project reference is required",
   "amount_is_required_and_must_be_greater_than_zero": "Amount is required and must be greater than zero",
   "begin_date_is_required": "Begin date is required",
@@ -76,6 +77,7 @@
   "project_info": "Project Info",
   "enter_key_details_about_your_project_to_continue": "Enter key details about your project to continue.",
   "project_name": "Project Name",
+  "finance_by":"Finance By",
   "renovation_project": "Renovation Project",
   "project_reference": "Project Reference",
   "amount": "Amount",
@@ -186,5 +188,8 @@
   "select_address": "Select Address",
   "loading": "loading....",
   "file_uploaded_successfully": "File uploaded successfully!",
-  "request_created": "Request Created"
+  "request_created": "Request Created",
+  "details":"Details",
+  "request_latter":"Request Letter:",
+  "call_for_tenders":"Call for Tenders"
 }

@@ -65,8 +65,8 @@ const EditProfile = () => {
             {t("edit_profile")}
           </Typography>
           <ProfileHeader
-            email="pratik@mailinator.com"
-            name="Pratik Patel"
+            email={profile&&profile.data.email||""}
+            name={profile&&`${profile.data.first_name} ${profile.data.last_name}`||""}
             imageUrl="/images/user/thubmnail.png"
           />
         </div>

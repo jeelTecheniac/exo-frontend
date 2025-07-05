@@ -14,6 +14,8 @@ import {
 } from "../../icons";
 import { useNavigate } from "react-router-dom";
 import homeService from "../../services/home.service";
+import projectService from "../../services/project.service.ts";
+import { useMutation } from "@tanstack/react-query";
 
 export interface Data {
   id: number;
@@ -23,7 +25,7 @@ export interface Data {
   amount: number;
   createdDate: string;
   noOfRequest: number;
-  projectUuid?: string;
+  projectUuid: string;
 }
 type SortOrder = "asc" | "desc" | null;
 
@@ -66,9 +68,8 @@ const ListDashBoardTable = ({
   };
 
   const handleEdit = (order: Data) => {
-    setEditingId(order.id);
-    setEditFormData({ ...order });
-    setOpenMenuId(null);
+
+    navigate(`/edit-project/${order.projectUuid}`)
   };
 
   const handleSaveEdit = (orderId: number) => {
@@ -98,11 +99,25 @@ const ListDashBoardTable = ({
     setEditingId(null);
     setEditFormData({});
   };
-
-  const handleDelete = (orderId: number) => {
+const deleteProjectMutation=useMutation({
+    mutationFn:async(projectIds:any)=>{
+      const res = await projectService.deleteProject(projectIds);      
+      return res
+    },
+    onSuccess: (data) => {
+      console.log(data);      
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  })
+  const handleDelete = async (orderId: number,projectId:string) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
-      setTableData((prev) => prev.filter((order) => order.id !== orderId));
-      setSelectedRows((prev) => prev.filter((id) => id !== orderId));
+      const response=await deleteProjectMutation.mutateAsync(projectId);
+      if(response.data.status===200){
+        setTableData((prev) => prev.filter((order) => order.id !== orderId));
+        setSelectedRows((prev) => prev.filter((id) => id !== orderId));
+      }
     }
     setOpenMenuId(null);
   };
@@ -468,7 +483,7 @@ const ListDashBoardTable = ({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDelete(data.id);
+                                  handleDelete(data.id,data.projectUuid);
                                 }}
                                 className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
                                 role="menuitem"
