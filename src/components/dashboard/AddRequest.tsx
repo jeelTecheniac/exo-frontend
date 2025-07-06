@@ -52,8 +52,9 @@ interface CreateRequestPayload {
   project_id: string;
   address_id: string;
   request_letter: string;
-  document_ids?: UploadedFile[];
+  document_ids?: string;
   request_entity: string; // must be stringified JSON
+  request_id?:string
 }
 
 const AddRequest = () => {
@@ -150,7 +151,7 @@ const AddRequest = () => {
 
   const updateEntitys = (entitys: []) => {
     const newOrder: Order[] = entitys.map((entity: Entity) => ({
-      id: new Date().getTime(),
+      id: new Date().getTime(),      
       label: entity.label,
       quantity: entity.quantity,
       unitPrice: entity.unit_price,
@@ -209,7 +210,7 @@ const AddRequest = () => {
       project_id: projectId,
       address_id: selectedAddress,
       request_letter: requestLetter,
-      document_ids: uploadedFiles.length > 0 ? uploadedFiles : undefined,
+      document_ids: uploadedFiles.length > 0 ? uploadedFiles.map(file=>file.id)?.join(",") : undefined,
       request_entity: JSON.stringify(
         data.map((d) => ({
           label: d.label,
@@ -222,7 +223,8 @@ const AddRequest = () => {
           financial_authority: d.financialAuthority,
         }))
       ),
-    };
+      ...(requestId&&{request_id:requestId})
+    };    
     createRequestMutation.mutate(apiData);
   };
   const fileUploadMutation = async ({
@@ -251,6 +253,7 @@ const AddRequest = () => {
     return {
       id: response.data.data?.id ?? Date.now().toString(),
       url: response.data.data?.url ?? "",
+      // file:response.data.data ?? ""
     };
   };
   const uploadMutation = useMutation({
@@ -317,7 +320,7 @@ const AddRequest = () => {
       setRequestLetter(request_letter);
       const res = await fetchProjectAddressesAsync(project_id);
       if (res.status === 200) {
-        setSelectedAddress(address.address_id);
+        setSelectedAddress(address.id);
       }
     }
   };
@@ -368,6 +371,9 @@ const AddRequest = () => {
       totalAmountWithTax,
     });
   }, [data]);
+  const handleFilesSelect = (files: UploadedFile[]) => {
+    setUploadedFiles(files);
+  };
   if (isLoading) return <h1>Loading...</h1>;
 
   return (
@@ -486,6 +492,7 @@ const AddRequest = () => {
                 maxSize={10}
                 acceptedFormats={[".pdf", ".doc", ".txt", ".ppt"]}
                 files={uploadedFiles}
+                onFilesSelect={handleFilesSelect}
                 onUploadFile={handleUploadFile}
                 onDeleteFile={handleDeleteFile}
               />
