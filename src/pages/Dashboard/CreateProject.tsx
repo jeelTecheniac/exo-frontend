@@ -111,7 +111,9 @@ const CreateProject = () => {
   const [loading, setLoading] = useState(true);
   const [newProjectId, setNewProjectId] = useState("");
   const { projectId } = useParams();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
+  const [isProjectCreating, setIsProjectCreating] = useState(false);
 
   const steps = [
     { id: 1, title: t("call_for_tenders") },
@@ -217,7 +219,42 @@ const CreateProject = () => {
   };
 
   const handleSaveAsDraft = () => {
-    console.log("Saving as draft:", projectData);
+    const filesId = projectData.files.map((file) => file.id);
+    const contractFilesID = projectData.contractFiles.map((file) => file.id);
+    setIsDraftSaving(true);
+
+    const data = {
+      name: projectData.projectName || "",
+      reference: projectData.projectReference || "",
+      amount: projectData.amount || "",
+      currency: projectData.currency || "",
+      begin_date:
+        moment(projectData.beginDate, "DD-MM-YYYY").format("YYYY-MM-DD") || "",
+      end_date:
+        moment(projectData.endDate, "DD-MM-YYYY").format("YYYY-MM-DD") || "",
+      description: projectData.description || "",
+      signed_by: projectData.contactName || "",
+      finance_by: projectData.financeBy || "",
+      position: projectData.position || "",
+      organization: projectData.company || "",
+      place: projectData.place || "",
+      date_of_signing:
+        moment(projectData.signingDate, "DD-MM-YYYY").format("YYYY-MM-DD") ||
+        "",
+      address:
+        JSON.stringify(
+          projectData.addresses.map((address) => ({
+            city: address.city,
+            country: address.country,
+            municipality: address.municipality,
+            providence: address.province,
+          }))
+        ) || [],
+      status: "draft",
+      document_ids: [...filesId, ...contractFilesID].join(","),
+      ...{ project_id: projectId },
+    };
+    createProjectMutation.mutate(data);
     // Save draft logic
   };
 
@@ -237,6 +274,7 @@ const CreateProject = () => {
   });
 
   const handleSubmit = async () => {
+    setIsProjectCreating(true);
     const filesId = projectData.files.map((file) => file.id);
     const contractFilesID = projectData.contractFiles.map((file) => file.id);
 
@@ -405,23 +443,26 @@ const CreateProject = () => {
               )}
               {currentStep === 2 && <ReviewForm projectData={projectData} />}
               <div className="flex flex-col-reverse md:flex-row justify-end gap-4 mt-8">
-                <button
-                  onClick={handleSaveAsDraft}
-                  className="px-6 py-3 bg-white rounded-lg text-primary-150 font-medium flex items-center justify-center gap-2 shadow-md hover:bg-gray-50 w-full md:w-auto"
-                >
-                  <SaveDraftIcon
-                    width={20}
-                    height={20}
-                    className="text-primary-150"
-                  />
-                  {t("save_as_draft")}
-                </button>
-
+                {currentStep === 2 && (
+                  <Button
+                    variant="secondary"
+                    onClick={handleSaveAsDraft}
+                    className="px-6 py-3 bg-white rounded-lg text-primary-150 font-medium flex items-center justify-center gap-2 shadow-md hover:bg-gray-50 w-full md:w-auto "
+                    loading={createProjectMutation.isPending && isDraftSaving}
+                  >
+                    <SaveDraftIcon
+                      width={20}
+                      height={20}
+                      className="text-primary-150"
+                    />
+                    {t("save_as_draft")}
+                  </Button>
+                )}
                 <Button
                   variant="primary"
                   onClick={handleNextStep}
                   className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
-                  loading={createProjectMutation.isPending}
+                  loading={createProjectMutation.isPending && isProjectCreating}
                 >
                   {currentStep === steps.length - 1
                     ? `${t("create_project")}`

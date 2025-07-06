@@ -59,7 +59,7 @@ layer(base);
   --color-secondary-50: #919db3;
   --color-secondary-60: #667185;
   --color-secondary-70: #475367;
-  --color-secondary-80: #344054;
+  --color-secondary-800: #344054;
   --color-secondary-90: #1d2739;
   --color-secondary-100: #101928;
 
@@ -795,4 +795,18 @@ span.flatpickr-weekday,
 }
 .fc.fc-media-screen {
   @apply min-h-screen;
+}
+
+/* Notification styles */
+.notification-unread {
+  background-color: #e0f2fe; /* light blue */
+  font-weight: 600;
+  color: #1e3a8a; /* blue-800 */
+}
+
+.notification-read {
+  background-color: #f3f4f6; /* light gray */
+  font-weight: 400;
+  color: #6b7280; /* gray-500 */
+  opacity: 0.7;
 }
