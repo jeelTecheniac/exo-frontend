@@ -72,6 +72,9 @@ const ProjectInfoForm = ({
     endDate: false,
   },
 }: ProjectInfoFormProps) => {
+  console.log(updateProjectData, "updateProjectData");
+  console.log(projectData, "proect dat");
+
   const [addresses, setAddresses] = useState<Address[]>(
     projectData.addresses || [
       {

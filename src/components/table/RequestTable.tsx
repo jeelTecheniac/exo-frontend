@@ -385,7 +385,7 @@ const RequestTable = ({
                                 role="menuitem"
                                 aria-label="Edit row"
                               >
-                                View Project
+                                View Request
                               </button>
                               <button
                                 onClick={(

@@ -67,7 +67,8 @@ const RequestDetailModal = ({
         isOpen={isOpen}
         onClose={onClose}
         isFullscreen={false}
-        className="xl:max-w-[1200px] lg:max-w-[800px] max-w-[80dvw] mx-auto p-6 max-h-[500px]">
+        className="xl:max-w-[1200px] lg:max-w-[800px] max-w-[80dvw] mx-auto p-6 max-h-[500px]"
+      >
         <div className="py-4">
           <Typography size="xl" weight="bold" className="text-secondary-100">
             {t("details")}
@@ -76,47 +77,49 @@ const RequestDetailModal = ({
             <Typography
               size="base"
               weight="semibold"
-              className="text-secondary-100">
+              className="text-secondary-100"
+            >
               {t("request_latter")}
             </Typography>
-            <Typography
-              size="sm"
-              weight="normal"
-              className="text-secondary-60">
-                <div dangerouslySetInnerHTML={{__html:requestDetails.request_letter}}></div>
-              </Typography>
+            <Typography size="sm" weight="normal" className="text-secondary-60">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: requestDetails.request_letter,
+                }}
+              ></div>
+            </Typography>
           </div>
         </div>
         <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-              <DashBoardCard
-                icon={<FileVioletIcon width={44} height={44} />}
-                count={total_quantity || 0}
-                title={t("total_entity")}
-              />
-              <DashBoardCard
-                icon={<UsdGreenIcon width={44} height={44} />}
-                count={total_amount || 0}
-                title={t("total_amount")}
-              />
-              <DashBoardCard
-                icon={<UsdVioletIcon width={44} height={44} />}
-                count={total_tax || 0}
-                title={t("total_tax_amount")}
-              />
-              <DashBoardCard
-                icon={<UsdOrangeIcon width={44} height={44} />}
-                count={vat_included || 0}
-                title={t("total_amount_with_tax")}
-              />
-            </div>
-          </div>
-          <div className="mt-3 md:mt-5 mb-2">
-            <CreateRequestTable
-              data={requestDetails.entities}
-              showActions={false}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+            <DashBoardCard
+              icon={<FileVioletIcon width={44} height={44} />}
+              count={total_quantity || 0}
+              title={t("total_quantity")}
+            />
+            <DashBoardCard
+              icon={<UsdGreenIcon width={44} height={44} />}
+              count={total_amount || 0}
+              title={t("total_amount")}
+            />
+            <DashBoardCard
+              icon={<UsdVioletIcon width={44} height={44} />}
+              count={total_tax || 0}
+              title={t("total_tax_amount")}
+            />
+            <DashBoardCard
+              icon={<UsdOrangeIcon width={44} height={44} />}
+              count={vat_included || 0}
+              title={t("total_amount_with_tax")}
             />
           </div>
+        </div>
+        <div className="mt-3 md:mt-5 mb-2">
+          <CreateRequestTable
+            data={requestDetails.entities}
+            showActions={false}
+          />
+        </div>
       </Modal>
     </div>
   );

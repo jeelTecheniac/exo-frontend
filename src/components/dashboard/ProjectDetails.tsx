@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { ArrowLeftIcon, CommentIcon, PdfIcon, WhitePlusIcon } from "../../icons";
+import {
+  ArrowLeftIcon,
+  CommentIcon,
+  PdfIcon,
+  WhitePlusIcon,
+} from "../../icons";
 import AppLayout from "../../layout/AppLayout";
 import Button from "../../lib/components/atoms/Button";
 import Typography from "../../lib/components/atoms/Typography";
@@ -389,19 +394,20 @@ const ProjectDetails = () => {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2 }}>
+                transition={{ duration: 0.2 }}
+              >
                 <Button
                   variant="primary"
                   className="flex items-center justify-center w-fit gap-2 py-2 px-4 sm:py-3"
                   onClick={() => navigate(`/add-request/${projectId}`)}
                 >
-              <WhitePlusIcon width={13} height={13} />
-              <Typography size="base">{t("create_request")}</Typography>
-            </Button>
+                  <WhitePlusIcon width={13} height={13} />
+                  <Typography size="base">{t("create_request")}</Typography>
+                </Button>
               </motion.div>
             </div>
             <motion.div
-              className="mt-4 sm:mt-6 overflow-x-auto"
+              className="mt-4 sm:mt-6 overflow-x-auto min-h-[230px]"
               variants={itemVariants}
             >
               <RequestTable data={requestData} />

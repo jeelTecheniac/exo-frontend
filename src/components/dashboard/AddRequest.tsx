@@ -80,6 +80,8 @@ const AddRequest = () => {
     setUserData(JSON.parse(user));
   }, []);
 
+  console.log(selectedAddress, "selected addredss");
+
   // let projectId = localStorageService.getProjectId() || null;
 
   // const { data: addressData, isLoading: isLoadingAddresses } = useQuery<any>({
@@ -150,6 +152,8 @@ const AddRequest = () => {
   };
 
   const updateEntitys = (entitys: []) => {
+    console.log(entitys, "e");
+
     const newOrder: Order[] = entitys.map((entity: Entity) => ({
       id: new Date().getTime(),      
       label: entity.label,
@@ -315,6 +319,7 @@ const AddRequest = () => {
     const response = await requestMutaion.mutateAsync(requestId);
     if (response.status === 200) {
       const { project_id, request_letter, entities, address } = response.data;
+
       updateEntitys(entities);
       setProjectId(project_id);
       setRequestLetter(request_letter);

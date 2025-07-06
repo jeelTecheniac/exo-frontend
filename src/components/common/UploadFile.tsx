@@ -4,6 +4,8 @@ export interface UploadedFile {
   file: File | undefined;
   id: string;
   url: string;
+  original_name?: string;
+  size?: number;
 }
 interface FileUploadProps {
   onFilesSelect?: (files: UploadedFile[]) => void;
@@ -273,10 +275,13 @@ const UploadFile: React.FC<FileUploadProps> = ({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-800">
-                      {file.file && file.file.name}
+                      {(file.file && file.file.name) || file.original_name}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {file.file && (file.file.size / (1024 * 1024)).toFixed(2)}
+                      {(
+                        (file.file?.size ?? file.size ?? 0) /
+                        (1024 * 1024)
+                      ).toFixed(2)}{" "}
                       MB
                     </p>
                   </div>
