@@ -47,7 +47,7 @@ const ListDashBoard = () => {
           currency: item.currency,
           amount: Number(item.amount),
           createdDate: item.created_at,
-          noOfRequest: item.no_of_request || 0,
+          noOfRequest: item.requests_count || 0,
           projectUuid: item.id,
         }));
 

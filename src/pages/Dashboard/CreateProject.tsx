@@ -327,13 +327,15 @@ const CreateProject = () => {
         address,
         date_of_signing,
         organization,
-        project_name,
         finance_by,
+        signed_by,
+        place,
+        position
       } = data;
       console.log(data, "data");
 
       setProjectData({
-        projectName: project_name || "",
+        projectName: name || "",
         projectReference: reference,
         amount: amount,
         currency: currency,
@@ -342,10 +344,10 @@ const CreateProject = () => {
         description: description,
         addresses: address,
         files: [],
-        contactName: name,
-        position: "",
+        contactName: signed_by,
+        position: position,
         company: organization,
-        place: "",
+        place: place,
         financeBy: finance_by,
         signingDate: date_of_signing,
         contractFiles: [],
