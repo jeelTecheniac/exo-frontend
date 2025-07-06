@@ -8,9 +8,39 @@ import { useTranslation } from "react-i18next";
 export default function NotificationDropdown() {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      heading: "Renovation Project request is approved.",
+      time: "Today at 1:30 PM",
+      isRead: false,
+    },
+    {
+      heading: "Reminder: Task ‘Submit proposal’ is due tomorrow.",
+      time: "Today at 1:30 PM",
+      isRead: true,
+    },
+    {
+      heading: "Rapid Return System project request is sent for approval.",
+      time: "Today at 1:30 PM",
+      isRead: true,
+    },
+    {
+      heading:
+        "Upcoming deadline: Request Vertex Compliance Hub is due for submission in 3 days",
+      time: "Today at 1:30 PM",
+      isRead: true,
+    },
+    {
+      heading: "Renovation Project request is approved.",
+      time: "Today at 1:30 PM",
+      isRead: true,
+    },
+  ]);
 
   function toggleDropdown() {
     setIsOpen(true);
+    // Mark all as read when dropdown is opened
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   }
 
   function closeDropdown() {
@@ -21,37 +51,26 @@ export default function NotificationDropdown() {
     toggleDropdown();
   };
 
-  const list = [
-    {
-      heading: "Renovation Project request is approved.",
-      time: "Today at 1:30 PM",
-    },
-    {
-      heading: "Reminder: Task ‘Submit proposal’ is due tomorrow.",
-      time: "Today at 1:30 PM",
-    },
-    {
-      heading: "Rapid Return System project request is sent for approval.",
-      time: "Today at 1:30 PM",
-    },
-    {
-      heading:
-        "Upcoming deadline: Request Vertex Compliance Hub is due for submission in 3 days",
-      time: "Today at 1:30 PM",
-    },
-    {
-      heading: "Renovation Project request is approved.",
-      time: "Today at 1:30 PM",
-    },
-  ];
+  // Separate unread and read notifications
+  const unread = notifications.filter((n) => !n.isRead);
+  const read = notifications.filter((n) => n.isRead);
+
   return (
     <div className="relative">
-      <NotificationIcon
-        onClick={handleClick}
-        width={26}
-        height={26}
-        className="cursor-pointer"
-      />
+      <div className="relative inline-block">
+        <NotificationIcon
+          onClick={handleClick}
+          width={26}
+          height={26}
+          className="cursor-pointer"
+        />
+        {unread.length > 0 && (
+          <span
+            className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-blue-500 border-2 border-white"
+            style={{ transform: "translate(50%,-50%)" }}
+          />
+        )}
+      </div>
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
@@ -85,26 +104,64 @@ export default function NotificationDropdown() {
           {t("today")}
         </Typography>
         <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar mt-2 gap-3">
-          {list.map((l, index) => {
-            return (
-              <div key={index} className="flex flex-col gap-1">
-                <Typography
-                  size="xs"
-                  weight="semibold"
-                  className="text-secondary-100"
+          {unread.length > 0 && (
+            <>
+              <li className="text-xs font-bold text-blue-600 mb-1">
+                {t("Unread")}
+              </li>
+              {unread.map((l, index) => (
+                <div
+                  key={"unread-" + index}
+                  className="notification-unread flex flex-col gap-1 rounded p-2"
                 >
-                  {l.heading}
-                </Typography>
-                <Typography
-                  size="xs"
-                  weight="semibold"
-                  className="text-secondary-50"
+                  <Typography
+                    size="xs"
+                    weight="semibold"
+                    className="text-secondary-100"
+                  >
+                    {l.heading}
+                  </Typography>
+                  <Typography
+                    size="xs"
+                    weight="semibold"
+                    className="text-secondary-50"
+                  >
+                    {l.time}
+                  </Typography>
+                </div>
+              ))}
+            </>
+          )}
+          {read.length > 0 && (
+            <>
+              {unread.length > 0 && (
+                <li className="text-xs font-bold text-gray-400 mt-2 mb-1">
+                  {t("Read")}
+                </li>
+              )}
+              {read.map((l, index) => (
+                <div
+                  key={"read-" + index}
+                  className="notification-read flex flex-col gap-1 rounded p-2"
                 >
-                  {l.time}
-                </Typography>
-              </div>
-            );
-          })}
+                  <Typography
+                    size="xs"
+                    weight="semibold"
+                    className="text-secondary-100"
+                  >
+                    {l.heading}
+                  </Typography>
+                  <Typography
+                    size="xs"
+                    weight="semibold"
+                    className="text-secondary-50"
+                  >
+                    {l.time}
+                  </Typography>
+                </div>
+              ))}
+            </>
+          )}
         </ul>
         {/* <Link
           to="/"

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { CreateRequestIcon, WhitePlusIcon } from "../../icons";
 import Button from "../../lib/components/atoms/Button";
 import Typography from "../../lib/components/atoms/Typography";
+import { useNavigate } from "react-router";
 
 type Props = {
   onClick?: () => void;
@@ -9,6 +10,7 @@ type Props = {
 
 const CreateRequest = ({ onClick }: Props) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div
       className="flex justify-center items-center min-h-[calc(100vh-200px)]"
@@ -29,6 +31,7 @@ const CreateRequest = ({ onClick }: Props) => {
         <Button
           variant="primary"
           className="flex gap-2 w-fit px-5 py-4 items-center justify-center"
+          onClick={() => navigate("/create-project")}
         >
           <WhitePlusIcon />
           <Typography>{t("create_request")}</Typography>

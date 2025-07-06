@@ -6,7 +6,6 @@ import DatePicker from "../../lib/components/atoms/DatePicker";
 import UploadFile, { UploadedFile } from "../common/UploadFile";
 import { useTranslation } from "react-i18next";
 
-import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
 
@@ -52,18 +51,10 @@ const ContactInfoForm = ({
     signingDate: false,
   },
 }: ContactInfoFormProps) => {
-  const [isPositionDropdownOpen, setIsPositionDropdownOpen] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const { t } = useTranslation();
 
-  const positions = [
-    "Project Manager",
-    "Site Engineer",
-    "Contract Manager",
-    "Finance Manager",
-    "Technical Lead",
-  ];
   useEffect(() => {
     const defaultValues = {
       position: projectData.position || "",
@@ -156,12 +147,12 @@ const ContactInfoForm = ({
     setTouched({ ...touched, [name]: true });
   };
 
-  const handlePositionSelect = (position: string) => {
-    updateProjectData({ position });
-    validate("position", position);
-    setTouched({ ...touched, position: true });
-    setIsPositionDropdownOpen(false);
-  };
+  // const handlePositionSelect = (position: string) => {
+  //   updateProjectData({ position });
+  //   validate("position", position);
+  //   setTouched({ ...touched, position: true });
+  //   setIsPositionDropdownOpen(false);
+  // };
 
   const handleDateChange = (field: string, date: Date) => {
     if (!date) return;
