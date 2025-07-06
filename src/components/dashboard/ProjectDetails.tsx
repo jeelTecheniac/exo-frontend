@@ -2,78 +2,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import {
-  ArrowLeftIcon,
-  CloseYellowIcon,
-  CommentIcon,
-  InfoIcon,
-  PdfIcon,
-} from "../../icons";
+import { ArrowLeftIcon, CommentIcon, PdfIcon } from "../../icons";
 import AppLayout from "../../layout/AppLayout";
 import Button from "../../lib/components/atoms/Button";
 import Typography from "../../lib/components/atoms/Typography";
-import AddressTable, { Data as AddressData } from "../table/AddressTable";
-import RequestTable, { Data as RequestData } from "../table/RequestTable";
-import History, { HistoryItem } from "./History";
+import AddressTable from "../table/AddressTable";
+import RequestTable from "../table/RequestTable";
 import projectService from "../../services/project.service";
-
-const initialAddressData: AddressData[] = [
-  {
-    id: 1,
-    city: "Ahmedabad",
-    country: "India",
-    municipality: "AMC",
-    providence: "West Arindale",
-  },
-  {
-    id: 2,
-    city: "Ahmedabad",
-    country: "India",
-    municipality: "AMC",
-    providence: "West Arindale",
-  },
-];
-
-const initialRequestData: RequestData[] = [
-  {
-    id: 1,
-    requestNo: 1200,
-    amount: 123300,
-    createdDate: "24-20-2001",
-    status: "pending",
-    request_id:""
-  },
-];
-
-const historyData: HistoryItem[] = [
-  {
-    id: "1",
-    date: "24/10/2001",
-    time: "2:30 PM",
-    title: "Return the signed documents to the Secretariat",
-    description: "Prepared a summary calculation note",
-  },
-  {
-    id: "2",
-    date: "24/10/2001",
-    time: "2:30 PM",
-    title: "Return the signed documents to the Secretariat",
-    description: "Prepared a summary calculation note",
-  },
-  {
-    id: "3",
-    date: "Today",
-    time: "2:30 PM",
-    title: "Return the signed documents to the Secretariat",
-  },
-  {
-    id: "4",
-    date: "Yesterday",
-    time: "2:30 PM",
-    title: "Return the signed documents to the Secretariat",
-    description: "Prepared a summary calculation note",
-  },
-];
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
@@ -110,21 +45,27 @@ const ProjectDetails = () => {
     city: item.city,
     municipality: item.municipality,
   }));
-  
+
   // Map requests for RequestTable
-  const requestData = (project.requests || []).map((item: any, idx: number) => ({
-    id: idx + 1,
-    requestNo: item.request_unique_number || idx + 1,
-    amount: Number(item.total_amount || 0),
-    createdDate: item.created_at ? new Date(item.created_at).toLocaleDateString("en-US") : "",
-    status: item.status || "",
-    request_id:item.id,
-  }));
+  const requestData = (project.requests || []).map(
+    (item: any, idx: number) => ({
+      id: idx + 1,
+      requestNo: item.request_unique_number || idx + 1,
+      amount: Number(item.total_amount || 0),
+      createdDate: item.created_at
+        ? new Date(item.created_at).toLocaleDateString("en-US")
+        : "",
+      status: item.status || "",
+      request_id: item.id,
+    })
+  );
 
   // Format dates
-  const formatDate = (date: string) => date ? new Date(date).toLocaleDateString("en-US") : "-";
+  const formatDate = (date: string) =>
+    date ? new Date(date).toLocaleDateString("en-US") : "-";
   // Format amount
-  const formatAmount = (amount: string | number) => Number(amount).toLocaleString();
+  const formatAmount = (amount: string | number) =>
+    Number(amount).toLocaleString();
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -184,7 +125,8 @@ const ProjectDetails = () => {
                   weight="extrabold"
                   className="text-secondary-100"
                 >
-                  {t("project_details")} {project.reference ? `#${project.reference}` : ""}
+                  {t("project_details")}{" "}
+                  {project.reference ? `#${project.reference}` : ""}
                 </Typography>
               </motion.div>
               <Typography
@@ -232,19 +174,49 @@ const ProjectDetails = () => {
                     label: "Amount:",
                     value: (
                       <>
-                        <span className="text-secondary-60">{project.currency}</span> {formatAmount(project.amount)}
+                        <span className="text-secondary-60">
+                          {project.currency}
+                        </span>{" "}
+                        {formatAmount(project.amount)}
                       </>
                     ),
                   },
-                  { label: "Project Begin Date:", value: formatDate(project.begin_date) },
-                  { label: "Project End Date:", value: formatDate(project.end_date) },
-                  { label: "Description:", value: <span dangerouslySetInnerHTML={{ __html: project.description || "-" }} /> },
-                  { label: "Upload Files:", value: project.documents && project.documents.length > 0 ? project.documents.map((doc: any, idx: number) => (
-                    <a key={idx} href={doc.file} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
-                      <PdfIcon width={16} height={16} />
-                      {doc.original_name}
-                    </a>
-                  )) : "-" },
+                  {
+                    label: "Project Begin Date:",
+                    value: formatDate(project.begin_date),
+                  },
+                  {
+                    label: "Project End Date:",
+                    value: formatDate(project.end_date),
+                  },
+                  {
+                    label: "Description:",
+                    value: (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: project.description || "-",
+                        }}
+                      />
+                    ),
+                  },
+                  {
+                    label: "Upload Files:",
+                    value:
+                      project.documents && project.documents.length > 0
+                        ? project.documents.map((doc: any, idx: number) => (
+                            <a
+                              key={idx}
+                              href={doc.file}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-blue-600 hover:underline"
+                            >
+                              <PdfIcon width={16} height={16} />
+                              {doc.original_name}
+                            </a>
+                          ))
+                        : "-",
+                  },
                 ].map((item, index) => (
                   <motion.div
                     key={index}
@@ -290,7 +262,10 @@ const ProjectDetails = () => {
                   { label: "Position:", value: project.position },
                   { label: "Organization:", value: project.organization },
                   { label: "Place:", value: project.place },
-                  { label: "Date of Signing:", value: formatDate(project.date_of_signing) },
+                  {
+                    label: "Date of Signing:",
+                    value: formatDate(project.date_of_signing),
+                  },
                 ].map((item, index) => (
                   <motion.div
                     key={index}

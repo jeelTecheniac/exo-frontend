@@ -1,13 +1,9 @@
 import { useTranslation } from "react-i18next";
 import {
   BlueCopyIcon,
-  CommentRemarkIcon,
-  CommentRemarkIconFrench,
   MenuListIcon,
   MenuListIconFrench,
   PdfIcon,
-  RequestProgressIcon,
-  RequestProgressIconFrench,
   UsdGreenIcon,
   UsdOrangeIcon,
   UsdVioletIcon,
@@ -23,7 +19,6 @@ import { useEffect, useState } from "react";
 import localStorageService from "../../services/local.service";
 import { useParams } from "react-router";
 import RequestProgress from "../../components/dashboard/ProgressStep";
-import CommentData from "../../components/dashboard/CommentData";
 import { useModal } from "../../hooks/useModal";
 import RequestDetailModal from "../../components/modal/RequestDetailModal";
 interface UserData {
@@ -88,9 +83,6 @@ interface CommentProps {
   timestamp: string;
 }
 
-interface CommentDataProps {
-  data: CommentProps[];
-}
 export const progressSteps: ProgressStep[] = [
   { id: 1, title: "Secretariat Review", status: "current" },
   { id: 2, title: "Coordinator Review", status: "pending" },
@@ -111,50 +103,55 @@ export const comments: CommentProps[] = [
   {
     initial: "GH",
     username: "Guy Hawkins",
-    comment: "Not eligible for exemption as the applicant is a for-profit entity. Rejected with appropriate reasoning.",
+    comment:
+      "Not eligible for exemption as the applicant is a for-profit entity. Rejected with appropriate reasoning.",
     timestamp: "Yesterday",
   },
   {
     initial: "JW",
     username: "Jenny Wilson",
-    comment: "Request under review. Pending legal team's clarification on eligibility criteria for one-time event-based exemptions.",
+    comment:
+      "Request under review. Pending legal team's clarification on eligibility criteria for one-time event-based exemptions.",
     timestamp: "May 28, 2025",
   },
   {
     initial: "CF",
     username: "Cody Fisher",
-    comment: "Verified PAN and registration certificate. Cause is genuine and aligns with approved tax-exempt activities. Forwarded to accounts team for further processing.",
+    comment:
+      "Verified PAN and registration certificate. Cause is genuine and aligns with approved tax-exempt activities. Forwarded to accounts team for further processing.",
     timestamp: "May 21, 2025",
   },
 ];
 
 const TestRequestDetails = () => {
   const [userData, setUserData] = useState<UserData | undefined>();
-  const [requestData,setRequestData]=useState<RequestDetails|null>(null)
+  const [requestData, setRequestData] = useState<RequestDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const {isOpen:isOpenRequestDetails,closeModal:closeRequestDetails,openModal:openRequestDetails}=useModal();
+  const {
+    isOpen: isOpenRequestDetails,
+    closeModal: closeRequestDetails,
+    openModal: openRequestDetails,
+  } = useModal();
 
   const { t, i18n } = useTranslation();
-  const {requestId} = useParams();
+  const { requestId } = useParams();
 
-  
-  const { data: _requestDetails,isLoading:_requestLoading } =
-    useQuery<any>({
-      queryKey: [`project-${requestId}-address`],
-      enabled: !!requestId && !!userData?.token,
-      refetchOnWindowFocus: false, 
-      queryFn: async () => {
-        setLoading(true)
-        const res = await projectService.requestDetails({
-          request_id: requestId,
-        });      
-        setLoading(false)          
-        console.log(res.data.data);
-          
-        setRequestData(res.data.data)
-        return res.data;
-      },
-    });
+  const { data: _requestDetails, isLoading: _requestLoading } = useQuery<any>({
+    queryKey: [`project-${requestId}-address`],
+    enabled: !!requestId && !!userData?.token,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      setLoading(true);
+      const res = await projectService.requestDetails({
+        request_id: requestId,
+      });
+      setLoading(false);
+      console.log(res.data.data);
+
+      setRequestData(res.data.data);
+      return res.data;
+    },
+  });
 
   useEffect(() => {
     const user = localStorageService.getUser() || "";
@@ -184,8 +181,10 @@ const TestRequestDetails = () => {
             <Typography
               size="xl_2"
               weight="extrabold"
-              className="text-secondary-100">
-              {t("request_details")} # {requestData?requestData.unique_number:""}
+              className="text-secondary-100"
+            >
+              {t("request_details")} #{" "}
+              {requestData ? requestData.unique_number : ""}
             </Typography>
           </div>
           <div className="flex gap-6">
@@ -212,10 +211,15 @@ const TestRequestDetails = () => {
                     <Typography
                       size="base"
                       weight="bold"
-                      className="text-secondary-100">
+                      className="text-secondary-100"
+                    >
                       {t("request_details")}
                     </Typography>
-                    <Button variant="outline" className="px-4 py-2 w-fit" onClick={openRequestDetails}>
+                    <Button
+                      variant="outline"
+                      className="px-4 py-2 w-fit"
+                      onClick={openRequestDetails}
+                    >
                       {t("view_more")}
                     </Button>
                   </div>
@@ -265,36 +269,43 @@ const TestRequestDetails = () => {
                     <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
                       <Typography
                         className="text-secondary-60 min-w-[100px]"
-                        size="sm">
+                        size="sm"
+                      >
                         {t("amount")}
                       </Typography>
                       <Typography className="text-secondary-100" size="sm">
-                        {requestData?requestData.amount_summary.total_amount:0}
+                        {requestData
+                          ? requestData.amount_summary.total_amount
+                          : 0}
                       </Typography>
                     </div>
 
                     <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
                       <Typography
                         className="text-secondary-60 min-w-[100px]"
-                        size="sm">
+                        size="sm"
+                      >
                         {t("address")}
                       </Typography>
                       <Typography className="text-secondary-100" size="sm">
-                        {requestData?[
-                          requestData.address?.country,
-                          requestData.address?.providence,
-                          requestData.address?.city,
-                          requestData.address?.municipality,
-                        ]
-                          .filter((val) => val && val.trim() !== "")
-                          .join(", ") : "-"}
+                        {requestData
+                          ? [
+                              requestData.address?.country,
+                              requestData.address?.providence,
+                              requestData.address?.city,
+                              requestData.address?.municipality,
+                            ]
+                              .filter((val) => val && val.trim() !== "")
+                              .join(", ")
+                          : "-"}
                       </Typography>
                     </div>
 
                     <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
                       <Typography
                         className="text-secondary-60 min-w-[100px]"
-                        size="sm">
+                        size="sm"
+                      >
                         {t("invoice_files")}
                       </Typography>
                       <div className="flex flex-wrap gap-2">
@@ -303,7 +314,8 @@ const TestRequestDetails = () => {
                           <Typography
                             size="xs"
                             weight="semibold"
-                            className="text-secondary-100 whitespace-nowrap">
+                            className="text-secondary-100 whitespace-nowrap"
+                          >
                             Taxe 2025_fichier.pdf
                             <span className="text-secondary-60 ml-1">
                               (5.3MB)
@@ -322,13 +334,17 @@ const TestRequestDetails = () => {
                 ) : (
                   <CommentRemarkIconFrench width="100%" height="100%" />
                 )} */}
-                {/* <CommentData data={comments}/>                 */}
+              {/* <CommentData data={comments}/>                 */}
               {/* </div> */}
             </div>
           </div>
         </div>
       </AppLayout>
-      <RequestDetailModal isOpen={isOpenRequestDetails} onClose={closeRequestDetails} requestDetails={requestData} />
+      <RequestDetailModal
+        isOpen={isOpenRequestDetails}
+        onClose={closeRequestDetails}
+        requestDetails={requestData}
+      />
     </div>
   );
 };

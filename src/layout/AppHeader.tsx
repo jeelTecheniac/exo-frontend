@@ -11,9 +11,9 @@ import { useTranslation } from "react-i18next";
 
 const AppHeader: React.FC = () => {
   const { t } = useTranslation();
-  const navigate=useNavigate()
-  const {pathname}=useLocation();
-  
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, toggleMobileSidebar } = useSidebar();
@@ -51,15 +51,19 @@ const AppHeader: React.FC = () => {
           <div className="lg:flex gap-4 hidden">
             <Button
               variant="outline"
-              className={`border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 ${pathname==='/list-project'?"hover:bg-primary-10":"hover:text-primary-150"} hover:bg-primary-10 rounded-lg`}
-              onClick={()=>navigate("/list-project")}
+              className={`border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 ${
+                pathname === "/dashboard"
+                  ? "hover:bg-primary-10"
+                  : "hover:text-primary-150"
+              } hover:bg-primary-10 rounded-lg`}
+              onClick={() => navigate("/dashboard")}
             >
               {t("dashboard")}
             </Button>
             <Button
               variant="outline"
               className={`border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 hover:text-primary-150 hover:bg-primary-10 rounded-lg`}
-              onClick={()=>navigate("/help")}
+              onClick={() => navigate("/help")}
             >
               {t("help")}
             </Button>

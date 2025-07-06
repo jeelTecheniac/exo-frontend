@@ -13,7 +13,6 @@ import {
   RightGreenIcon,
 } from "../../icons";
 import { useNavigate } from "react-router-dom";
-import homeService from "../../services/home.service";
 import projectService from "../../services/project.service.ts";
 import { useMutation } from "@tanstack/react-query";
 
@@ -68,8 +67,7 @@ const ListDashBoardTable = ({
   };
 
   const handleEdit = (order: Data) => {
-
-    navigate(`/edit-project/${order.projectUuid}`)
+    navigate(`/edit-project/${order.projectUuid}`);
   };
 
   const handleSaveEdit = (orderId: number) => {
@@ -99,22 +97,22 @@ const ListDashBoardTable = ({
     setEditingId(null);
     setEditFormData({});
   };
-const deleteProjectMutation=useMutation({
-    mutationFn:async(projectIds:any)=>{
-      const res = await projectService.deleteProject(projectIds);      
-      return res
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (projectIds: any) => {
+      const res = await projectService.deleteProject(projectIds);
+      return res;
     },
     onSuccess: (data) => {
-      console.log(data);      
+      console.log(data);
     },
     onError: (error) => {
       console.error(error);
     },
-  })
-  const handleDelete = async (orderId: number,projectId:string) => {
+  });
+  const handleDelete = async (orderId: number, projectId: string) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
-      const response=await deleteProjectMutation.mutateAsync(projectId);
-      if(response.data.status===200){
+      const response = await deleteProjectMutation.mutateAsync(projectId);
+      if (response.data.status === 200) {
         setTableData((prev) => prev.filter((order) => order.id !== orderId));
         setSelectedRows((prev) => prev.filter((id) => id !== orderId));
       }
@@ -188,7 +186,7 @@ const deleteProjectMutation=useMutation({
   };
 
   // Handler for viewing project details
-  const handleViewProject = (projectId: string="") => {
+  const handleViewProject = (projectId: string = "") => {
     navigate(`/project-details/${projectId}`);
   };
 
@@ -388,7 +386,11 @@ const deleteProjectMutation=useMutation({
                         </div>
                       ) : (
                         <span className="block font-medium text-secondary-100 text-sm">
-                          {data.createdDate ? new Date(data.createdDate).toLocaleDateString("en-US") : ""}
+                          {data.createdDate
+                            ? new Date(data.createdDate).toLocaleDateString(
+                                "en-US"
+                              )
+                            : ""}
                         </span>
                       )}
                     </TableCell>
@@ -483,7 +485,7 @@ const deleteProjectMutation=useMutation({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDelete(data.id,data.projectUuid);
+                                  handleDelete(data.id, data.projectUuid);
                                 }}
                                 className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
                                 role="menuitem"

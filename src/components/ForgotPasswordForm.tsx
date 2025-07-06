@@ -10,7 +10,6 @@ import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import authService from "../services/auth.service";
-import { toast } from "react-toastify";
 import localStorageService from "../services/local.service";
 import { AxiosError } from "axios";
 
@@ -29,11 +28,8 @@ const ForgotPasswordForm = () => {
       console.log(data, "data");
       localStorageService.setEmail(JSON.stringify(data.email));
       // toast.success(t("otp_sent_successfully"));
-      navigate("/otp-verification", {
-        state: {
-          path: "forgot-password",
-        },
-      });
+      localStorageService.setPath("forgot-password");
+      navigate("/otp-verification");
     },
     onError: (error: AxiosError) => {
       if (error.response?.status === 412) {
@@ -126,6 +122,7 @@ const ForgotPasswordForm = () => {
             className="py-3 mt-4"
             type="submit"
             disable={forgotPasswordMutation.isPending}
+            loading={forgotPasswordMutation.isPending}
           >
             {t("send_otp")}
           </Button>

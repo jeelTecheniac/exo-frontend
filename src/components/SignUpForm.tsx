@@ -14,23 +14,8 @@ import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { useModal } from "../hooks/useModal";
 import TermsConditionModal from "./modal/TermsConditionModal";
-import { toast } from "react-toastify";
 import localStorageService from "../services/local.service";
-
-const mobileCountryCode = [
-  {
-    label: "+1",
-    value: "+1",
-  },
-  {
-    label: "+91",
-    value: "+91",
-  },
-  {
-    label: "+44",
-    value: "+44",
-  },
-];
+import { mobileCountryCode } from "../utils/constant/apiRoutes";
 
 const SignUpForm = () => {
   const [remember, setRemember] = useState(false);
@@ -83,6 +68,7 @@ const SignUpForm = () => {
     validationSchema,
     onSubmit: (values) => {
       localStorageService.setUser(JSON.stringify(values));
+      localStorageService.setPath("sign-up");
       // toast.success(t("account_created_successfully"), {
       //   autoClose: 800,
       // });
@@ -322,33 +308,11 @@ const SignUpForm = () => {
             variant="primary"
             className="py-3 mt-4"
             type="submit"
-            // disable={!formik.isValid}
+            disable={!formik.isValid || !remember}
           >
             {t("create_account")}
           </Button>
         </motion.div>
-
-        {/* <motion.div variants={itemVariants} className="mt-10">
-          <TextDivider text={t("or")} />
-        </motion.div>
-
-        <motion.div
-          variants={itemVariants}
-          className="flex gap-5 mt-6 flex-col lg:flex-row"
-        >
-          <Button variant="outline" type="button">
-            <div className="flex items-center justify-center gap-3">
-              <GoogleLogo />
-              <Typography>{t("continue_with_google")}</Typography>
-            </div>
-          </Button>
-          <Button variant="outline" type="button">
-            <div className="flex items-center justify-center gap-3">
-              <AppleLogo />
-              <Typography>{t("continue_with_apple")}</Typography>
-            </div>
-          </Button>
-        </motion.div> */}
       </motion.form>
       <TermsConditionModal isOpen={isOpen} onClose={closeModal} />
     </motion.div>
