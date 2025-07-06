@@ -57,7 +57,7 @@ const UserInformation = ({ userData }: UserInformationProps) => {
         formData.append(key, value);
       });
 
-      const res = await authService.editProfile(data)
+      const res = await authService.editProfile(data);
       return res.data;
     },
     onSuccess: (res) => {
@@ -72,7 +72,6 @@ const UserInformation = ({ userData }: UserInformationProps) => {
     },
   });
 
-  // 📌 NOW SAFE TO HAVE EARLY RETURNS AFTER ALL HOOKS
   if (!userData) {
     return (
       <div className="bg-white p-4 md:p-6 lg:p-10 w-full">

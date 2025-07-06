@@ -7,6 +7,8 @@ class LocalStorageService {
   LANGUAGE_PREVIEW_URL = "imagePreviewUrl";
   CLIENT_VIEW = "clientView";
   PROJECT_ID = "projectId";
+  LOGIN = "isLogin";
+  PATH = "path";
 
   getLanguage() {
     if (typeof window !== "undefined" && window.localStorage) {
@@ -109,10 +111,34 @@ class LocalStorageService {
   removeProjectId() {
     localStorage.removeItem(this.PROJECT_ID);
   }
-  logoutUSer(){
+  logoutUSer() {
     localStorage.removeItem(this.USER_KEY);
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.PROJECT_ID);
+  }
+
+  getLogin() {
+    return localStorage.getItem(this.LOGIN);
+  }
+
+  setLogin(data: string) {
+    localStorage.setItem(this.LOGIN, data);
+  }
+
+  removeLogin() {
+    localStorage.removeItem(this.LOGIN);
+  }
+
+  getPath() {
+    return localStorage.getItem(this.PATH);
+  }
+
+  setPath(data: string) {
+    localStorage.setItem(this.PATH, data);
+  }
+
+  removePath() {
+    localStorage.removeItem(this.PATH);
   }
 }
 

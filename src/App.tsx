@@ -18,6 +18,8 @@ import TestFilterData from "./pages/OtherPage/TestFilterData";
 import AddRequest from "./components/dashboard/AddRequest";
 import ProjectDetails from "./components/dashboard/ProjectDetails";
 import ListDashBoard from "./components/dashboard/ListDashBoard";
+import PublicRoute from "./utils/PublicRoute";
+import ProtectedRoute from "./utils/constant/ProtectedRoute";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -27,20 +29,111 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
           <ToastContainer className="z-100" />
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/edit-project/:projectId" element={<Home />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/otp-verification" element={<OtpVerification />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/edit-profile" element={<EditProfile />} />
-            <Route path="/add-request/:projectId" element={<AddRequest />} />
-            <Route path="/edit-request/:requestId" element={<AddRequest />} />
-            <Route path="/list-project" element={<ListDashBoard />} />
-            <Route path="/project-details/:projectId" element={<ProjectDetails />} />
-            <Route path="/request-details/:requestId" element={<TestRequestDetails />} />
-            <Route path="/filter-data" element={<TestFilterData />} />
+            <Route
+              path="/sign-in"
+              element={
+                <PublicRoute>
+                  <SignIn />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/sign-up"
+              element={
+                <PublicRoute>
+                  <SignUp />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/otp-verification"
+              element={
+                <PublicRoute>
+                  <OtpVerification />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <PublicRoute>
+                  <ResetPassword />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/edit-profile"
+              element={
+                <ProtectedRoute>
+                  <EditProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/add-request/:projectId"
+              element={
+                <ProtectedRoute>
+                  <AddRequest />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-request/:requestId"
+              element={
+                <ProtectedRoute>
+                  <AddRequest />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <ListDashBoard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/project-details/:projectId"
+              element={
+                <ProtectedRoute>
+                  <ProjectDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/request-details/:requestId"
+              element={
+                <ProtectedRoute>
+                  <TestRequestDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/filter-data"
+              element={
+                <ProtectedRoute>
+                  <TestFilterData />
+                </ProtectedRoute>
+              }
+            />
 
             <Route path="/help" element={<Help />} />
             <Route path="*" element={<NotFound />} />

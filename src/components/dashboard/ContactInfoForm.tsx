@@ -6,7 +6,6 @@ import DatePicker from "../../lib/components/atoms/DatePicker";
 import UploadFile, { UploadedFile } from "../common/UploadFile";
 import { useTranslation } from "react-i18next";
 
-import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
 

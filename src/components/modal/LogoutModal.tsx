@@ -8,20 +8,25 @@ import authService from "../../services/auth.service";
 import { useMutation } from "@tanstack/react-query";
 import localStorageService from "../../services/local.service";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 interface ChangeEmailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userData?:UserData
+  userData?: UserData;
 }
 
-const LogoutModal = ({ isOpen, onClose,userData }: ChangeEmailModalProps) => {
+const LogoutModal = ({ isOpen, onClose, userData }: ChangeEmailModalProps) => {
   const navigate = useNavigate();
-  const [loading,setIsLoading]=useState<boolean>(false)
-  const logoutMutatioin=useMutation({
+  const [loading, setIsLoading] = useState<boolean>(false);
+  const { logout } = useAuth();
+  const logoutMutatioin = useMutation({
     mutationFn: async () => {
-      setIsLoading(true)  
-      const res = await authService.logOutUser()
+      setIsLoading(true);
+      const res = await authService.logOutUser();
+      localStorageService.removeUser();
+      localStorageService.removeLogin();
+      logout();
       setIsLoading(false);
       return res.data;
     },
@@ -30,20 +35,20 @@ const LogoutModal = ({ isOpen, onClose,userData }: ChangeEmailModalProps) => {
       setIsLoading(false);
     },
     onError: (error) => {
-      console.error(error)
+      console.error(error);
       setIsLoading(false);
     },
   });
 
-  const handelLogoutUser= async()=>{
-    const res=await logoutMutatioin.mutateAsync();
-    if(res.status===200){
-      console.log("inside status")
-      onClose()
+  const handelLogoutUser = async () => {
+    const res = await logoutMutatioin.mutateAsync();
+    if (res.status === 200) {
+      console.log("inside status");
+      onClose();
       navigate("/sign-in");
       localStorageService.logoutUSer();
     }
-  }
+  };
 
   return (
     <div className="w-fit">

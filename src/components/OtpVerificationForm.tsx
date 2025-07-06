@@ -11,18 +11,16 @@ import authService from "../services/auth.service";
 import { useEffect, useState } from "react";
 import localStorageService from "../services/local.service";
 import { toast } from "react-toastify";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { UserData } from "../pages/Dashboard/CreateProject";
 
 const OtpVerificationForm = () => {
   const { t } = useTranslation();
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [userData, setUserData] = useState<UserData | undefined>();
-  const path = location.state.path;
-  console.log(path, "path");
+  const path = localStorageService.getPath();
 
   const validationSchema = Yup.object().shape({
     otp: Yup.string()
@@ -36,9 +34,12 @@ const OtpVerificationForm = () => {
       return await authService.signUp(data);
     },
     onSuccess: (res) => {
-      localStorageService.setUser(JSON.stringify(res.data.data));
-      navigate("/");
-      console.log("Sign up successful");
+      console.log(res.data, "resp data");
+
+      // localStorageService.setUser(JSON.stringify(res.data.data));
+      // localStorageService.setLogin(JSON.stringify("true"));
+      // localStorageService.removePath();
+      navigate("/dashboard");
     },
     onError: (error) => {
       console.error("Error during sign up:", error);
@@ -48,8 +49,6 @@ const OtpVerificationForm = () => {
   });
   const sendOtpMutation = useMutation({
     mutationFn: async (email: string) => {
-      console.log(email, "email in mutate");
-
       await authService.sendOtp(email);
     },
     onSuccess: () => {
@@ -67,7 +66,6 @@ const OtpVerificationForm = () => {
       return await authService.forgotPassword(data);
     },
     onSuccess: (_, data) => {
-      console.log(data, "data");
       localStorageService.setEmail(JSON.stringify(data.email));
       toast.success(t("otp_sent_successfully"));
     },
@@ -84,8 +82,7 @@ const OtpVerificationForm = () => {
     mutationFn: async (data: any) => {
       await authService.otpVerification(data);
     },
-    onSuccess: (_, variable) => {
-      console.log(variable.otp, "data");
+    onSuccess: () => {
       toast.success(t("otp_verified_successfully"));
       navigate("/reset-password");
     },
@@ -206,6 +203,9 @@ const OtpVerificationForm = () => {
             className="py-3 mt-4"
             type="submit"
             disable={!formik.isValid || formik.isSubmitting}
+            loading={
+              signUpMutation.isPending || otpVerificationMutation.isPending
+            }
           >
             {t("verify")}
           </Button>

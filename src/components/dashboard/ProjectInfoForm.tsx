@@ -12,7 +12,6 @@ import { useTranslation } from "react-i18next";
 
 import projectService from "../../services/project.service";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 
 interface ProjectInfoFormProps {
   projectData: any;
@@ -47,7 +46,7 @@ interface ValidationErrors {
   amount?: string;
   beginDate?: string;
   endDate?: string;
-  financeBy?:string
+  financeBy?: string;
 }
 
 export interface UploadResponse {
@@ -66,7 +65,7 @@ const ProjectInfoForm = ({
   highlightErrors = false,
   fieldErrors = {
     projectName: false,
-    financeBy:false,
+    financeBy: false,
     projectReference: false,
     amount: false,
     beginDate: false,
@@ -127,7 +126,7 @@ const ProjectInfoForm = ({
         amount: true,
         beginDate: true,
         endDate: true,
-        financeBy:true
+        financeBy: true,
       });
 
       validate("projectName", projectData.projectName || "");

@@ -43,7 +43,7 @@ const EditProfile = () => {
     queryKey: ["userProfile", userData?.token],
     enabled: isTokenAvailable,
     queryFn: async () => {
-      const res = await authService.getProfile()
+      const res = await authService.getProfile();
       return res.data;
     },
   });
@@ -65,8 +65,12 @@ const EditProfile = () => {
             {t("edit_profile")}
           </Typography>
           <ProfileHeader
-            email={profile&&profile.data.email||""}
-            name={profile&&`${profile.data.first_name} ${profile.data.last_name}`||""}
+            email={(profile && profile.data.email) || ""}
+            name={
+              (profile &&
+                `${profile.data.first_name} ${profile.data.last_name}`) ||
+              ""
+            }
             imageUrl="/images/user/thubmnail.png"
           />
         </div>
@@ -117,7 +121,11 @@ const EditProfile = () => {
             <Security userData={profile && profile.data} />
           )}
         </div>
-        <LogoutModal isOpen={isOpenLogoutModal} onClose={closeLogoutModal} userData={userData} />
+        <LogoutModal
+          isOpen={isOpenLogoutModal}
+          onClose={closeLogoutModal}
+          userData={userData}
+        />
       </div>
     </AppLayout>
   );

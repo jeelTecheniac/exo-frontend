@@ -17,12 +17,11 @@ import Button from "../../lib/components/atoms/Button";
 import { useEffect, useState } from "react";
 import AppLayout from "../../layout/AppLayout.tsx";
 import localStorageService from "../../services/local.service.ts";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { UserData } from "../../pages/Dashboard/CreateProject.tsx";
 import { UploadArgs, UploadResponse } from "./ProjectInfoForm.tsx";
 import projectService from "../../services/project.service.ts";
-import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router";
 
 // Type for address data structure
@@ -60,7 +59,7 @@ interface CreateRequestPayload {
 const AddRequest = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { requestId,projectId:newProjectId } = useParams();
+  const { requestId, projectId: newProjectId } = useParams();
 
   const [data, setData] = useState<Order[]>([]);
   const [userData, setUserData] = useState<UserData | undefined>();
@@ -68,7 +67,7 @@ const AddRequest = () => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [requestLetter, setRequestLetter] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [projectId,setProjectId]=useState<string>("null")
+  const [projectId, setProjectId] = useState<string>("null");
   const [totals, setTotals] = useState({
     totalEntity: 0,
     totalAmount: 0,
@@ -99,25 +98,25 @@ const AddRequest = () => {
   //   },
   // });
   const {
-  mutate: fetchProjectAddresses,
-  mutateAsync:  fetchProjectAddressesAsync,       
-  data: addressData,                    
-  isPending: isLoadingAddresses
-} = useMutation({
-  mutationFn: async (projectId: string) => {
-    const res = await projectService.getAddressList(projectId)
-    // const res = await axios.post(
-    //   "https://exotrack.makuta.cash/api/V1/project/list-address",
-    //   { project_id: projectId },
-    //   {
-    //     headers: {
-    //       VAuthorization: `Bearer ${userData?.token}`,
-    //     },
-    //   }
-    // );
-    return res.data;
-  },
-});
+    mutate: fetchProjectAddresses,
+    mutateAsync: fetchProjectAddressesAsync,
+    data: addressData,
+    isPending: isLoadingAddresses,
+  } = useMutation({
+    mutationFn: async (projectId: string) => {
+      const res = await projectService.getAddressList(projectId);
+      // const res = await axios.post(
+      //   "https://exotrack.makuta.cash/api/V1/project/list-address",
+      //   { project_id: projectId },
+      //   {
+      //     headers: {
+      //       VAuthorization: `Bearer ${userData?.token}`,
+      //     },
+      //   }
+      // );
+      return res.data;
+    },
+  });
 
   const recalculateTableData = (tableData: Order[]): Order[] => {
     return tableData.map((row) => {
@@ -150,7 +149,7 @@ const AddRequest = () => {
   };
 
   const updateEntitys = (entitys: []) => {
-    const newOrder: Order[] = entitys.map((entity:Entity) => ({
+    const newOrder: Order[] = entitys.map((entity: Entity) => ({
       id: new Date().getTime(),
       label: entity.label,
       quantity: entity.quantity,
@@ -198,7 +197,7 @@ const AddRequest = () => {
     },
     onSuccess: () => {
       // toast.success(t("request_created"));
-      navigate("/list-project");
+      navigate("/dashboard");
     },
     onError: () => {
       // toast.error("Failed to upload file.");
@@ -300,7 +299,7 @@ const AddRequest = () => {
       setIsLoading(false);
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       setIsLoading(false);
     },
     onError: (error) => {
@@ -312,13 +311,13 @@ const AddRequest = () => {
   const getRequestData = async (requestId: string) => {
     const response = await requestMutaion.mutateAsync(requestId);
     if (response.status === 200) {
-      const { project_id,request_letter,entities,address } = response.data;
-      updateEntitys(entities)
+      const { project_id, request_letter, entities, address } = response.data;
+      updateEntitys(entities);
       setProjectId(project_id);
-      setRequestLetter(request_letter)
-      const res =await fetchProjectAddressesAsync(project_id);
-      if(res.status===200){        
-        setSelectedAddress(address.address_id)
+      setRequestLetter(request_letter);
+      const res = await fetchProjectAddressesAsync(project_id);
+      if (res.status === 200) {
+        setSelectedAddress(address.address_id);
       }
     }
   };
@@ -376,19 +375,22 @@ const AddRequest = () => {
       <div className="px-4 md:px-0">
         <div
           className="flex items-center gap-2 cursor-pointer mb-2"
-          onClick={() => window.history.back()}>
+          onClick={() => window.history.back()}
+        >
           <ArrowLeftIcon width={16} height={16} className="text-primary-150" />
           <Typography
             size="base"
             weight="semibold"
-            className="text-primary-150">
+            className="text-primary-150"
+          >
             {t("back_to_dashboard")}
           </Typography>
         </div>
         <Typography
           size="xl_2"
           weight="extrabold"
-          className="text-secondary-100 text-2xl md:text-3xl">
+          className="text-secondary-100 text-2xl md:text-3xl"
+        >
           {t("create_request")}
         </Typography>
 
@@ -401,7 +403,8 @@ const AddRequest = () => {
             value={selectedAddress}
             onChange={handleAddressChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-30 focus:border-transparent"
-            disabled={isLoadingAddresses}>
+            disabled={isLoadingAddresses}
+          >
             <option value="">
               {isLoadingAddresses ? t("loading") : t("select_address")}
             </option>
@@ -430,7 +433,8 @@ const AddRequest = () => {
           <Button
             variant="secondary"
             className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center"
-            onClick={handleAddEntity}>
+            onClick={handleAddEntity}
+          >
             <PlusBlueIcon />
             <Typography>{t("add_entity")}</Typography>
           </Button>
@@ -495,7 +499,8 @@ const AddRequest = () => {
             disable={createRequestMutation.isPending}
             loading={createRequestMutation.isPending}
             variant="primary"
-            className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center">
+            className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center"
+          >
             {t("submit_request")}
           </Button>
         </div>

@@ -82,11 +82,11 @@ export interface Order {
   taxAmount: number;
   vatIncluded: number;
   financialAuthority: string;
-  unit_price?:number;
-  tax_rate?:number;
-  tax_amount?:number;
-  vat_included?:number;
-  financial_authority?:string
+  unit_price?: number;
+  tax_rate?: number;
+  tax_amount?: number;
+  vat_included?: number;
+  financial_authority?: string;
 }
 
 type SortOrder = "asc" | "desc" | null;
@@ -94,13 +94,13 @@ type SortOrder = "asc" | "desc" | null;
 const CreateRequestTable = ({
   data,
   onDataChange,
-  isEditable=true,
-  showActions=true,
+  // isEditable=true,
+  showActions = true,
 }: {
   data: Order[];
-  onDataChange?: (newData: Order[],) => void;
-  isEditable?:boolean
-  showActions?:boolean
+  onDataChange?: (newData: Order[]) => void;
+  isEditable?: boolean;
+  showActions?: boolean;
 }) => {
   const [tableData, setTableData] = useState<Order[]>(data);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -427,19 +427,19 @@ const CreateRequestTable = ({
           </TableHeader>
 
           <TableBody className="divide-y divide-gray-100">
-            {tableData.map((order,index) => (
+            {tableData.map((order, index) => (
               <TableRow key={index}>
                 <TableCell className="px-5 py-4 w-10">
                   <input
                     type="checkbox"
-                    checked={selectedRows.includes(order.id||index+1)}
-                    onChange={() => handleSelectRow(order.id||index+1)}
+                    checked={selectedRows.includes(order.id || index + 1)}
+                    onChange={() => handleSelectRow(order.id || index + 1)}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    aria-label={`Select row ${order.id||index+1}`}
+                    aria-label={`Select row ${order.id || index + 1}`}
                   />
                 </TableCell>
                 <TableCell className="px-5 py-4 text-gray-500 text-sm">
-                  {order.id||index+1}
+                  {order.id || index + 1}
                 </TableCell>
                 <TableCell className="px-5 py-4 sm:px-6">
                   {editingId === order.id ? (
@@ -541,7 +541,7 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.taxRate||order.tax_rate}%
+                      {order.taxRate || order.tax_rate}%
                     </span>
                   )}
                 </TableCell>
@@ -558,7 +558,7 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.taxAmount||order.tax_amount}
+                      {order.taxAmount || order.tax_amount}
                     </span>
                   )}
                 </TableCell>
@@ -575,7 +575,7 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.vatIncluded||order.vat_included}
+                      {order.vatIncluded || order.vat_included}
                     </span>
                   )}
                 </TableCell>
@@ -600,86 +600,88 @@ const CreateRequestTable = ({
                     </div>
                   ) : (
                     <span className="block font-medium text-secondary-100 text-sm">
-                      {order.financialAuthority||order.financial_authority}
+                      {order.financialAuthority || order.financial_authority}
                     </span>
                   )}
                 </TableCell>
-                {showActions&&<TableCell className="px-4 py-3 text-gray-500 text-sm">
-                  {editingId === order.id ? (
-                    <div className="flex items-center space-x-4">
-                      <RightGreenIcon
-                        onClick={() => handleSaveEdit(order.id)}
-                        width={24}
-                        height={24}
-                        className="cursor-pointer"
-                      />
+                {showActions && (
+                  <TableCell className="px-4 py-3 text-gray-500 text-sm">
+                    {editingId === order.id ? (
+                      <div className="flex items-center space-x-4">
+                        <RightGreenIcon
+                          onClick={() => handleSaveEdit(order.id)}
+                          width={24}
+                          height={24}
+                          className="cursor-pointer"
+                        />
 
-                      <CrossRedIcon
-                        onClick={handleCancelEdit}
-                        width={24}
-                        height={24}
-                        className="cursor-pointer"
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      className="relative"
-                      ref={openMenuId === order.id ? menuRef : null}
-                    >
-                      <button
-                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                          e.stopPropagation();
-                          handleMenuToggle(order.id);
-                        }}
-                        className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                        aria-label="Open actions menu"
-                        aria-haspopup="true"
-                        aria-expanded={openMenuId === order.id}
+                        <CrossRedIcon
+                          onClick={handleCancelEdit}
+                          width={24}
+                          height={24}
+                          className="cursor-pointer"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className="relative"
+                        ref={openMenuId === order.id ? menuRef : null}
                       >
-                        <svg
-                          className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
+                        <button
+                          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                            e.stopPropagation();
+                            handleMenuToggle(order.id);
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                          aria-label="Open actions menu"
+                          aria-haspopup="true"
+                          aria-expanded={openMenuId === order.id}
                         >
-                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                        </svg>
-                      </button>
-                      {openMenuId === order.id && (
-                        <div
-                          className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-50"
-                          role="menu"
-                        >
-                          <button
-                            onClick={(
-                              e: React.MouseEvent<HTMLButtonElement>
-                            ) => {
-                              e.stopPropagation();
-                              handleEdit(order);
-                            }}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                            role="menuitem"
-                            aria-label="Edit row"
+                          <svg
+                            className="w-4 h-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
                           >
-                            Edit
-                          </button>
-                          <button
-                            onClick={(
-                              e: React.MouseEvent<HTMLButtonElement>
-                            ) => {
-                              e.stopPropagation();
-                              handleDelete(order.id);
-                            }}
-                            className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
-                            role="menuitem"
-                            aria-label="Delete row"
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                          </svg>
+                        </button>
+                        {openMenuId === order.id && (
+                          <div
+                            className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+                            role="menu"
                           >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </TableCell>}
+                            <button
+                              onClick={(
+                                e: React.MouseEvent<HTMLButtonElement>
+                              ) => {
+                                e.stopPropagation();
+                                handleEdit(order);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                              role="menuitem"
+                              aria-label="Edit row"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={(
+                                e: React.MouseEvent<HTMLButtonElement>
+                              ) => {
+                                e.stopPropagation();
+                                handleDelete(order.id);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
+                              role="menuitem"
+                              aria-label="Delete row"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

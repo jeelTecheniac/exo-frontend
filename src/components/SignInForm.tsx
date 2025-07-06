@@ -12,34 +12,32 @@ import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import authService from "../services/auth.service";
-import { toast } from "react-toastify";
 import localStorageService from "../services/local.service";
+import { useAuth } from "../context/AuthContext";
 
 const SignInForm = () => {
   const navigate = useNavigate();
   const [remember, setRemember] = useState(false);
-  const [loading, setLoading] = useState<boolean>(false);
+
   const { t } = useTranslation();
+  const { login } = useAuth();
   const [passwordStrength, setPasswordStrength] = useState<
     "week" | "acceptable" | "strong" | ""
   >("");
 
   const signInMutation = useMutation({
     mutationFn: async (data: any) => {
-      setLoading(true)
-      const res= await authService.signIn(data);
-      setLoading(false);
-      return res
+      const res = await authService.signIn(data);
+      return res;
     },
     onSuccess: (res) => {
       localStorageService.setUser(JSON.stringify(res.data.data));
       localStorageService.setAccessToken(JSON.stringify(res.data.data.token));
-      // toast.success(t("login_successful"));
-      setLoading(false);
-      navigate("/list-project");
+      localStorageService.setLogin(JSON.stringify("true"));
+      login("true");
+      navigate("/dashboard");
     },
     onError: (error) => {
-      setLoading(false);
       console.error("Error during sign in:", error);
       // return toast.error(t("sign_in_error"));
     },
@@ -188,34 +186,12 @@ const SignInForm = () => {
             variant="primary"
             className="py-3 mt-4"
             type="submit"
-            disable={!formik.isValid}
-            loading={loading}
+            disable={!formik.isValid || signInMutation.isPending}
+            loading={signInMutation.isPending}
           >
             {t("login")}
           </Button>
         </motion.div>
-
-        {/* <motion.div variants={itemVariants} className="mt-10">
-          <TextDivider text={t("or")} />
-        </motion.div> */}
-
-        {/* <motion.div
-          variants={itemVariants}
-          className="flex gap-5 mt-6 flex-col lg:flex-row"
-        >
-          <Button variant="outline" type="button">
-            <div className="flex items-center justify-center gap-3">
-              <GoogleLogo />
-              <Typography>{t("continue_with_google")}</Typography>
-            </div>
-          </Button>
-          <Button variant="outline" type="button">
-            <div className="flex items-center justify-center gap-3">
-              <AppleLogo />
-              <Typography>{t("continue_with_apple")}</Typography>
-            </div>
-          </Button>
-        </motion.div> */}
       </motion.form>
     </motion.div>
   );

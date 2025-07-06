@@ -159,6 +159,7 @@ const ResetPasswordForm = () => {
             className="py-3 mt-4"
             type="submit"
             disable={!formik.isValid || resetPasswordMutate.isPending}
+            loading={resetPasswordMutate.isPending}
           >
             {t("reset_password")}
           </Button>
