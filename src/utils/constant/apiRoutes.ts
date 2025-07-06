@@ -9,6 +9,7 @@ export const ApiRoutes = {
   EDIT_PROFILE: "/profile",
   CHANGE_EMAIL: "/change-email",
   LOGOUT_USER: "/logout",
+  CHANGE_PASSWORD:"/change-password",
   // project routes
   CREATE_PROJECT: "/project/create",
   UPLOAD_FILE: "/project/upload-file",

@@ -10,7 +10,8 @@ import { useMutation } from "@tanstack/react-query";
 import authService from "../../services/auth.service";
 import { toast } from "react-toastify";
 import localStorageService from "../../services/local.service";
-
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 interface UserData {
   id: number;
@@ -44,6 +45,7 @@ const Security = ({ userData,setUserDate }: UserInformationProps) => {
   const [changeEmialFields, setChangeEmailFields] = useState<ChangeEmailFields>(
     initialChangeEmailFields
   );
+  const [passwordStrength, setPasswordStrength] = useState<"week" | "acceptable" | "strong" | "">("");
 
   const { t } = useTranslation();
   const {
@@ -118,15 +120,90 @@ const Security = ({ userData,setUserDate }: UserInformationProps) => {
     },
   });
   const verifyOTP = async () => {
-    console.log(changeEmialFields, "changeEmialFields");
     const res= await changeEmail.mutateAsync(changeEmialFields);
     if(res.data.status===200){
       setUserDate({...res.data.data})
+      setChangeEmailFields(initialChangeEmailFields);
       localStorageService.setUser(JSON.stringify({...userData,email:res.data.data.email}))
       closeOtpModal();
     }
   };
-  console.log(userData)
+
+  const validationSchema = Yup.object().shape({
+    currentPassword: Yup.string().required(t("current_password_required")),
+    newPassword: Yup.string()
+      .matches(
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]/,
+        t("password_requirements")
+      )
+      .required(t("new_password_required")),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("newPassword")], t("passwords_must_match"))
+      .required(t("confirm_password_required")),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      changePasswordMutation.mutate(values);
+    },
+  });
+  // Password validation schema
+
+
+  // Password strength checker
+  const checkPasswordStrength = (password: string) => {
+    if (password.length < 8) return "week";
+    const hasLetter = /[A-Za-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[@$!%*#?&]/.test(password);
+
+    if (hasLetter && hasNumber && hasSpecial) return "strong";
+    if (
+      (hasLetter && hasNumber) ||
+      (hasLetter && hasSpecial) ||
+      (hasNumber && hasSpecial)
+    )
+      return "acceptable";
+    return "week";
+  };
+  
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const password = e.target.value;
+    formik.handleChange(e);
+    if (e.target.name === "newPassword") {
+      setPasswordStrength(checkPasswordStrength(password));
+    }
+  };
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: {
+      currentPassword: string;
+      newPassword: string;
+      confirmPassword: string;
+    }) => {
+      const payload={
+        old_password:data.currentPassword,
+        new_password:data.newPassword,
+        conf_new_password:data.confirmPassword
+      }            
+      const res = await authService.changePassword(payload);
+      return res;
+    },
+    onSuccess: () => {
+      toast.success(t("password_updated_successfully"));
+      formik.resetForm();
+      setPasswordStrength("");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || t("password_update_error"));
+    },
+  });
   return (
     <div className="w-full flex gap-4 md:gap-6 flex-col">
       <div className="bg-white p-4 md:p-6 lg:p-10">
@@ -165,40 +242,83 @@ const Security = ({ userData,setUserDate }: UserInformationProps) => {
         >
           {t("change_password")}
         </Typography>
-        <div className="mt-6">
-          <Password
-            labelProps={{
-              children: "Current Password",
-            }}
-          />
-        </div>
+        <form onSubmit={formik.handleSubmit}>
+          <div className="mt-6">
+            <Password
+              labelProps={{
+                children: "Current Password",
+              }}
+              name="currentPassword"
+              value={formik.values.currentPassword}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.currentPassword &&
+                Boolean(formik.errors.currentPassword)
+              }
+              hint={
+                formik.touched.currentPassword
+                  ? formik.errors.currentPassword
+                  : undefined
+              }
+            />
+          </div>
 
-        <div className="mt-6 flex flex-col md:flex-row gap-6 w-full">
-          <div className="w-full">
+          <div className="mt-6 flex flex-col md:flex-row gap-6 w-full">
+            <div className="w-full">
+              <Password
+                className="w-full"
+                labelProps={{
+                  children: t("new_password"),
+                }}
+                name="newPassword"
+                value={formik.values.newPassword}
+                onChange={handlePasswordChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.newPassword && Boolean(formik.errors.newPassword)
+                }
+                hint={
+                  formik.touched.newPassword
+                    ? formik.errors.newPassword
+                    : undefined
+                }
+                passwordType={passwordStrength}
+              />
+            </div>
+            <div className="w-full">
             <Password
-              className="w-full"
-              labelProps={{
-                children: t("new_password"),
-              }}
-            />
+                labelProps={{
+                  children: t("confirm_password"),
+                }}
+                name="confirmPassword"
+                value={formik.values.confirmPassword}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.confirmPassword &&
+                  Boolean(formik.errors.confirmPassword)
+                }
+                hint={
+                  formik.touched.confirmPassword
+                    ? formik.errors.confirmPassword
+                    : undefined
+                }
+              />
+            </div>
           </div>
-          <div className="w-full">
-            <Password
-              labelProps={{
-                children: t("confirm_password"),
-              }}
-            />
+          <div className="mt-6">
+            <Button
+              variant="primary"
+              className="w-full md:w-fit !py-3"
+              type="submit"
+              disabled={!formik.isValid || changePasswordMutation.isPending}
+              loading={changePasswordMutation.isPending}
+            >
+              {t("update_password")}
+            </Button>
           </div>
-        </div>
-        <div className="mt-6">
-          <Button
-            variant="primary"
-            className="w-full md:w-fit !py-3"
-            onClick={openOtpModal}
-          >
-            {t("update_password")}
-          </Button>
-        </div>
+        </form>
       </div>
       <ChangeEmailModal
         isOpen={isOpenEmailModal}

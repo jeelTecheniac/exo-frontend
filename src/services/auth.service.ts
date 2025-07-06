@@ -36,6 +36,10 @@ class AuthService extends ApiBaseService {
   async logOutUser(){
     return await this.authorizedRequest.get(ApiRoutes.LOGOUT_USER)
   }
+
+  async changePassword(data:any){
+    return await this.authorizedRequest.put(ApiRoutes.CHANGE_PASSWORD,data)
+  }
   // async getProfile() {
   //   return await this.guestRequest.post(ApiRoutes.RESET_PASSWORD, data);
   // }
