@@ -245,7 +245,7 @@ const ListDashBoardTable = ({
 
   return (
     <div className="relative rounded-lg bg-white ">
-      <div className="relative">
+      <div className="relative min-h-[225px]">
         <Table>
           <TableHeader className="border-b border-gray-100 bg-secondary-10 rounded-lg">
             <TableRow>
