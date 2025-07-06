@@ -6,6 +6,7 @@ import DatePicker from "../../lib/components/atoms/DatePicker";
 import UploadFile, { UploadedFile } from "../common/UploadFile";
 import { useTranslation } from "react-i18next";
 
+import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
 
@@ -17,7 +18,7 @@ interface ContactInfoFormProps {
     contactName: boolean;
     position: boolean;
     company: boolean;
-    phone: boolean;
+    place: boolean;
     signingDate: boolean;
   };
 }
@@ -26,7 +27,7 @@ interface ValidationErrors {
   contactName?: string;
   position?: string;
   company?: string;
-  phone?: string;
+  place?: string;
   signingDate?: string;
 }
 
@@ -47,7 +48,7 @@ const ContactInfoForm = ({
     contactName: false,
     position: false,
     company: false,
-    phone: false,
+    place: false,
     signingDate: false,
   },
 }: ContactInfoFormProps) => {
@@ -65,10 +66,10 @@ const ContactInfoForm = ({
   ];
   useEffect(() => {
     const defaultValues = {
-      position: projectData.position || "Project Manager",
-      company: projectData.company || "ABC Construction Ltd.",
+      position: projectData.position || "",
+      company: projectData.company || "",
       contactName: projectData.contactName || "",
-      phone: projectData.phone || "",
+      place: projectData.place || "",
       signingDate: projectData.signingDate || "",
       contractFiles: projectData.contractFiles || [],
     };
@@ -90,14 +91,14 @@ const ContactInfoForm = ({
         contactName: true,
         position: true,
         company: true,
-        phone: true,
+        place: true,
         signingDate: true,
       });
 
       validate("contactName", projectData.contactName || "");
       validate("position", projectData.position || "");
       validate("company", projectData.company || "");
-      validate("phone", projectData.phone || "");
+      validate("place", projectData.place || "");
       validate("signingDate", projectData.signingDate || "");
     }
   }, [highlightErrors]);
@@ -129,11 +130,11 @@ const ContactInfoForm = ({
       }
     }
 
-    if (name === "phone") {
+    if (name === "place") {
       if (!value.trim()) {
-        newErrors.phone = `${t("phone_number_is_required")}`;
+        newErrors.place = `${t("place_name_is_requir")}`;
       } else {
-        delete newErrors.phone;
+        delete newErrors.place;
       }
     }
 
@@ -293,52 +294,15 @@ const ContactInfoForm = ({
           <Label htmlFor="position">
             {t("position")} <span className="text-red-500">*</span>
           </Label>
-          <div className="relative">
-            <button
-              type="button"
-              className={`flex items-center justify-between w-full h-11 px-4 py-2 text-left border rounded-lg bg-secondary-10 
-                ${
-                  shouldShowError("position")
-                    ? "border-red-500"
-                    : "border-secondary-30"
-                }`}
-              onClick={() => setIsPositionDropdownOpen(!isPositionDropdownOpen)}
-              onBlur={() => handleBlur("position")}
-            >
-              <span className="text-secondary-100">
-                {projectData.position || t("project_manager")}
-              </span>
-              <svg
-                className={`w-5 h-5 transition-transform ${
-                  isPositionDropdownOpen ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
-
-            {isPositionDropdownOpen && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-secondary-30 rounded-lg shadow-lg">
-                {positions.map((position) => (
-                  <div
-                    key={position}
-                    className="px-4 py-2 cursor-pointer hover:bg-secondary-10"
-                    onClick={() => handlePositionSelect(position)}
-                  >
-                    {position}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <Input
+            id="position"
+            name="position"
+            placeholder={t("position")}
+            value={projectData.position || ""}
+            onChange={handleInputChange}
+            onBlur={() => handleBlur("position")}
+            error={shouldShowError("position")}
+          />
           {shouldShowError("position") && (
             <p className="mt-1 text-sm text-red-500">
               {errors.position || t("position_is_required")}
@@ -368,22 +332,22 @@ const ContactInfoForm = ({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="phone">
-              {t("phone")} <span className="text-red-500">*</span>
+            <Label htmlFor="place">
+              {t("place")} <span className="text-red-500">*</span>
             </Label>
             <Input
-              id="phone"
-              name="phone"
+              id="place"
+              name="place"
               type="tel"
-              placeholder="+1 123 456 7890"
-              value={projectData.phone || ""}
+              placeholder={t("place")}
+              value={projectData.place || ""}
               onChange={handleInputChange}
-              onBlur={() => handleBlur("phone")}
-              error={shouldShowError("phone")}
+              onBlur={() => handleBlur("place")}
+              error={shouldShowError("place")}
             />
-            {shouldShowError("phone") && (
+            {shouldShowError("place") && (
               <p className="mt-1 text-sm text-red-500">
-                {errors.phone || "Phone number is required"}
+                {errors.place || "Place is required"}
               </p>
             )}
           </div>
@@ -404,11 +368,6 @@ const ContactInfoForm = ({
                   : false
               }
             />
-            {shouldShowError("signingDate") && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.signingDate || "Signing date is required"}
-              </p>
-            )}
           </div>
         </div>
 

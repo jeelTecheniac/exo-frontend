@@ -26,24 +26,34 @@ const EditProfile = () => {
   const [isActiveButton, setIsActiveButton] = useState<"info" | "security">(
     "info"
   );
-  const [userData, setUserData] = useState<UserData | undefined>();
+  const [loading,setLoading]=useState(true)
+  const [userData, setUserData] = useState<UserData|null>(null);
 
   useEffect(() => {
     try {
       const userRaw = localStorageService.getUser();
       const user = typeof userRaw === "string" ? JSON.parse(userRaw) : userRaw;
       setUserData(user || null);
+      setLoading(false)
     } catch (error) {
       console.error("Failed to parse user data from localStorage", error);
     }
   }, []);
   const isTokenAvailable = !!userData?.token;
 
-  const { data: profile } = useQuery({
+  const { data: profile,isLoading:loadingProfile } = useQuery({
     queryKey: ["userProfile", userData?.token],
     enabled: isTokenAvailable,
     queryFn: async () => {
       const res = await authService.getProfile();
+      console.log(res.data.data,"userProfileData");
+      setLoading(false)
+      setUserData((prev) => {
+        if (!prev) return prev; 
+        return {
+          ...prev          
+        };
+      });
       return res.data;
     },
   });
@@ -53,23 +63,39 @@ const EditProfile = () => {
     openModal: openLogoutModal,
     closeModal: closeLogoutModal,
   } = useModal();
+
+  const handelSetUser=(data:UserData):void=>{
+    if(data){
+      setUserData((prev) => {
+        if (!prev) return prev; 
+        return {
+          ...prev,
+          email: data.email,          
+        };
+      });
+    }
+  }
   return (
     <AppLayout>
+      {loading ||loadingProfile && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+          <span className="text-xl font-semibold text-primary-150">
+            {t("Loading...")}
+          </span>
+        </div>
+      )}
       <div className="lg:px-10 px-4">
         <div>
           <Typography
             size="xl_2"
             weight="extrabold"
-            className="text-secondary-100"
-          >
+            className="text-secondary-100">
             {t("edit_profile")}
           </Typography>
           <ProfileHeader
-            email={(profile && profile.data.email) || ""}
+            email={(userData && userData.email) || ""}
             name={
-              (profile &&
-                `${profile.data.first_name} ${profile.data.last_name}`) ||
-              ""
+              (userData && `${userData.first_name} ${userData.last_name}`) || ""
             }
             imageUrl="/images/user/thubmnail.png"
           />
@@ -116,15 +142,18 @@ const EditProfile = () => {
           </div>
 
           {isActiveButton === "info" ? (
-            <UserInformation userData={profile && profile.data} />
+            <UserInformation userData={profile && userData} />
           ) : (
-            <Security userData={profile && profile.data} />
+            <Security
+              userData={profile && userData}
+              setUserDate={handelSetUser}
+            />
           )}
         </div>
         <LogoutModal
           isOpen={isOpenLogoutModal}
           onClose={closeLogoutModal}
-          userData={userData}
+          userData={profile && userData}
         />
       </div>
     </AppLayout>

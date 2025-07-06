@@ -185,5 +185,7 @@
   "request_created": "Request Created",
   "details":"détails",
   "request_latter": "Lettre de demande :",
-  "call_for_tenders": "Appel d'offres"
+  "call_for_tenders": "Appel d'offres",
+  "place":"Lieu",
+  "place_name_is_require":"Un lieu est requis"
 }

@@ -112,7 +112,6 @@ const ListDashBoard = () => {
             <Button
               variant="primary"
               className="flex items-center justify-center w-fit gap-2 py-2 px-4 sm:py-3"
-              onClick={() => navigate("/create-project")}
             >
               <WhitePlusIcon width={13} height={13} />
               <Typography size="base">{t("create_project")}</Typography>
