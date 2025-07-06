@@ -20,6 +20,7 @@ import ProjectDetails from "./components/dashboard/ProjectDetails";
 import ListDashBoard from "./components/dashboard/ListDashBoard";
 import PublicRoute from "./utils/PublicRoute";
 import ProtectedRoute from "./utils/constant/ProtectedRoute";
+import CreateProject from "./pages/Dashboard/CreateProject";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -37,7 +38,18 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/edit-project/:projectId" element={<Home />} />
+            <Route
+              path="/create-project"
+              element={
+                <ProtectedRoute>
+                  <CreateProject />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-project/:projectId"
+              element={<CreateProject />}
+            />
             <Route
               path="/sign-in"
               element={

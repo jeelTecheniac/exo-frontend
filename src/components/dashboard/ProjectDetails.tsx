@@ -25,6 +25,8 @@ const ProjectDetails = () => {
         const data = await projectService.getProjectDetails(projectId!);
         setProject(data);
       } catch (err: any) {
+        console.log(err, "erro");
+
         setError(t("Failed to load project details"));
       } finally {
         setLoading(false);
@@ -33,21 +35,22 @@ const ProjectDetails = () => {
     if (projectId) fetchProject();
   }, [projectId, t]);
 
-  if (loading) return <div className="p-8">Loading...</div>;
   if (error) return <div className="p-8 text-red-500">{error}</div>;
-  if (!project) return null;
+  if (!project && !loading) return null;
 
   // Map address for AddressTable
-  const addressData = (project.address || []).map((item: any, idx: number) => ({
-    id: idx + 1,
-    country: item.country,
-    providence: item.providence,
-    city: item.city,
-    municipality: item.municipality,
-  }));
+  const addressData = (project?.address || []).map(
+    (item: any, idx: number) => ({
+      id: idx + 1,
+      country: item.country,
+      providence: item.providence,
+      city: item.city,
+      municipality: item.municipality,
+    })
+  );
 
   // Map requests for RequestTable
-  const requestData = (project.requests || []).map(
+  const requestData = (project?.requests || []).map(
     (item: any, idx: number) => ({
       id: idx + 1,
       requestNo: item.request_unique_number || idx + 1,
@@ -88,7 +91,25 @@ const ProjectDetails = () => {
   return (
     <div>
       <AppLayout>
-        <div className="px-4 sm:px-6 md:px-8">
+        {/* Blur overlay when loading */}
+        {loading && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-150"></div>
+              <span className="text-xl font-semibold text-primary-150">
+                {t("Loading...")}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div
+          className={
+            loading
+              ? "pointer-events-none select-none blur-sm relative px-4 sm:px-6 md:px-8"
+              : "relative px-4 sm:px-6 md:px-8"
+          }
+        >
           <motion.div
             className="flex flex-col sm:flex-row sm:justify-between sm:items-center"
             variants={containerVariants}
@@ -126,7 +147,7 @@ const ProjectDetails = () => {
                   className="text-secondary-100"
                 >
                   {t("project_details")}{" "}
-                  {project.reference ? `#${project.reference}` : ""}
+                  {project?.reference ? `#${project.reference}` : ""}
                 </Typography>
               </motion.div>
               <Typography
@@ -134,7 +155,7 @@ const ProjectDetails = () => {
                 weight="normal"
                 className="text-secondary-60"
               >
-                {t("last_updated")} {formatDate(project.created_at)}
+                {t("last_updated")} {formatDate(project?.created_at)}
               </Typography>
             </div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -168,33 +189,33 @@ const ProjectDetails = () => {
               </Typography>
               <div className="mt-4 sm:mt-6 space-y-4 sm:space-y-5">
                 {[
-                  { label: "Project Name:", value: project.name },
-                  { label: "Project Reference:", value: project.reference },
+                  { label: "Project Name:", value: project?.name },
+                  { label: "Project Reference:", value: project?.reference },
                   {
                     label: "Amount:",
                     value: (
                       <>
                         <span className="text-secondary-60">
-                          {project.currency}
+                          {project?.currency}
                         </span>{" "}
-                        {formatAmount(project.amount)}
+                        {formatAmount(project?.amount)}
                       </>
                     ),
                   },
                   {
                     label: "Project Begin Date:",
-                    value: formatDate(project.begin_date),
+                    value: formatDate(project?.begin_date),
                   },
                   {
                     label: "Project End Date:",
-                    value: formatDate(project.end_date),
+                    value: formatDate(project?.end_date),
                   },
                   {
                     label: "Description:",
                     value: (
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: project.description || "-",
+                          __html: project?.description || "-",
                         }}
                       />
                     ),
@@ -202,7 +223,7 @@ const ProjectDetails = () => {
                   {
                     label: "Upload Files:",
                     value:
-                      project.documents && project.documents.length > 0
+                      project?.documents && project.documents.length > 0
                         ? project.documents.map((doc: any, idx: number) => (
                             <a
                               key={idx}
@@ -258,13 +279,13 @@ const ProjectDetails = () => {
               </Typography>
               <div className="mt-4 sm:mt-6 space-y-4 sm:space-y-5">
                 {[
-                  { label: "Signed By:", value: project.signed_by },
-                  { label: "Position:", value: project.position },
-                  { label: "Organization:", value: project.organization },
-                  { label: "Place:", value: project.place },
+                  { label: "Signed By:", value: project?.signed_by },
+                  { label: "Position:", value: project?.position },
+                  { label: "Organization:", value: project?.organization },
+                  { label: "Place:", value: project?.place },
                   {
                     label: "Date of Signing:",
-                    value: formatDate(project.date_of_signing),
+                    value: formatDate(project?.date_of_signing),
                   },
                 ].map((item, index) => (
                   <motion.div
@@ -292,7 +313,7 @@ const ProjectDetails = () => {
                     </Typography>
                   </motion.div>
                 ))}
-                {project.documents && project.documents.length > 0 && (
+                {project?.documents && project.documents.length > 0 && (
                   <motion.div
                     className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4"
                     variants={itemVariants}

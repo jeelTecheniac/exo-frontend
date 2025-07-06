@@ -9,7 +9,6 @@ import {
   SaveDraftIcon,
   ArrowRightIconButton,
 } from "../../icons";
-import CreateRequest from "../../components/dashboard/CreateRequest";
 import CreateProjectConfirmationModal from "../../components/modal/CreateProjectConfirmationModal";
 import { useModal } from "../../hooks/useModal";
 import { useTranslation } from "react-i18next";
@@ -18,6 +17,7 @@ import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
 import localStorageService from "../../services/local.service";
 import { useParams } from "react-router";
+import AppLayout from "../../layout/AppLayout";
 
 export interface UserData {
   id: number;
@@ -71,7 +71,6 @@ interface FieldValidation {
 const CreateProject = () => {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
-  const [isOpenStepperForm, setIsOpenStepperForm] = useState(false);
   const [highlightErrors, setHighlightErrors] = useState(false);
   const [fieldValidation, setFieldValidation] = useState<FieldValidation>({
     projectInfo: {
@@ -291,6 +290,8 @@ const CreateProject = () => {
         project_name,
         finance_by,
       } = data;
+      console.log(data, "data");
+
       setProjectData({
         projectName: project_name || "",
         projectReference: reference,
@@ -319,20 +320,33 @@ const CreateProject = () => {
   useEffect(() => {
     if (projectId) {
       console.log(projectId, "editProjectData");
-      setIsOpenStepperForm(true);
       fetchProject(projectId);
     } else {
       setLoading(false);
     }
   }, [projectId]);
-  if (loading) return <>loading...</>;
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 backdrop-blur-sm z-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary-150 border-t-transparent rounded-full animate-spin"></div>
+          <Typography
+            size="lg"
+            weight="semibold"
+            className="text-secondary-100"
+          >
+            {t("loading")}...
+          </Typography>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-secondary-5 h-full p-4 md:p-6">
-      <div className="max-w-[900px] mx-auto">
-        {!isOpenStepperForm && (
-          <CreateRequest onClick={() => setIsOpenStepperForm(true)} />
-        )}
-        {isOpenStepperForm && (
+    <AppLayout className="bg-white">
+      <div className="bg-secondary-5 h-full p-4 md:p-6">
+        <div className="max-w-[900px] mx-auto">
           <div className="rounded-lg overflow-hidden bg-white shadow-md border border-gray-100">
             <div className="h-1 w-full bg-primary-150"></div>
             <div className="p-4 md:p-6">
@@ -417,14 +431,14 @@ const CreateProject = () => {
               </div>
             </div>
           </div>
-        )}
+        </div>
+        <CreateProjectConfirmationModal
+          isOpen={isOpen}
+          onClose={closeModal}
+          projectId={newProjectId}
+        />
       </div>
-      <CreateProjectConfirmationModal
-        isOpen={isOpen}
-        onClose={closeModal}
-        projectId={newProjectId}
-      />
-    </div>
+    </AppLayout>
   );
 };
 
