@@ -316,6 +316,8 @@ const CreateProject = () => {
     setLoading(true);
     try {
       const data = await projectService.getProjectDetails(projectId);
+      console.log(data, "data");
+
       const {
         name,
         reference,
@@ -330,9 +332,26 @@ const CreateProject = () => {
         finance_by,
         signed_by,
         place,
-        position
+        position,
       } = data;
       console.log(data, "data");
+      const files = data.documents
+        .filter((d: any) => d.object_type === "project")
+        .map((d: any) => {
+          return {
+            ...d,
+            name: d.original_name, // Corrected: Use property assignment
+          };
+        });
+
+      const contractFiles = data.documents
+        .filter((d: any) => d.object_type === "contract")
+        .map((d: any) => {
+          return {
+            ...d,
+            name: d.original_name, // Corrected: Use property assignment
+          };
+        });
 
       setProjectData({
         projectName: name || "",
@@ -343,14 +362,14 @@ const CreateProject = () => {
         endDate: end_date,
         description: description,
         addresses: address,
-        files: [],
+        files: files,
         contactName: signed_by,
         position: position,
         company: organization,
         place: place,
         financeBy: finance_by,
         signingDate: date_of_signing,
-        contractFiles: [],
+        contractFiles: contractFiles,
       });
     } catch (err: any) {
       console.error(err);

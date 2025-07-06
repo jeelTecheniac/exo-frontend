@@ -54,6 +54,7 @@ const ContactInfoForm = ({
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const { t } = useTranslation();
+  console.log(projectData, "p");
 
   useEffect(() => {
     const defaultValues = {
@@ -352,6 +353,7 @@ const ContactInfoForm = ({
               onChange={(selectedDates: Date[]) =>
                 handleDateChange("signingDate", selectedDates[0])
               }
+              defaultDate={projectData.signingDate}
               placeholder="01-06-2025"
               error={
                 shouldShowError("signingDate")
