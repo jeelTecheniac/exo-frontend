@@ -3,7 +3,7 @@ import {
   BlueCopyIcon,
   MenuListIcon,
   MenuListIconFrench,
-  PdfIcon,
+  // PdfIcon,
   UsdGreenIcon,
   UsdOrangeIcon,
   UsdVioletIcon,
@@ -235,7 +235,7 @@ const TestRequestDetails = () => {
                           ? requestData?.amount_summary?.total_quantity
                           : 0
                       }
-                      title={t("total_entity")}
+                      title={t("total_quantity")}
                     />
                     <DashBoardCard
                       icon={<UsdGreenIcon width={44} height={44} />}
@@ -302,14 +302,14 @@ const TestRequestDetails = () => {
                     </div>
 
                     <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
-                      <Typography
+                      {/* <Typography
                         className="text-secondary-60 min-w-[100px]"
                         size="sm"
                       >
                         {t("invoice_files")}
-                      </Typography>
+                      </Typography> */}
                       <div className="flex flex-wrap gap-2">
-                        <div className="inline-flex items-center gap-2 border border-secondary-60 rounded-full px-3 py-1.5 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
+                        {/* <div className="inline-flex items-center gap-2 border border-secondary-60 rounded-full px-3 py-1.5 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
                           <PdfIcon width={12} height={12} />
                           <Typography
                             size="xs"
@@ -321,7 +321,7 @@ const TestRequestDetails = () => {
                               (5.3MB)
                             </span>
                           </Typography>
-                        </div>
+                        </div> */}
                         {/* Add more invoice files here if needed */}
                       </div>
                     </div>
