@@ -263,6 +263,7 @@ const CreateRequestTable = ({
   const handleDelete = (orderId: number) => {
     if (window.confirm("Are you sure you want to delete this record?")) {
       setTableData((prev) => prev.filter((order) => order.id !== orderId));
+      onDataChange?.(tableData.filter((order) => order.id !== orderId));
       setSelectedRows((prev) => prev.filter((id) => id !== orderId));
     }
     setOpenMenuId(null);
@@ -428,18 +429,18 @@ const CreateRequestTable = ({
 
           <TableBody className="divide-y divide-gray-100">
             {tableData.map((order, index) => (
-              <TableRow key={index}>
+              <TableRow key={order.id}>
                 <TableCell className="px-5 py-4 w-10">
                   <input
                     type="checkbox"
-                    checked={selectedRows.includes(order.id || index + 1)}
-                    onChange={() => handleSelectRow(order.id || index + 1)}
+                    checked={selectedRows.includes(order.id)}
+                    onChange={() => handleSelectRow(order.id)}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    aria-label={`Select row ${order.id || index + 1}`}
+                    aria-label={`Select row ${order.id}`}
                   />
                 </TableCell>
                 <TableCell className="px-5 py-4 text-gray-500 text-sm">
-                  {order.id || index + 1}
+                  {index+1}
                 </TableCell>
                 <TableCell className="px-5 py-4 sm:px-6">
                   {editingId === order.id ? (

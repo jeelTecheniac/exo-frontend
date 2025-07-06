@@ -100,9 +100,9 @@ const UploadFile: React.FC<FileUploadProps> = ({
       const uploadedFile = { file, id: uploaded.id, url: uploaded.url };
       setSelectedFiles((prev) => {
         const updated = [...prev, uploadedFile];
-        onFilesSelect?.(updated);
         return updated;
       });
+      onFilesSelect?.([...selectedFiles,uploadedFile]);
     } catch (err) {
       console.log(err, "er");
 
