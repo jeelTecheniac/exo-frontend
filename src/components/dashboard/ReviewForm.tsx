@@ -262,10 +262,10 @@ const ReviewForm = ({ projectData }: ReviewFormProps) => {
 
             <div className="flex">
               <div className="w-1/3 text-secondary-60">
-                <Label>{t("phone")}</Label>
+                <Label>{t("place")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {projectData.phone || "-"}
+                {projectData.place || "-"}
               </div>
             </div>
 

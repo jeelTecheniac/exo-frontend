@@ -14,10 +14,12 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { UserData } from "../pages/Dashboard/CreateProject";
+import { useAuth } from "../context/AuthContext";
 
 const OtpVerificationForm = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const {login} =useAuth()
 
   const [userData, setUserData] = useState<UserData | undefined>();
   const path = localStorageService.getPath();
@@ -36,15 +38,16 @@ const OtpVerificationForm = () => {
     onSuccess: (res) => {
       console.log(res.data, "resp data");
 
-      // localStorageService.setUser(JSON.stringify(res.data.data));
-      // localStorageService.setLogin(JSON.stringify("true"));
+      localStorageService.setUser(JSON.stringify(res.data.data));
+      localStorageService.setLogin(JSON.stringify("true"));
+      login("true");
       // localStorageService.removePath();
+      localStorageService.setAccessToken(JSON.stringify(res.data.data.token));
       navigate("/dashboard");
     },
     onError: (error) => {
       console.error("Error during sign up:", error);
-      toast.error(t("sign_up_error"));
-      navigate("/");
+      toast.error(t("sign_up_error"));      
     },
   });
   const sendOtpMutation = useMutation({

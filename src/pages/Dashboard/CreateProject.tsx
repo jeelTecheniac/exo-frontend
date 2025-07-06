@@ -16,8 +16,9 @@ import moment from "moment";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
 import localStorageService from "../../services/local.service";
-import { useParams } from "react-router";
 import AppLayout from "../../layout/AppLayout";
+import { useNavigate, useParams } from "react-router";
+import Button from "../../lib/components/atoms/Button";
 
 export interface UserData {
   id: number;
@@ -45,7 +46,7 @@ interface ProjectData {
   contactName: string;
   position: string;
   company: string;
-  phone: string;
+  place: string;
   signingDate: string;
   contractFiles: any[];
   financeBy: string;
@@ -63,7 +64,7 @@ interface FieldValidation {
     contactName: boolean;
     position: boolean;
     company: boolean;
-    phone: boolean;
+    place: boolean;
     signingDate: boolean;
   };
 }
@@ -84,7 +85,7 @@ const CreateProject = () => {
       contactName: false,
       position: false,
       company: false,
-      phone: false,
+      place: false,
       signingDate: false,
     },
   });
@@ -102,7 +103,7 @@ const CreateProject = () => {
     contactName: "",
     position: "",
     company: "",
-    phone: "",
+    place: "",
     signingDate: "",
     financeBy: "",
     contractFiles: [],
@@ -110,6 +111,7 @@ const CreateProject = () => {
   const [loading, setLoading] = useState(true);
   const [newProjectId, setNewProjectId] = useState("");
   const { projectId } = useParams();
+  const navigate=useNavigate()
 
   const steps = [
     { id: 1, title: t("call_for_tenders") },
@@ -142,7 +144,7 @@ const CreateProject = () => {
       "contactName",
       "position",
       "company",
-      "phone",
+      "place",
       "signingDate",
     ];
 
@@ -252,7 +254,7 @@ const CreateProject = () => {
       finance_by: projectData.financeBy || "",
       position: projectData.position || "",
       organization: projectData.company || "",
-      place: "Testing",
+      place: projectData.place || "",
       date_of_signing:
         moment(projectData.signingDate, "DD-MM-YYYY").format("YYYY-MM-DD") ||
         "",
@@ -305,7 +307,7 @@ const CreateProject = () => {
         contactName: name,
         position: "",
         company: organization,
-        phone: "",
+        place: "",
         financeBy: finance_by,
         signingDate: date_of_signing,
         contractFiles: [],
@@ -352,7 +354,7 @@ const CreateProject = () => {
             <div className="p-4 md:p-6">
               <div
                 className="flex items-center gap-2 cursor-pointer mb-2"
-                onClick={() => window.history.back()}
+                onClick={() => navigate("/dashboard")}
               >
                 <ArrowLeftIcon
                   width={16}
@@ -415,9 +417,11 @@ const CreateProject = () => {
                   {t("save_as_draft")}
                 </button>
 
-                <button
+                <Button
+                  variant="primary"
                   onClick={handleNextStep}
                   className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
+                  loading={createProjectMutation.isPending}
                 >
                   {currentStep === steps.length - 1
                     ? `${t("create_project")}`
@@ -427,7 +431,7 @@ const CreateProject = () => {
                     height={18}
                     className="text-white"
                   />
-                </button>
+                </Button>
               </div>
             </div>
           </div>

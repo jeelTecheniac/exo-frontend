@@ -9,19 +9,24 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import authService from "../../services/auth.service";
 import { toast } from "react-toastify";
+import localStorageService from "../../services/local.service";
+
 
 interface UserData {
-  id: string;
-  first_name?: string;
-  last_name?: string;
-  company_name?: string;
-  country_code?: string;
-  mobile?: string;
-  token?: string;
-  email?: string;
+  id: number;
+  first_name: string;
+  last_name: string;
+  company_name: string;
+  country_code: string;
+  mobile: string;
+  email: string;
+  profile_image: string;
+  type: string;
+  token: string;
 }
 interface UserInformationProps {
   userData: UserData;
+  setUserDate:(data:UserData)=>void;
 }
 
 interface ChangeEmailFields {
@@ -35,7 +40,7 @@ const initialChangeEmailFields: ChangeEmailFields = {
   password: "",
   otp: "",
 };
-const Security = ({ userData }: UserInformationProps) => {
+const Security = ({ userData,setUserDate }: UserInformationProps) => {
   const [changeEmialFields, setChangeEmailFields] = useState<ChangeEmailFields>(
     initialChangeEmailFields
   );
@@ -88,36 +93,40 @@ const Security = ({ userData }: UserInformationProps) => {
       openOtpModal();
     }
   };
-  // const changeEmail = useMutation({
-  //   mutationFn: async (data: ChangeEmailFields) => {
-  //     const formData = new FormData();
+  const changeEmail = useMutation({
+    mutationFn: async (data: ChangeEmailFields) => {
+      const formData = new FormData();
 
-  //     // Append form data
-  //     Object.entries(data).forEach(([key, value]) => {
-  //       formData.append(key, value);
-  //     });
+      // Append form data
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
 
-  //     const res = await authService.changeEmail(data);
-  //     return res.data;
-  //   },
-  //   onSuccess: (res) => {
-  //     console.log("Email updated successfully:", res);
-  //     setChangeEmailFields(initialChangeEmailFields);
-  //     // Add success notification here
-  //     // toast.success(t("email_updated_successfully"));
-  //   },
-  //   onError: (error) => {
-  //     console.error("Error during Email update:", error);
-  //     // Add error notification here
-  //     // toast.error(t("email_update_error"));
-  //   },
-  // });
+      const res = await authService.changeEmail(data);      
+      return res;
+    },
+    onSuccess: (res) => {
+      console.log("Email updated successfully:", res);
+      setChangeEmailFields(initialChangeEmailFields);
+      // Add success notification here
+      // toast.success(t("email_updated_successfully"));
+    },
+    onError: (error) => {
+      console.error("Error during Email update:", error);
+      // Add error notification here
+      // toast.error(t("email_update_error"));
+    },
+  });
   const verifyOTP = async () => {
     console.log(changeEmialFields, "changeEmialFields");
-    // const res= await changeEmail.mutateAsync(changeEmialFields)
-    closeOtpModal();
+    const res= await changeEmail.mutateAsync(changeEmialFields);
+    if(res.data.status===200){
+      setUserDate({...res.data.data})
+      localStorageService.setUser(JSON.stringify({...userData,email:res.data.data.email}))
+      closeOtpModal();
+    }
   };
-
+  console.log(userData)
   return (
     <div className="w-full flex gap-4 md:gap-6 flex-col">
       <div className="bg-white p-4 md:p-6 lg:p-10">
@@ -195,6 +204,7 @@ const Security = ({ userData }: UserInformationProps) => {
         isOpen={isOpenEmailModal}
         onClose={closeEmailModal}
         sendOtp={handelSendOtp}
+        loading={sendOtpMutation.isPending}
         onChange={handelOnChange}
         fieldValue={changeEmialFields}
       />
@@ -202,6 +212,7 @@ const Security = ({ userData }: UserInformationProps) => {
         isOpen={isOpenOtpModal}
         onClose={closeOtpModal}
         setOtp={setOtp}
+        loading={changeEmail.isPending}
         fieldValue={changeEmialFields}
         verifyOTP={verifyOTP}
       />

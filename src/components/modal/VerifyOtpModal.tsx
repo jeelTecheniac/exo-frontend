@@ -7,13 +7,14 @@ import Typography from "../../lib/components/atoms/Typography";
 
 interface ChangeEmailModalProps {
   isOpen: boolean;
+  loading?:boolean;
   onClose: () => void;
   verifyOTP: () => void;
   setOtp:(otp:string)=>void;
   fieldValue:{email:string,password:string,otp:string}
 }
 
-const VerifyOtpModal = ({ isOpen, onClose,setOtp,fieldValue,verifyOTP }: ChangeEmailModalProps) => {
+const VerifyOtpModal = ({ isOpen, onClose,setOtp,fieldValue,verifyOTP,loading }: ChangeEmailModalProps) => {
   const { t } = useTranslation();
   return (
     <div className="w-fit">
@@ -43,7 +44,7 @@ const VerifyOtpModal = ({ isOpen, onClose,setOtp,fieldValue,verifyOTP }: ChangeE
           </Typography>
         </div>
         <div className="w-full flex gap-4 justify-end mt-6">
-          <Button variant="primary" className="w-fit !py-3" onClick={verifyOTP}>
+          <Button variant="primary" className="w-fit !py-3" onClick={verifyOTP} loading={loading}>
             {t("verify")}
           </Button>
         </div>

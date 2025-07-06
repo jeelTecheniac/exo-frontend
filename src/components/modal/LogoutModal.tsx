@@ -3,13 +3,23 @@ import { ExitIcon } from "../../icons";
 import Button from "../../lib/components/atoms/Button";
 import Modal from "../../lib/components/atoms/Modal";
 import Typography from "../../lib/components/atoms/Typography";
-import { UserData } from "../../pages/Dashboard/CreateProject";
 import authService from "../../services/auth.service";
 import { useMutation } from "@tanstack/react-query";
 import localStorageService from "../../services/local.service";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-
+interface UserData {
+  id: number;
+  first_name: string;
+  last_name: string;
+  company_name: string;
+  country_code: string;
+  mobile: string;
+  email: string;
+  profile_image: string;
+  type: string;
+  token: string;
+}
 interface ChangeEmailModalProps {
   isOpen: boolean;
   onClose: () => void;

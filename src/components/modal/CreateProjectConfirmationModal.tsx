@@ -22,7 +22,7 @@ const CreateProjectConfirmationModal = ({
       <Modal
         className="w-[90%] md:max-w-[600px] mx-auto p-4 md:p-6 max-h-[90vh] md:max-h-[900px] flex justify-center items-center"
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={()=>{onClose();navigate("/dashboard");}}
         isFullscreen={false}
         showCloseButton={false}
       >
@@ -58,7 +58,7 @@ const CreateProjectConfirmationModal = ({
             <Button
               variant="outline"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
-              onClick={()=>{navigate("/");onClose()}}
+              onClick={()=>{navigate("/dashboard");onClose()}}
             >
               {t("go_to_dashboard")}
             </Button>

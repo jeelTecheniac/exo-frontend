@@ -8,13 +8,14 @@ import Typography from "../../lib/components/atoms/Typography";
 
 interface ChangeEmailModalProps {
   isOpen: boolean;
+  loading?:boolean
   onClose: () => void;
   sendOtp:()=>void;
   onChange:(e:React.ChangeEvent<HTMLInputElement>)=>void;
   fieldValue:{email:string,password:string,otp:string}
 }
 
-const ChangeEmailModal = ({ isOpen, onClose,sendOtp,onChange,fieldValue }: ChangeEmailModalProps) => {
+const ChangeEmailModal = ({ isOpen, onClose,sendOtp,onChange,fieldValue,loading }: ChangeEmailModalProps) => {
   const { t } = useTranslation();
   return (
     <div className="w-fit">
@@ -48,7 +49,7 @@ const ChangeEmailModal = ({ isOpen, onClose,sendOtp,onChange,fieldValue }: Chang
           >
             {t("cancel")}
           </Button>
-          <Button variant="primary" className="w-fit !py-3" onClick={() => sendOtp()}>
+          <Button variant="primary" className="w-fit !py-3" onClick={() => sendOtp()} loading={loading}>
             {t("send_otp")}
           </Button>
         </div>
