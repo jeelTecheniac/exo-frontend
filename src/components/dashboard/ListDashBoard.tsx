@@ -5,9 +5,9 @@ import AppLayout from "../../layout/AppLayout";
 import Button from "../../lib/components/atoms/Button";
 import DashBoardCard from "../../lib/components/molecules/DashBoardCard.tsx";
 import {
-  ArchiveIcon,
+  // ArchiveIcon,
   FileVioletIcon,
-  FilterIcon,
+  // FilterIcon,
   SearchIcon,
   UsdGreenIcon,
   UsdOrangeIcon,
@@ -27,21 +27,37 @@ const ListDashBoard = () => {
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
-  const [limit, setLimit] = useState(8); // default rows per page
-  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(8);
+  const [offset, setOffset] = useState(0);
   // Dashboard card state
   const [totalProject, setTotalProject] = useState(0);
   const [totalAmountProject, setTotalAmountProject] = useState(0);
   const [totalRequest, setTotalRequest] = useState(0);
   const [totalAmountRequest, setTotalAmountRequest] = useState(0);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await homeService.getHomeData(limit, page);
+        const res = await homeService.getHomeData(
+          limit,
+          offset,
+          debouncedSearchTerm
+        );
         const dataArray = (res.data || []).map((item: any, idx: number) => ({
-          id: idx + 1 + (page - 1) * limit,
+          id: idx + 1 + offset,
           projectId: item.reference,
           projectName: item.name,
           currency: item.currency,
@@ -52,13 +68,12 @@ const ListDashBoard = () => {
         }));
 
         setData(dataArray);
-        setTotal(res.total_project || 0); // Use total_project for pagination
+        setTotal(res.total_project || 0);
         setTotalProject(res.total_project || 0);
         setTotalAmountProject(res.total_amount_project || 0);
         setTotalRequest(res.total_request || 0);
         setTotalAmountRequest(res.total_amount_request || 0);
 
-        // Redirect to home page if data length is zero or less
         if (dataArray.length <= 0) {
           navigate("/");
         }
@@ -71,14 +86,26 @@ const ListDashBoard = () => {
       }
     };
     fetchData();
-  }, [limit, page, navigate]);
+  }, [limit, offset, navigate, debouncedSearchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const currentPage = Math.floor(offset / limit) + 1;
+
+  const handlePageChange = (newPage: number) => {
+    const newOffset = (newPage - 1) * limit;
+    setOffset(newOffset);
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setOffset(0); // Reset to first page when changing limit
+  };
 
   return (
     <AppLayout>
-      {/* Blur overlay when loading */}
       {loading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-          <span className="text-xl font-semibold text-primary-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+          <span className="text-lg sm:text-xl font-semibold text-primary-150">
             {t("Loading...")}
           </span>
         </div>
@@ -91,15 +118,15 @@ const ListDashBoard = () => {
         }
       >
         <motion.div
-          className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4"
+          className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4 px-4 sm:px-0"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <Typography
-            size="xl_2"
+            size="xl"
             weight="extrabold"
-            className="text-secondary-100 mb-4 sm:mb-0"
+            className="text-secondary-100 text-center sm:text-left"
           >
             {t("dashboard")}
           </Typography>
@@ -108,20 +135,28 @@ const ListDashBoard = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
+            className="w-full sm:w-auto"
           >
             <Button
               variant="primary"
-              className="flex items-center justify-center w-fit gap-2 py-2 px-4 sm:py-3"
+              className="flex items-center justify-center w-full sm:w-fit gap-2 py-2.5 px-4"
               onClick={() => navigate("/create-project")}
             >
-              <WhitePlusIcon width={13} height={13} />
-              <Typography size="base">{t("create_project")}</Typography>
+              <WhitePlusIcon
+                width={12}
+                height={12}
+                className="sm:w-[13px] sm:h-[13px]"
+              />
+              <Typography size="sm" className="sm:text-base">
+                {t("create_project")}
+              </Typography>
             </Button>
           </motion.div>
         </motion.div>
-        <motion.div>
+
+        <motion.div className="px-4 sm:px-0">
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6"
             initial="hidden"
             animate="visible"
           >
@@ -180,87 +215,88 @@ const ListDashBoard = () => {
               </motion.div>
             ))}
           </motion.div>
+
           <motion.div
-            className="bg-white p-4 rounded-lg shadow-sm"
+            className="bg-white p-3 sm:p-4 rounded-lg shadow-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
           >
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center sm:gap-4 mb-4 sm:mb-5">
               <motion.div
                 className="w-full sm:w-1/2"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.3 }}
               >
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-2.5 sm:left-3 flex items-center pointer-events-none">
                     <SearchIcon className="h-4 w-4 sm:h-5 sm:w-5 text-secondary-50" />
                   </div>
                   <Input
                     type="text"
-                    placeholder="Search By Project ID or Project Name..."
-                    className="pl-9 sm:pl-10 bg-white pr-4 text-sm sm:text-base w-full"
+                    placeholder={t("Search By Project ID or Project Name...")}
+                    className="pl-8 sm:pl-10 bg-white pr-3 sm:pr-4 text-sm sm:text-base w-full h-9 sm:h-10"
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
               </motion.div>
-              <div className="flex gap-2 sm:gap-3">
+
+              <div className="flex gap-2 sm:gap-3 justify-end">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Button
+                  {/* <Button
                     variant="outline"
-                    className="flex justify-center items-center gap-2 w-fit py-2 px-3 sm:py-3 sm:px-4 min-w-[100px] sm:min-w-[120px] h-fit"
+                    className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[90px] sm:min-w-[120px] h-9 sm:h-10"
                   >
-                    <ArchiveIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <ArchiveIcon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     <Typography
                       className="text-secondary-60"
                       element="span"
                       size="sm"
                       weight="semibold"
                     >
-                      Archive
+                      {t("Archive")}
                     </Typography>
-                  </Button>
+                  </Button> */}
                 </motion.div>
+
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Button
+                  {/* <Button
                     variant="outline"
-                    className="flex justify-center items-center gap-2 w-fit py-2 px-3 sm:py-3 sm:px-4 min-w-[100px] sm:min-w-[120px] h-fit"
+                    className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[90px] sm:min-w-[120px] h-9 sm:h-10"
                   >
-                    <FilterIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <FilterIcon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     <Typography
                       className="text-secondary-60"
                       element="span"
                       size="sm"
                       weight="semibold"
                     >
-                      Filter
+                      {t("Filter")}
                     </Typography>
-                  </Button>
+                  </Button> */}
                 </motion.div>
               </div>
             </div>
-            <motion.div
-              className="mt-4 sm:mt-6 mb-5 overflow-x-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }}
-            >
+
+            <div className="-mx-3 sm:mx-0 overflow-x-auto">
               <ListDashBoardTable data={data} />
-            </motion.div>
-            <div className="flex justify-between items-center mt-4">
-              <div>
-                Rows per page:
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4 px-4 sm:px-0">
+              <div className="flex items-center gap-3 text-sm">
+                <span>{t("Rows per page:")} </span>
                 <select
                   value={limit}
-                  onChange={(e) => setLimit(Number(e.target.value))}
-                  className="ml-2 border rounded px-2 py-1"
+                  onChange={(e) => handleLimitChange(Number(e.target.value))}
+                  className="border rounded px-2 py-1 text-sm bg-white"
                 >
                   {[8, 16, 32].map((opt) => (
                     <option key={opt} value={opt}>
@@ -268,24 +304,57 @@ const ListDashBoard = () => {
                     </option>
                   ))}
                 </select>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>
-                  Page: {page} of {Math.max(1, Math.ceil(total / limit))}
+                <span className="hidden sm:inline">
+                  {t("Showing")} {offset + 1} -{" "}
+                  {Math.min(offset + limit, total)} {t("of")} {total}
                 </span>
+              </div>
+
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
-                  className="px-2 py-1"
-                  disabled={page === 1}
-                  onClick={() => setPage(page - 1)}
+                  className="px-2 py-1 min-w-[32px] text-sm"
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
                   &lt;
                 </Button>
+
+                <div className="flex gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={
+                          currentPage === pageNum ? "primary" : "outline"
+                        }
+                        className={`px-2 py-1 min-w-[32px] text-sm ${
+                          currentPage === pageNum ? "text-white" : ""
+                        }`}
+                        onClick={() => handlePageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+
                 <Button
                   variant="outline"
-                  className="px-2 py-1"
-                  disabled={page === Math.ceil(total / limit) || total === 0}
-                  onClick={() => setPage(page + 1)}
+                  className="px-2 py-1 min-w-[32px] text-sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
                 >
                   &gt;
                 </Button>
