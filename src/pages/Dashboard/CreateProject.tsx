@@ -247,7 +247,7 @@ const CreateProject = () => {
             city: address.city,
             country: address.country,
             municipality: address.municipality,
-            providence: address.province,
+            providence: address.providence,
           }))
         ) || [],
       status: "draft",
@@ -302,7 +302,7 @@ const CreateProject = () => {
             city: address.city,
             country: address.country,
             municipality: address.municipality,
-            providence: address.province,
+            providence: address.providence,
           }))
         ) || [],
       status: "publish",

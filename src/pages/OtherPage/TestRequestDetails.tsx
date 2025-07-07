@@ -22,6 +22,8 @@ import { useParams } from "react-router";
 import RequestProgress from "../../components/dashboard/ProgressStep";
 import { useModal } from "../../hooks/useModal";
 import RequestDetailModal from "../../components/modal/RequestDetailModal";
+import History from "../../components/dashboard/History";
+import moment from "moment";
 interface UserData {
   id: number;
   first_name: string;
@@ -138,6 +140,7 @@ const TestRequestDetails = () => {
 
   const { t, i18n } = useTranslation();
   const { requestId } = useParams();
+  const [history, setHistory] = useState([]);
 
   const { data: _requestDetails, isLoading: _requestLoading } = useQuery<any>({
     queryKey: [`project-${requestId}-address`],
@@ -180,7 +183,18 @@ const TestRequestDetails = () => {
     },
   });
 
-  console.log(requestData, "req data");
+  useEffect(() => {
+    if (!requestData?.tracks) return;
+
+    const res = requestData.tracks.map((t, index) => ({
+      id: index,
+      date: moment(t.created_at).format("YYYY-MM-DD"),
+      time: moment(t.created_at).format("HH:mm:ss"),
+      title: t.status,
+    })) as [];
+
+    setHistory(res);
+  }, [requestData]);
 
   useEffect(() => {
     const user = localStorageService.getUser() || "";
@@ -346,7 +360,14 @@ const TestRequestDetails = () => {
                       </div>
                     </div>
                   </div>
+                  <div>df</div>
                 </div>
+              </div>
+              <div className="border border-secondary-30 bg-white rounded-lg">
+                <Typography size="base" weight="bold" className="p-4">
+                  History
+                </Typography>
+                <History items={history} />
               </div>
             </div>
           </div>
