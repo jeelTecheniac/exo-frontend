@@ -392,10 +392,10 @@ const CreateRequestTable = ({
       content: <div>VAT Included</div>,
       className: "w-28",
     },
-    {
+    ...(!showActions?[{
       content: <div>Financial Authority</div>,
       className: "min-w-[140px]",
-    },
+    }]:[]),
     ...(showActions
       ? [
           {
@@ -440,7 +440,7 @@ const CreateRequestTable = ({
                   />
                 </TableCell>
                 <TableCell className="px-5 py-4 text-gray-500 text-sm">
-                  {index+1}
+                  {index + 1}
                 </TableCell>
                 <TableCell className="px-5 py-4 sm:px-6">
                   {editingId === order.id ? (
@@ -468,8 +468,7 @@ const CreateRequestTable = ({
                       <button
                         onClick={() => handleDecrement(order.id)}
                         className="w-8 h-8 flex items-center justify-center bg-white text-secondary-50 border-r border-secondary-30 hover:bg-gray-100 transition-colors focus:outline-none"
-                        aria-label="Decrease quantity"
-                      >
+                        aria-label="Decrease quantity">
                         -
                       </button>
                       <div className="w-12 text-center font-medium bg-secondary-10 px-2 py-1 text-secondary-100 text-sm">
@@ -478,8 +477,7 @@ const CreateRequestTable = ({
                       <button
                         onClick={() => handleIncrement(order.id)}
                         className="w-8 h-8 flex items-center justify-center bg-white text-secondary-50 border-l border-secondary-30 hover:bg-gray-100 transition-colors focus:outline-none"
-                        aria-label="Increase quantity"
-                      >
+                        aria-label="Increase quantity">
                         +
                       </button>
                     </div>
@@ -515,8 +513,7 @@ const CreateRequestTable = ({
                       <Typography
                         size="sm"
                         weight="normal"
-                        className="text-secondary-30"
-                      >
+                        className="text-secondary-30">
                         Not-allowed
                       </Typography>
                     </div>
@@ -552,8 +549,7 @@ const CreateRequestTable = ({
                       <Typography
                         size="sm"
                         weight="normal"
-                        className="text-secondary-30"
-                      >
+                        className="text-secondary-30">
                         Not-allowed
                       </Typography>
                     </div>
@@ -580,31 +576,32 @@ const CreateRequestTable = ({
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="px-5 py-4 sm:px-6">
-                  {editingId === order.id ? (
-                    <div className="flex flex-col gap-1">
-                      <select
-                        value={editFormData.financialAuthority ?? ""}
-                        onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                          handleInputChange(
-                            "financialAuthority",
-                            e.target.value
-                          )
-                        }
-                        className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white"
-                        aria-label="Financial Authority"
-                      >
-                        <option value="DGDA">DGDA</option>
-                        <option value="DGI">DGI</option>
-                        <option value="DGRAD">DGRAD</option>
-                      </select>
-                    </div>
-                  ) : (
-                    <span className="block font-medium text-secondary-100 text-sm">
-                      {order.financialAuthority || order.financial_authority}
-                    </span>
-                  )}
-                </TableCell>
+                {!showActions && (
+                  <TableCell className="px-5 py-4 sm:px-6">
+                    {editingId === order.id ? (
+                      <div className="flex flex-col gap-1">
+                        <select
+                          value={editFormData.financialAuthority ?? ""}
+                          onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                            handleInputChange(
+                              "financialAuthority",
+                              e.target.value
+                            )
+                          }
+                          className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white"
+                          aria-label="Financial Authority">
+                          <option value="DGDA">DGDA</option>
+                          <option value="DGI">DGI</option>
+                          <option value="DGRAD">DGRAD</option>
+                        </select>
+                      </div>
+                    ) : (
+                      <span className="block font-medium text-secondary-100 text-sm">
+                        {order.financialAuthority || order.financial_authority}
+                      </span>
+                    )}
+                  </TableCell>
+                )}
                 {showActions && (
                   <TableCell className="px-4 py-3 text-gray-500 text-sm">
                     {editingId === order.id ? (
@@ -626,8 +623,7 @@ const CreateRequestTable = ({
                     ) : (
                       <div
                         className="relative"
-                        ref={openMenuId === order.id ? menuRef : null}
-                      >
+                        ref={openMenuId === order.id ? menuRef : null}>
                         <button
                           onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                             e.stopPropagation();
@@ -636,21 +632,18 @@ const CreateRequestTable = ({
                           className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                           aria-label="Open actions menu"
                           aria-haspopup="true"
-                          aria-expanded={openMenuId === order.id}
-                        >
+                          aria-expanded={openMenuId === order.id}>
                           <svg
                             className="w-4 h-4"
                             fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
+                            viewBox="0 0 20 20">
                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                           </svg>
                         </button>
                         {openMenuId === order.id && (
                           <div
                             className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-50"
-                            role="menu"
-                          >
+                            role="menu">
                             <button
                               onClick={(
                                 e: React.MouseEvent<HTMLButtonElement>
@@ -660,8 +653,7 @@ const CreateRequestTable = ({
                               }}
                               className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                               role="menuitem"
-                              aria-label="Edit row"
-                            >
+                              aria-label="Edit row">
                               Edit
                             </button>
                             <button
@@ -673,8 +665,7 @@ const CreateRequestTable = ({
                               }}
                               className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
                               role="menuitem"
-                              aria-label="Delete row"
-                            >
+                              aria-label="Delete row">
                               Delete
                             </button>
                           </div>
