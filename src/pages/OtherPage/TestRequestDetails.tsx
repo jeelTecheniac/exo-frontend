@@ -127,6 +127,7 @@ const TestRequestDetails = () => {
   const [userData, setUserData] = useState<UserData | undefined>();
   const [requestData, setRequestData] = useState<RequestDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [steps,setSteps]=useState<ProgressStep[]>(progressSteps)
   const {
     isOpen: isOpenRequestDetails,
     closeModal: closeRequestDetails,
@@ -145,9 +146,30 @@ const TestRequestDetails = () => {
       const res = await projectService.requestDetails({
         request_id: requestId,
       });
-      setLoading(false);
-      console.log(res.data.data);
+      setLoading(false);      
+      
+      const tracks=res.data.data.tracks
+      const trackLength = tracks.length;
+      
+      const newSteps: ProgressStep[] = steps.map((step, index) => {
+        let status: ProgressStep["status"];
 
+        if (index < trackLength) {
+          status = "completed";
+        } else if (index === trackLength && tracks[trackLength]?.status!=="Rejected" ) {
+          status = "current";
+        } else {
+          status = "pending";
+        }
+        if(tracks[index]?.status==="Rejected"){
+          status = "pending";
+        }
+        return {
+          ...step,
+          status,
+        };
+      });      
+      setSteps(newSteps);
       setRequestData(res.data.data);
       return res.data;
     },
@@ -202,7 +224,7 @@ const TestRequestDetails = () => {
                   viewBox="0 0 307 870"
                 />
               )} */}
-              <RequestProgress steps={progressSteps} />
+              <RequestProgress steps={steps} />
             </div>
             <div className="flex flex-col gap-6">
               <div className="border border-secondary-30 bg-white rounded-lg">
