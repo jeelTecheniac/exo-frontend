@@ -270,7 +270,7 @@ const ProjectInfoForm = ({
           ? Math.max(...addresses.map((addr) => addr.id)) + 1
           : 1,
       country: "",
-      province: "",
+      providence: "",
       city: "",
       municipality: "",
     };
@@ -296,10 +296,10 @@ const ProjectInfoForm = ({
 
         // Clear dependent fields when parent field changes
         if (field === "country") {
-          updatedAddr.province = "";
+          updatedAddr.providence = "";
           updatedAddr.city = "";
           updatedAddr.municipality = "";
-        } else if (field === "province") {
+        } else if (field === "providence") {
           updatedAddr.city = "";
           updatedAddr.municipality = "";
         } else if (field === "city") {
@@ -336,28 +336,6 @@ const ProjectInfoForm = ({
     return (
       (touched[fieldName] && !!errors[fieldName]) ||
       (highlightErrors && fieldErrors[fieldName])
-    );
-  };
-
-  // Fixed helper functions to get available options
-  const getProvinceOptions = (country: string) => {
-    return (
-      locationData.provinces[country as keyof typeof locationData.provinces] ||
-      []
-    );
-  };
-
-  const getCityOptions = (province: string) => {
-    return (
-      locationData.cities[province as keyof typeof locationData.cities] || []
-    );
-  };
-
-  const getMunicipalityOptions = (city: string) => {
-    return (
-      locationData.municipalities[
-        city as keyof typeof locationData.municipalities
-      ] || []
     );
   };
 
@@ -714,16 +692,17 @@ const ProjectInfoForm = ({
                           onBlur={stopEditing}
                           onKeyDown={handleKeyDown}
                           placeholder="Select city"
-                          disabled={!address.province}
+                          disabled={!address.providence}
                           autoFocus
                         />
                       ) : (
                         <div
                           onClick={() =>
-                            address.province && startEditing(address.id, "city")
+                            address.providence &&
+                            startEditing(address.id, "city")
                           }
                           className={`p-1 rounded ${
-                            address.province
+                            address.providence
                               ? "cursor-pointer hover:bg-secondary-5"
                               : "cursor-not-allowed text-gray-400"
                           }`}
