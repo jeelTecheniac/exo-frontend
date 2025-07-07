@@ -1,9 +1,68 @@
+import React from "react";
+import moment from "moment";
 import Button from "../atoms/Button";
 import DatePicker from "../atoms/DatePicker";
 import Label from "../atoms/Label";
 import Typography from "../atoms/Typography";
 
-const Filter = () => {
+interface FilterProps {
+  startDate: Date | null;
+  endDate: Date | null;
+  onApply: (range: { startDate: Date | null; endDate: Date | null }) => void;
+  onReset?: () => void;
+}
+
+const Filter: React.FC<FilterProps> = ({ startDate, endDate, onApply, onReset }) => {
+  const [localStartDate, setLocalStartDate] = React.useState<Date | null>(startDate);
+  const [localEndDate, setLocalEndDate] = React.useState<Date | null>(endDate);
+  const handleQuickSelect = (type: "today" | "week" | "month") => {
+    let from: moment.Moment;
+    let to: moment.Moment;
+
+    switch (type) {
+      case "today":
+        from = moment().startOf("day");
+        to = moment().endOf("day");
+        break;
+      case "week":
+        from = moment().startOf("week");
+        to = moment().endOf("week");
+        break;
+      case "month":
+        from = moment().startOf("month");
+        to = moment().endOf("month");
+        break;
+    }
+
+    setLocalStartDate(from.toDate());
+    setLocalEndDate(to.toDate());
+  };
+
+  const handleStartDateChange = (dates: Date[]) => {
+    const date = dates?.[0];
+    if (date) {
+      setLocalStartDate(date);
+    }
+  };
+
+  const handleEndDateChange = (dates: Date[]) => {
+    const date = dates?.[0];
+    if (date) {
+      setLocalEndDate(date);
+    }
+  };
+
+  const handleReset = () => {
+    setLocalStartDate(null);
+    setLocalEndDate(null);
+    onReset?.();
+    onApply({ startDate: null, endDate: null });
+  };
+
+  const handleApply = () => {
+    onApply({ startDate: localStartDate, endDate: localEndDate });
+  };
+
   return (
     <div className="w-full max-w-[450px] md:w-[450px] border border-secondary-30 rounded-lg p-4 md:p-5 bg-white">
       <Typography size="sm" weight="semibold" className="text-secondary-100">
@@ -14,11 +73,21 @@ const Filter = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <Label htmlFor="fromDate">From</Label>
-            <DatePicker id="fromDate" placeholder="31-12-2025" />
+            <DatePicker
+              id="fromDate"
+              placeholder="31-12-2025"
+              defaultDate={localStartDate ?? undefined}
+              onChange={handleStartDateChange}
+            />
           </div>
           <div className="flex-1">
             <Label htmlFor="toDate">To</Label>
-            <DatePicker id="toDate" placeholder="31-12-2025" />
+            <DatePicker
+              id="toDate"
+              defaultDate={localEndDate ?? undefined}
+              onChange={handleEndDateChange}
+              placeholder="31-12-2025"
+            />
           </div>
         </div>
 
@@ -27,19 +96,19 @@ const Filter = () => {
           <Button
             variant="outline"
             className="text-secondary-50 py-2 px-2 w-full sm:w-auto"
-          >
+            onClick={() => handleQuickSelect("today")}>
             Today
           </Button>
           <Button
             variant="outline"
             className="text-secondary-50 py-2 px-2 w-full sm:w-auto"
-          >
+            onClick={() => handleQuickSelect("week")}>
             This Week
           </Button>
           <Button
             variant="outline"
             className="text-secondary-50 py-2 px-2 w-full sm:w-auto"
-          >
+            onClick={() => handleQuickSelect("month")}>
             This Month
           </Button>
         </div>
@@ -50,13 +119,13 @@ const Filter = () => {
             <Button
               variant="secondary"
               className="w-full sm:w-fit py-3 order-2 sm:order-1"
-            >
+              onClick={handleReset}>
               Reset All
             </Button>
             <Button
               variant="primary"
               className="w-full sm:w-fit py-3 order-1 sm:order-2"
-            >
+              onClick={handleApply}>
               Apply Filter
             </Button>
           </div>

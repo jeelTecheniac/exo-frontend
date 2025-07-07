@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import AppLayout from "../../layout/AppLayout";
@@ -7,6 +7,7 @@ import DashBoardCard from "../../lib/components/molecules/DashBoardCard.tsx";
 import {
   // ArchiveIcon,
   FileVioletIcon,
+  FilterIcon,
   // FilterIcon,
   SearchIcon,
   UsdGreenIcon,
@@ -19,6 +20,7 @@ import Input from "../../lib/components/atoms/Input.tsx";
 import ListDashBoardTable, { Data } from "../table/ListDashboardTable.tsx";
 import homeService from "../../services/home.service.ts";
 import { useNavigate } from "react-router";
+import Filter from "../../lib/components/molecules/Filter.tsx";
 
 const ListDashBoard = () => {
   const { t } = useTranslation();
@@ -34,6 +36,16 @@ const ListDashBoard = () => {
   const [totalAmountProject, setTotalAmountProject] = useState(0);
   const [totalRequest, setTotalRequest] = useState(0);
   const [totalAmountRequest, setTotalAmountRequest] = useState(0);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+   const [range, setRange] = useState<{
+     startDate: Date | null;
+     endDate: Date | null;
+   }>({
+     startDate: null,
+     endDate: null,
+   });
+
+  const datePickerRef = useRef<HTMLDivElement>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -47,6 +59,15 @@ const ListDashBoard = () => {
     };
   }, [searchTerm]);
 
+  const formateDate=(date:Date|null)=>{
+    if (!date) return;
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    const formattedDate = `${year}-${month}-${day}`;
+    // const formattedDate = `${day}-${month}-${year}`;
+    return formattedDate
+  }
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -54,7 +75,9 @@ const ListDashBoard = () => {
         const res = await homeService.getHomeData(
           limit,
           offset,
-          debouncedSearchTerm
+          debouncedSearchTerm,
+          formateDate(range.startDate),
+          formateDate(range.endDate),
         );
         const dataArray = (res.data || []).map((item: any, idx: number) => ({
           id: idx + 1 + offset,
@@ -74,7 +97,7 @@ const ListDashBoard = () => {
         setTotalRequest(res.total_request || 0);
         setTotalAmountRequest(res.total_amount_request || 0);
 
-        if (dataArray.length <= 0) {
+        if (res.total_project <= 0) {
           navigate("/");
         }
       } catch (e) {
@@ -86,7 +109,7 @@ const ListDashBoard = () => {
       }
     };
     fetchData();
-  }, [limit, offset, navigate, debouncedSearchTerm]);
+  }, [limit, offset, navigate, debouncedSearchTerm,range]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const currentPage = Math.floor(offset / limit) + 1;
@@ -100,6 +123,26 @@ const ListDashBoard = () => {
     setLimit(newLimit);
     setOffset(0); // Reset to first page when changing limit
   };
+
+   const handleApplyDateFilter = (newRange: {
+     startDate: Date | null;
+     endDate: Date | null;
+   }) => {
+     setRange(newRange);
+     setIsDatePickerOpen(false);
+   };
+     
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+        setIsDatePickerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <AppLayout>
@@ -241,7 +284,7 @@ const ListDashBoard = () => {
                 </div>
               </motion.div>
 
-              <div className="flex gap-2 sm:gap-3 justify-end">
+              <div className="flex gap-2 sm:gap-3 justify-end relative">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -266,23 +309,32 @@ const ListDashBoard = () => {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {/* <Button
+                  transition={{ duration: 0.2 }}>
+                  <Button
                     variant="outline"
                     className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[90px] sm:min-w-[120px] h-9 sm:h-10"
-                  >
+                    onClick={() => setIsDatePickerOpen(true)}>
                     <FilterIcon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     <Typography
                       className="text-secondary-60"
                       element="span"
                       size="sm"
-                      weight="semibold"
-                    >
+                      weight="semibold">
                       {t("Filter")}
                     </Typography>
-                  </Button> */}
+                  </Button>
                 </motion.div>
+                {isDatePickerOpen && (
+                  <div
+                    ref={datePickerRef}
+                    className="absolute top-[100%] right-0 w-max z-50 mt-2 bg-white border border-secondary-30 rounded-lg shadow-lg p-4">
+                    <Filter
+                      startDate={range.startDate}
+                      endDate={range.endDate}
+                      onApply={handleApplyDateFilter}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
