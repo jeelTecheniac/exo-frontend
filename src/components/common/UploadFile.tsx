@@ -102,7 +102,7 @@ const UploadFile: React.FC<FileUploadProps> = ({
         const updated = [...prev, uploadedFile];
         return updated;
       });
-      onFilesSelect?.([...selectedFiles,uploadedFile]);
+      onFilesSelect?.([...selectedFiles, uploadedFile]);
     } catch (err) {
       console.log(err, "er");
 
@@ -281,7 +281,7 @@ const UploadFile: React.FC<FileUploadProps> = ({
                       {(
                         (file.file?.size ?? file.size ?? 0) /
                         (1024 * 1024)
-                      ).toFixed(2)}{" "}
+                      ).toFixed(2)}
                       MB
                     </p>
                   </div>

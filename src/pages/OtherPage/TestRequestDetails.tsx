@@ -3,6 +3,7 @@ import {
   BlueCopyIcon,
   MenuListIcon,
   MenuListIconFrench,
+  PdfIcon,
   // PdfIcon,
   UsdGreenIcon,
   UsdOrangeIcon,
@@ -69,6 +70,7 @@ export interface RequestDetails {
   address: RequestAddress;
   entities: RequestEntity[];
   amount_summary: AmountSummary;
+  files?: any[];
   tracks: any[]; // Use a specific interface if `tracks` has a defined shape
 }
 export interface ProgressStep {
@@ -127,7 +129,7 @@ const TestRequestDetails = () => {
   const [userData, setUserData] = useState<UserData | undefined>();
   const [requestData, setRequestData] = useState<RequestDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [steps,setSteps]=useState<ProgressStep[]>(progressSteps)
+  const [steps, setSteps] = useState<ProgressStep[]>(progressSteps);
   const {
     isOpen: isOpenRequestDetails,
     closeModal: closeRequestDetails,
@@ -146,34 +148,39 @@ const TestRequestDetails = () => {
       const res = await projectService.requestDetails({
         request_id: requestId,
       });
-      setLoading(false);      
-      
-      const tracks=res.data.data.tracks
+      setLoading(false);
+
+      const tracks = res.data.data.tracks;
       const trackLength = tracks.length;
-      
+
       const newSteps: ProgressStep[] = steps.map((step, index) => {
         let status: ProgressStep["status"];
 
         if (index < trackLength) {
           status = "completed";
-        } else if (index === trackLength && tracks[trackLength]?.status!=="Rejected" ) {
+        } else if (
+          index === trackLength &&
+          tracks[trackLength]?.status !== "Rejected"
+        ) {
           status = "current";
         } else {
           status = "pending";
         }
-        if(tracks[index]?.status==="Rejected"){
+        if (tracks[index]?.status === "Rejected") {
           status = "pending";
         }
         return {
           ...step,
           status,
         };
-      });      
+      });
       setSteps(newSteps);
       setRequestData(res.data.data);
       return res.data;
     },
   });
+
+  console.log(requestData, "req data");
 
   useEffect(() => {
     const user = localStorageService.getUser() || "";
@@ -211,19 +218,6 @@ const TestRequestDetails = () => {
           </div>
           <div className="flex gap-6">
             <div>
-              {/* {i18n.language === "en" ? (
-                <RequestProgressIcon
-                  width="100%"
-                  height="100%"
-                  viewBox="0 0 307 870"
-                />
-              ) : (
-                <RequestProgressIconFrench
-                  width="100%"
-                  height="100%"
-                  viewBox="0 0 307 870"
-                />
-              )} */}
               <RequestProgress steps={steps} />
             </div>
             <div className="flex flex-col gap-6">
@@ -324,40 +318,36 @@ const TestRequestDetails = () => {
                     </div>
 
                     <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
-                      {/* <Typography
+                      <Typography
                         className="text-secondary-60 min-w-[100px]"
                         size="sm"
                       >
                         {t("invoice_files")}
-                      </Typography> */}
+                      </Typography>
                       <div className="flex flex-wrap gap-2">
-                        {/* <div className="inline-flex items-center gap-2 border border-secondary-60 rounded-full px-3 py-1.5 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
-                          <PdfIcon width={12} height={12} />
-                          <Typography
-                            size="xs"
-                            weight="semibold"
-                            className="text-secondary-100 whitespace-nowrap"
-                          >
-                            Taxe 2025_fichier.pdf
-                            <span className="text-secondary-60 ml-1">
-                              (5.3MB)
-                            </span>
-                          </Typography>
-                        </div> */}
-                        {/* Add more invoice files here if needed */}
+                        {requestData &&
+                          requestData?.files?.map((f) => {
+                            return (
+                              <div className="inline-flex items-center gap-2 border border-secondary-60 rounded-full px-3 py-1.5 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
+                                <PdfIcon width={12} height={12} />
+                                <Typography
+                                  size="xs"
+                                  weight="semibold"
+                                  className="text-secondary-100 whitespace-nowrap"
+                                >
+                                  {f.original_name}
+                                  <span className="text-secondary-60 ml-1">
+                                    {(f.size / (1024 * 1024)).toFixed(2)}MB
+                                  </span>
+                                </Typography>
+                              </div>
+                            );
+                          })}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              {/* <div>
-                {i18n.language === "en" ? (
-                  <CommentRemarkIcon width="100%" height="100%" />
-                ) : (
-                  <CommentRemarkIconFrench width="100%" height="100%" />
-                )} */}
-              {/* <CommentData data={comments}/>                 */}
-              {/* </div> */}
             </div>
           </div>
         </div>

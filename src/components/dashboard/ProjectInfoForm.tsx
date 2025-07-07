@@ -30,7 +30,7 @@ interface ProjectInfoFormProps {
 interface Address {
   id: number;
   country: string;
-  province: string;
+  providence: string;
   city: string;
   municipality: string;
 }
@@ -79,17 +79,17 @@ const ProjectInfoForm = ({
     projectData.addresses || [
       {
         id: 1,
-        country: "DRC",
-        province: "Eldara",
-        city: "Velmont",
-        municipality: "West Arindale",
+        country: "RD Congo",
+        province: "Kinshasa",
+        city: "Kinshasa",
+        municipality: "Gombe",
       },
       {
         id: 2,
-        country: "DRC",
-        province: "Eldara",
-        city: "Velmont 12",
-        municipality: "East Arindale",
+        country: "RD Congo",
+        province: "Nord-Kivu",
+        city: "Goma",
+        municipality: "Karisimbi",
       },
     ]
   );
@@ -102,6 +102,34 @@ const ProjectInfoForm = ({
     addressId: 0,
     field: null,
   });
+
+  // Fixed Location data structure for cascading selections
+  const locationData = {
+    countries: [{ value: "RD Congo", label: "RD Congo" }],
+
+    // Structure by country
+    provinces: [
+      { value: "Kinshasa", label: "Kinshasa" },
+      { value: "Nord-Kivu", label: "Nord-Kivu" },
+      { value: "Kasai", label: "Kasai" },
+    ],
+
+    // Structure by province
+    cities: [
+      { value: "Kinshasa", label: "Kinshasa" },
+      { value: "Goma", label: "Goma" },
+      { value: "Mbuji-Mayi", label: "Mbuji-Mayi" },
+    ],
+
+    // Structure by city
+    municipalities: [
+      { value: "Munic", label: "Munic" },
+      { value: "Gombe", label: "Gombe" },
+      { value: "Kintambo", label: "Kintambo" },
+      { value: "Karisimbi", label: "Karisimbi" },
+      { value: "Dibindi", label: "Dibindi" },
+    ],
+  };
 
   const currencyOptions = [
     {
@@ -121,6 +149,7 @@ const ProjectInfoForm = ({
       updateProjectData({ addresses });
     }
   }, []);
+
   useEffect(() => {
     if (highlightErrors) {
       setTouched({
@@ -261,9 +290,26 @@ const ProjectInfoForm = ({
   };
 
   const updateAddress = (id: number, field: keyof Address, value: string) => {
-    const updatedAddresses = addresses.map((addr) =>
-      addr.id === id ? { ...addr, [field]: value } : addr
-    );
+    const updatedAddresses = addresses.map((addr) => {
+      if (addr.id === id) {
+        const updatedAddr = { ...addr, [field]: value };
+
+        // Clear dependent fields when parent field changes
+        if (field === "country") {
+          updatedAddr.province = "";
+          updatedAddr.city = "";
+          updatedAddr.municipality = "";
+        } else if (field === "province") {
+          updatedAddr.city = "";
+          updatedAddr.municipality = "";
+        } else if (field === "city") {
+          updatedAddr.municipality = "";
+        }
+
+        return updatedAddr;
+      }
+      return addr;
+    });
     setAddresses(updatedAddresses);
     updateProjectData({ addresses: updatedAddresses });
   };
@@ -279,17 +325,83 @@ const ProjectInfoForm = ({
   const isFieldEditing = (id: number, field: string) => {
     return editingState.addressId === id && editingState.field === field;
   };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLSelectElement>) => {
+    if (e.key === "Enter" || e.key === "Escape") {
       stopEditing();
     }
   };
+
   const shouldShowError = (fieldName: keyof ValidationErrors) => {
     return (
       (touched[fieldName] && !!errors[fieldName]) ||
       (highlightErrors && fieldErrors[fieldName])
     );
   };
+
+  // Fixed helper functions to get available options
+  const getProvinceOptions = (country: string) => {
+    return (
+      locationData.provinces[country as keyof typeof locationData.provinces] ||
+      []
+    );
+  };
+
+  const getCityOptions = (province: string) => {
+    return (
+      locationData.cities[province as keyof typeof locationData.cities] || []
+    );
+  };
+
+  const getMunicipalityOptions = (city: string) => {
+    return (
+      locationData.municipalities[
+        city as keyof typeof locationData.municipalities
+      ] || []
+    );
+  };
+
+  // Enhanced Custom Select Component
+  const CustomSelect = ({
+    value,
+    options,
+    onChange,
+    onBlur,
+    onKeyDown,
+    placeholder = "Select...",
+    autoFocus = false,
+    disabled = false,
+  }: {
+    value: string;
+    options: { value: string; label: string }[];
+    onChange: (value: string) => void;
+    onBlur: () => void;
+    onKeyDown: (e: React.KeyboardEvent<HTMLSelectElement>) => void;
+    placeholder?: string;
+    autoFocus?: boolean;
+    disabled?: boolean;
+  }) => (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      autoFocus={autoFocus}
+      disabled={disabled || options.length === 0}
+      className={`w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+        disabled || options.length === 0 ? "bg-gray-100 cursor-not-allowed" : ""
+      }`}
+    >
+      <option value="">
+        {options.length === 0 ? "No options available" : placeholder}
+      </option>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
 
   const fileUploadMutation = async ({
     file,
@@ -303,6 +415,7 @@ const ProjectInfoForm = ({
 
     const response = await projectService.uploadFile(formData, {
       headers: {
+        Accept: "application/json",
         "Content-Type": "multipart/form-data",
       },
       onUploadProgress: (event: ProgressEvent) => {
@@ -322,11 +435,10 @@ const ProjectInfoForm = ({
   const uploadMutation = useMutation({
     mutationFn: fileUploadMutation,
     onSuccess: (data) => {
-      // toast.success("File uploaded successfully!");
       console.log("Upload result:", data);
     },
     onError: () => {
-      // toast.error("Failed to upload file.");
+      // Handle error
     },
   });
 
@@ -341,10 +453,10 @@ const ProjectInfoForm = ({
       return { status: true };
     },
     onSuccess: () => {
-      // toast.success("File removed successfully!");
+      // Handle success
     },
     onError: () => {
-      // toast.error("Failed to remove file.");
+      // Handle error
     },
   });
 
@@ -390,6 +502,7 @@ const ProjectInfoForm = ({
             </p>
           )}
         </div>
+
         <div>
           <Label htmlFor="financeBy">
             {t("finance_by")} <span className="text-red-500">*</span>
@@ -470,11 +583,6 @@ const ProjectInfoForm = ({
                   : false
               }
             />
-            {/* {shouldShowError("beginDate") && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.beginDate || t("start_date_is_required")}
-              </p>
-            )} */}
           </div>
 
           <div>
@@ -494,13 +602,9 @@ const ProjectInfoForm = ({
                   : false
               }
             />
-            {/* {shouldShowError("endDate") && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.endDate || "End date is required"}
-              </p>
-            )} */}
           </div>
         </div>
+
         <div>
           <Label htmlFor="description">{t("description")}</Label>
           <TextEditor
@@ -541,16 +645,19 @@ const ProjectInfoForm = ({
                     className="border-b border-secondary-30 last:border-0"
                   >
                     <td className="p-2">{index + 1}</td>
+
+                    {/* Country */}
                     <td className="p-2">
                       {isFieldEditing(address.id, "country") ? (
-                        <Input
+                        <CustomSelect
                           value={address.country}
-                          onChange={(e) =>
-                            updateAddress(address.id, "country", e.target.value)
+                          options={locationData.countries}
+                          onChange={(value) =>
+                            updateAddress(address.id, "country", value)
                           }
                           onBlur={stopEditing}
                           onKeyDown={handleKeyDown}
-                          size={12}
+                          placeholder="Select country"
                           autoFocus
                         />
                       ) : (
@@ -562,82 +669,106 @@ const ProjectInfoForm = ({
                         </div>
                       )}
                     </td>
+
+                    {/* Province */}
                     <td className="p-2">
                       {isFieldEditing(address.id, "province") ? (
-                        <Input
-                          value={address.province}
-                          onChange={(e) =>
-                            updateAddress(
-                              address.id,
-                              "province",
-                              e.target.value
-                            )
+                        <CustomSelect
+                          value={address.providence}
+                          options={locationData.provinces}
+                          onChange={(value) =>
+                            updateAddress(address.id, "providence", value)
                           }
                           onBlur={stopEditing}
                           onKeyDown={handleKeyDown}
-                          size={12}
-                          autoFocus
-                        />
-                      ) : (
-                        <div
-                          onClick={() => startEditing(address.id, "province")}
-                          className="cursor-pointer hover:bg-secondary-5 p-1 rounded"
-                        >
-                          {address.province || "—"}
-                        </div>
-                      )}
-                    </td>
-                    <td className="p-2">
-                      {isFieldEditing(address.id, "city") ? (
-                        <Input
-                          value={address.city}
-                          onChange={(e) =>
-                            updateAddress(address.id, "city", e.target.value)
-                          }
-                          onBlur={stopEditing}
-                          onKeyDown={handleKeyDown}
-                          size={12}
-                          autoFocus
-                        />
-                      ) : (
-                        <div
-                          onClick={() => startEditing(address.id, "city")}
-                          className="cursor-pointer hover:bg-secondary-5 p-1 rounded"
-                        >
-                          {address.city || "—"}
-                        </div>
-                      )}
-                    </td>
-                    <td className="p-2">
-                      {isFieldEditing(address.id, "municipality") ? (
-                        <Input
-                          value={address.municipality}
-                          onChange={(e) =>
-                            updateAddress(
-                              address.id,
-                              "municipality",
-                              e.target.value
-                            )
-                          }
-                          onBlur={stopEditing}
-                          onKeyDown={handleKeyDown}
-                          size={12}
+                          placeholder="Select province"
+                          disabled={!address.country}
                           autoFocus
                         />
                       ) : (
                         <div
                           onClick={() =>
+                            address.country &&
+                            startEditing(address.id, "province")
+                          }
+                          className={`p-1 rounded ${
+                            address.country
+                              ? "cursor-pointer hover:bg-secondary-5"
+                              : "cursor-not-allowed text-gray-400"
+                          }`}
+                        >
+                          {address.providence || "—"}
+                        </div>
+                      )}
+                    </td>
+
+                    {/* City */}
+                    <td className="p-2">
+                      {isFieldEditing(address.id, "city") ? (
+                        <CustomSelect
+                          value={address.city}
+                          options={locationData.cities}
+                          onChange={(value) =>
+                            updateAddress(address.id, "city", value)
+                          }
+                          onBlur={stopEditing}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Select city"
+                          disabled={!address.province}
+                          autoFocus
+                        />
+                      ) : (
+                        <div
+                          onClick={() =>
+                            address.province && startEditing(address.id, "city")
+                          }
+                          className={`p-1 rounded ${
+                            address.province
+                              ? "cursor-pointer hover:bg-secondary-5"
+                              : "cursor-not-allowed text-gray-400"
+                          }`}
+                        >
+                          {address.city || "—"}
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Municipality */}
+                    <td className="p-2">
+                      {isFieldEditing(address.id, "municipality") ? (
+                        <CustomSelect
+                          value={address.municipality}
+                          options={locationData.municipalities}
+                          onChange={(value) =>
+                            updateAddress(address.id, "municipality", value)
+                          }
+                          onBlur={stopEditing}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Select municipality"
+                          disabled={!address.city}
+                          autoFocus
+                        />
+                      ) : (
+                        <div
+                          onClick={() =>
+                            address.city &&
                             startEditing(address.id, "municipality")
                           }
-                          className="cursor-pointer hover:bg-secondary-5 p-1 rounded"
+                          className={`p-1 rounded ${
+                            address.city
+                              ? "cursor-pointer hover:bg-secondary-5"
+                              : "cursor-not-allowed text-gray-400"
+                          }`}
                         >
                           {address.municipality || "—"}
                         </div>
                       )}
                     </td>
+
+                    {/* Action */}
                     <td className="p-2">
                       <button
-                        className="text-red-500"
+                        className="text-red-500 hover:text-red-700"
                         onClick={() => deleteAddress(address.id)}
                       >
                         <TrashIcon width={20} height={20} />
