@@ -14,13 +14,15 @@ import Typography from "../../lib/components/atoms/Typography";
 import AddressTable from "../table/AddressTable";
 import RequestTable from "../table/RequestTable";
 import projectService from "../../services/project.service";
+import { useLoading } from "../../context/LoaderProvider";
 
 const ProjectDetails = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
   const { t } = useTranslation();
   const [project, setProject] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
+  const {loading,setLoading}=useLoading()
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,7 +44,7 @@ const ProjectDetails = () => {
   }, [projectId, t]);
 
   if (error) return <div className="p-8 text-red-500">{error}</div>;
-  if (!project && !loading) return null;
+  // if (!project && !loading) return null;
 
   // Map address for AddressTable
   const addressData = (project?.address || []).map(
@@ -97,24 +99,8 @@ const ProjectDetails = () => {
   return (
     <div>
       <AppLayout>
-        {/* Blur overlay when loading */}
-        {loading && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-150"></div>
-              <span className="text-xl font-semibold text-primary-150">
-                {t("Loading...")}
-              </span>
-            </div>
-          </div>
-        )}
-
         <div
-          className={
-            loading
-              ? "pointer-events-none select-none blur-sm relative px-4 sm:px-6 md:px-8"
-              : "relative px-4 sm:px-6 md:px-8"
-          }
+          className={"relative px-4 sm:px-6 md:px-8"}
         >
           <motion.div
             className="flex flex-col sm:flex-row sm:justify-between sm:items-center"

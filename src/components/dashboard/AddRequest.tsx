@@ -23,6 +23,7 @@ import { UserData } from "../../pages/Dashboard/CreateProject.tsx";
 import { UploadArgs, UploadResponse } from "./ProjectInfoForm.tsx";
 import projectService from "../../services/project.service.ts";
 import { useNavigate, useParams } from "react-router";
+import Loader from "../common/Loader.tsx";
 
 // Type for address data structure
 interface AddressData {
@@ -386,7 +387,7 @@ const AddRequest = () => {
   const handleFinancialAuthority=(event: React.ChangeEvent<HTMLSelectElement>)=>{
     setFinancialAuthority(event.target.value)
   }
-  if (isLoading) return <h1>Loading...</h1>;
+  if (isLoading) return <Loader/>;
 
   return (
     <AppLayout className="bg-white">

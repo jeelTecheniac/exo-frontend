@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 interface Address {
   id: string;
   country?: string;
-  province?: string;
+  providence?: string;
   city?: string;
   municipality?: string;
 }
@@ -206,7 +206,7 @@ const ReviewForm = ({ projectData }: ReviewFormProps) => {
                             <span>{index + 1}</span>
                           </div>
                           <div>{address.country || "-"}</div>
-                          <div>{address.province || "-"}</div>
+                          <div>{address.providence || "-"}</div>
                           <div>{address.city || "-"}</div>
                           <div>{address.municipality || "-"}</div>
                         </div>
