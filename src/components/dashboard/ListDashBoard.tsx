@@ -21,13 +21,15 @@ import ListDashBoardTable, { Data } from "../table/ListDashboardTable.tsx";
 import homeService from "../../services/home.service.ts";
 import { useNavigate } from "react-router";
 import Filter from "../../lib/components/molecules/Filter.tsx";
+import { useLoading } from "../../context/LoaderProvider.tsx";
 
 const ListDashBoard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [data, setData] = useState<Data[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<Data[]>([]);  
+  const {loading,setLoading}=useLoading()  
+
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(8);
   const [offset, setOffset] = useState(0);
@@ -145,20 +147,9 @@ const ListDashBoard = () => {
   }, []);
 
   return (
-    <AppLayout>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-          <span className="text-lg sm:text-xl font-semibold text-primary-150">
-            {t("Loading...")}
-          </span>
-        </div>
-      )}
+    <AppLayout>      
       <div
-        className={
-          loading
-            ? "pointer-events-none select-none blur-sm relative"
-            : "relative"
-        }
+        className={"relative"}
       >
         <motion.div
           className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4 px-4 sm:px-0"

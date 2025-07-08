@@ -24,6 +24,7 @@ import { useModal } from "../../hooks/useModal";
 import RequestDetailModal from "../../components/modal/RequestDetailModal";
 import History from "../../components/dashboard/History";
 import moment from "moment";
+import { useLoading } from "../../context/LoaderProvider";
 interface UserData {
   id: number;
   first_name: string;
@@ -130,7 +131,7 @@ export const comments: CommentProps[] = [
 const TestRequestDetails = () => {
   const [userData, setUserData] = useState<UserData | undefined>();
   const [requestData, setRequestData] = useState<RequestDetails | null>(null);
-  const [loading, setLoading] = useState(true);
+  const {loading,setLoading}=useLoading()
   const [steps, setSteps] = useState<ProgressStep[]>(progressSteps);
   const {
     isOpen: isOpenRequestDetails,
@@ -199,185 +200,184 @@ const TestRequestDetails = () => {
   useEffect(() => {
     const user = localStorageService.getUser() || "";
     setUserData(JSON.parse(user));
-  }, []);
-  if (loading) return <div className="p-8">Loading...</div>;
+  }, []);    
+  
   return (
     <div>
-      <AppLayout>
-        <div className="px-4 md:px-8 py-6">
-          <div className="mb-6">
-            <div className="cursor-pointer mb-4">
-              {i18n.language === "en" ? (
-                <MenuListIcon
-                  width="100%"
-                  height={30}
-                  className="max-w-[700px]"
-                />
-              ) : (
-                <MenuListIconFrench
-                  width="100%"
-                  height={30}
-                  className="max-w-[700px]"
-                />
-              )}
+      {requestData && <AppLayout>
+          <div className="px-4 md:px-8 py-6">
+            <div className="mb-6">
+              <div className="cursor-pointer mb-4">
+                {i18n.language === "en" ? (
+                  <MenuListIcon
+                    width="100%"
+                    height={30}
+                    className="max-w-[700px]"
+                  />
+                ) : (
+                  <MenuListIconFrench
+                    width="100%"
+                    height={30}
+                    className="max-w-[700px]"
+                  />
+                )}
+              </div>
+              <Typography
+                size="xl_2"
+                weight="extrabold"
+                className="text-secondary-100"
+              >
+                {t("request_details")} #{" "}
+                {requestData ? requestData.unique_number : ""}
+              </Typography>
             </div>
-            <Typography
-              size="xl_2"
-              weight="extrabold"
-              className="text-secondary-100"
-            >
-              {t("request_details")} #{" "}
-              {requestData ? requestData.unique_number : ""}
-            </Typography>
-          </div>
-          <div className="flex gap-6">
-            <div>
-              <RequestProgress steps={steps} />
-            </div>
-            <div className="flex flex-col gap-6">
-              <div className="border border-secondary-30 bg-white rounded-lg">
-                <div className="px-4 md:px-6 py-5 ">
-                  <div className="flex justify-between items-center">
-                    <Typography
-                      size="base"
-                      weight="bold"
-                      className="text-secondary-100"
-                    >
-                      {t("request_details")}
-                    </Typography>
-                    <Button
-                      variant="outline"
-                      className="px-4 py-2 w-fit"
-                      onClick={openRequestDetails}
-                    >
-                      {t("view_more")}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Cards Grid */}
-                <div className="px-4 md:px-6 py-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <DashBoardCard
-                      icon={<BlueCopyIcon width={44} height={44} />}
-                      count={
-                        requestData
-                          ? requestData?.amount_summary?.total_quantity
-                          : 0
-                      }
-                      title={t("total_quantity")}
-                    />
-                    <DashBoardCard
-                      icon={<UsdGreenIcon width={44} height={44} />}
-                      count={
-                        requestData
-                          ? requestData?.amount_summary?.total_amount
-                          : 0
-                      }
-                      title={t("total_amount")}
-                    />
-                    <DashBoardCard
-                      icon={<UsdVioletIcon width={44} height={44} />}
-                      count={
-                        requestData ? requestData?.amount_summary?.total_tax : 0
-                      }
-                      title={t("total_tax_amount")}
-                    />
-                    <DashBoardCard
-                      icon={<UsdOrangeIcon width={44} height={44} />}
-                      count={
-                        requestData
-                          ? requestData?.amount_summary?.vat_included
-                          : 0
-                      }
-                      title={t("total_amount_with_tax")}
-                    />
+            <div className="flex gap-6">
+              <div>
+                <RequestProgress steps={steps} />
+              </div>
+              <div className="flex flex-col gap-6">
+                <div className="border border-secondary-30 bg-white rounded-lg">
+                  <div className="px-4 md:px-6 py-5 ">
+                    <div className="flex justify-between items-center">
+                      <Typography
+                        size="base"
+                        weight="bold"
+                        className="text-secondary-100"
+                      >
+                        {t("request_details")}
+                      </Typography>
+                      <Button
+                        variant="outline"
+                        className="px-4 py-2 w-fit"
+                        onClick={openRequestDetails}
+                      >
+                        {t("view_more")}
+                      </Button>
+                    </div>
                   </div>
 
-                  {/* Details List */}
-                  <div className="space-y-4">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
-                      <Typography
-                        className="text-secondary-60 min-w-[100px]"
-                        size="sm"
-                      >
-                        {t("amount")}
-                      </Typography>
-                      <Typography className="text-secondary-100" size="sm">
-                        {requestData
-                          ? requestData.amount_summary.total_amount
-                          : 0}
-                      </Typography>
+                  {/* Cards Grid */}
+                  <div className="px-4 md:px-6 py-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                      <DashBoardCard
+                        icon={<BlueCopyIcon width={44} height={44} />}
+                        count={
+                          requestData
+                            ? requestData?.amount_summary?.total_quantity
+                            : 0
+                        }
+                        title={t("total_quantity")}
+                      />
+                      <DashBoardCard
+                        icon={<UsdGreenIcon width={44} height={44} />}
+                        count={
+                          requestData
+                            ? requestData?.amount_summary?.total_amount
+                            : 0
+                        }
+                        title={t("total_amount")}
+                      />
+                      <DashBoardCard
+                        icon={<UsdVioletIcon width={44} height={44} />}
+                        count={
+                          requestData ? requestData?.amount_summary?.total_tax : 0
+                        }
+                        title={t("total_tax_amount")}
+                      />
+                      <DashBoardCard
+                        icon={<UsdOrangeIcon width={44} height={44} />}
+                        count={
+                          requestData
+                            ? requestData?.amount_summary?.vat_included
+                            : 0
+                        }
+                        title={t("total_amount_with_tax")}
+                      />
                     </div>
 
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
-                      <Typography
-                        className="text-secondary-60 min-w-[100px]"
-                        size="sm"
-                      >
-                        {t("address")}
-                      </Typography>
-                      <Typography className="text-secondary-100" size="sm">
-                        {requestData
-                          ? [
-                              requestData.address?.country,
-                              requestData.address?.providence,
-                              requestData.address?.city,
-                              requestData.address?.municipality,
-                            ]
-                              .filter((val) => val && val.trim() !== "")
-                              .join(", ")
-                          : "-"}
-                      </Typography>
-                    </div>
-
-                    <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
-                      <Typography
-                        className="text-secondary-60 min-w-[100px]"
-                        size="sm"
-                      >
-                        {t("invoice_files")}
-                      </Typography>
-                      <div className="flex flex-wrap gap-2">
-                        {requestData &&
-                          requestData?.files?.map((f) => {
-                            return (
-                              <div className="inline-flex items-center gap-2 border border-secondary-60 rounded-full px-3 py-1.5 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
-                                <PdfIcon width={12} height={12} />
-                                <Typography
-                                  size="xs"
-                                  weight="semibold"
-                                  className="text-secondary-100 whitespace-nowrap"
-                                >
-                                  {f.original_name}
-                                  <span className="text-secondary-60 ml-1">
-                                    {(f.size / (1024 * 1024)).toFixed(2)}MB
-                                  </span>
-                                </Typography>
-                              </div>
-                            );
-                          })}
+                    {/* Details List */}
+                    <div className="space-y-4">
+                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
+                        <Typography
+                          className="text-secondary-60 min-w-[100px]"
+                          size="sm"
+                        >
+                          {t("amount")}
+                        </Typography>
+                        <Typography className="text-secondary-100" size="sm">
+                          {requestData
+                            ? requestData.amount_summary.total_amount
+                            : 0}
+                        </Typography>
                       </div>
-                    </div>
+
+                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
+                        <Typography
+                          className="text-secondary-60 min-w-[100px]"
+                          size="sm"
+                        >
+                          {t("address")}
+                        </Typography>
+                        <Typography className="text-secondary-100" size="sm">
+                          {requestData
+                            ? [
+                                requestData.address?.country,
+                                requestData.address?.providence,
+                                requestData.address?.city,
+                                requestData.address?.municipality,
+                              ]
+                                .filter((val) => val && val.trim() !== "")
+                                .join(", ")
+                            : "-"}
+                        </Typography>
+                      </div>
+
+                      <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
+                        <Typography
+                          className="text-secondary-60 min-w-[100px]"
+                          size="sm"
+                        >
+                          {t("invoice_files")}
+                        </Typography>
+                        <div className="flex flex-wrap gap-2">
+                          {requestData &&
+                            requestData?.files?.map((f) => {
+                              return (
+                                <div className="inline-flex items-center gap-2 border border-secondary-60 rounded-full px-3 py-1.5 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
+                                  <PdfIcon width={12} height={12} />
+                                  <Typography
+                                    size="xs"
+                                    weight="semibold"
+                                    className="text-secondary-100 whitespace-nowrap"
+                                  >
+                                    {f.original_name}
+                                    <span className="text-secondary-60 ml-1">
+                                      {(f.size / (1024 * 1024)).toFixed(2)}MB
+                                    </span>
+                                  </Typography>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    </div>                  
                   </div>
-                  <div>df</div>
                 </div>
-              </div>
-              <div className="border border-secondary-30 bg-white rounded-lg">
-                <Typography size="base" weight="bold" className="p-4">
-                  History
-                </Typography>
-                <History items={history} />
+                <div className="border border-secondary-30 bg-white rounded-lg">
+                  <Typography size="base" weight="bold" className="p-4">
+                    History
+                  </Typography>
+                  <History items={history} />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </AppLayout>
-      <RequestDetailModal
+        </AppLayout>}
+      {requestData&&<RequestDetailModal
         isOpen={isOpenRequestDetails}
         onClose={closeRequestDetails}
         requestDetails={requestData}
-      />
+      />}
     </div>
   );
 };

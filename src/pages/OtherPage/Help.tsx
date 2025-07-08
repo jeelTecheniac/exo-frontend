@@ -9,6 +9,7 @@ import Input from "../../lib/components/atoms/Input";
 import TextArea from "../../lib/components/atoms/TextArea";
 import Button from "../../lib/components/atoms/Button";
 import faqService from "../../services/faq.service";
+import Loader from "../../components/common/Loader";
 
 interface FAQItem {
   question: string;
@@ -50,18 +51,7 @@ const Help = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 backdrop-blur-sm z-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary-150 border-t-transparent rounded-full animate-spin"></div>
-          <Typography
-            size="lg"
-            weight="semibold"
-            className="text-secondary-100"
-          >
-            {t("loading")}...
-          </Typography>
-        </div>
-      </div>
+      <Loader/>
     );
   }
 

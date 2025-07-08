@@ -20,13 +20,14 @@ import { useQuery } from "@tanstack/react-query";
 import { UserData } from "../Dashboard/CreateProject";
 import localStorageService from "../../services/local.service";
 import authService from "../../services/auth.service";
+import { useLoading } from "../../context/LoaderProvider";
 
 const EditProfile = () => {
   const { t } = useTranslation();
   const [isActiveButton, setIsActiveButton] = useState<"info" | "security">(
     "info"
   );
-  const [loading,setLoading]=useState(true)
+  const {setLoading}=useLoading()
   const [userData, setUserData] = useState<UserData|null>(null);
 
   useEffect(() => {
@@ -45,6 +46,7 @@ const EditProfile = () => {
     queryKey: ["userProfile", userData?.token],
     enabled: isTokenAvailable,
     queryFn: async () => {
+      setLoading(true)
       const res = await authService.getProfile();
       console.log(res.data.data,"userProfileData");
       setLoading(false)
@@ -77,13 +79,6 @@ const EditProfile = () => {
   }
   return (
     <AppLayout>
-      {loading ||loadingProfile && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-          <span className="text-xl font-semibold text-primary-150">
-            {t("Loading...")}
-          </span>
-        </div>
-      )}
       <div className="lg:px-10 px-4">
         <div>
           <Typography
