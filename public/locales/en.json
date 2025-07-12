@@ -198,6 +198,15 @@
   "new_password_required": "New password is required.",
   "password_update_error": "Failed to update password.",
   "password_updated_successfully": "Password updated successfully.",
-  "last_updated": "last updated",
-  "total_quantity": "Total Quantity"
+  "last_updated": "last updated",  
+  "total_quantity": "Total Quantity",
+  "no_projects_available":"No Projects available",
+  "get_started_by_submitting_your_first_project":"Get started by submitting your first project.",
+  "security":"Security",
+  "logout_confirmation": "Are you sure want to logout?",
+  "logout_as": "Logout of ExoTrack as",
+  "sign_out":"Sign out",
+  "The email does not exist.": "The email does not exist.",
+  "The provided credentials are incorrect. Please check your email and password.": "The provided credentials are incorrect. Please check your email and password.",
+  "password_incorrect": "The provided password is incorrect."
 }

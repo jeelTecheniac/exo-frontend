@@ -53,7 +53,10 @@ const EditProfile = () => {
       setUserData((prev) => {
         if (!prev) return prev; 
         return {
-          ...prev          
+          ...prev,          
+          first_name: res.data.data.first_name,
+          last_name: res.data.data.last_name,
+          company_name: res.data.data.company_name,  
         };
       });
       return res.data;
@@ -87,13 +90,14 @@ const EditProfile = () => {
             className="text-secondary-100">
             {t("edit_profile")}
           </Typography>
-          <ProfileHeader
+          {userData&&<ProfileHeader
             email={(userData && userData.email) || ""}
-            name={
+            fullName={
               (userData && `${userData.first_name} ${userData.last_name}`) || ""
             }
-            imageUrl="/images/user/thubmnail.png"
-          />
+            name={({firstName:userData.first_name||"",lastName:userData.last_name||""})}
+            // imageUrl="/images/user/thubmnail.png"
+          />}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 mt-6">
@@ -123,7 +127,7 @@ const EditProfile = () => {
                 )
               }
               isActive={isActiveButton === "security"}
-              label="Security"
+              label={t("security")}
               textClassName="text-[14px]"
             />
             <hr className="hidden lg:block" />

@@ -14,6 +14,8 @@ import { useMutation } from "@tanstack/react-query";
 import authService from "../services/auth.service";
 import localStorageService from "../services/local.service";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 const SignInForm = () => {
   const navigate = useNavigate();
@@ -37,9 +39,16 @@ const SignInForm = () => {
       login("true");
       navigate("/dashboard");
     },
-    onError: (error) => {
-      console.error("Error during sign in:", error);
-      // return toast.error(t("sign_in_error"));
+    onError: (error: any) => {
+      const axiosError:any = error as AxiosError;
+      let message="Something went wrong"
+       message =
+        axiosError?.response?.data?.message || // backend-defined message
+        axiosError?.message ||                 // fallback Axios error message
+        "An unexpected error occurred";        // fallback generic message
+
+      console.error("Error during sign in:", axiosError?.response?.data?.message);
+      toast.error(t(message));
     },
   });
 

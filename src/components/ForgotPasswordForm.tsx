@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import authService from "../services/auth.service";
 import localStorageService from "../services/local.service";
 import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const ForgotPasswordForm = () => {
   const { t } = useTranslation();
@@ -27,16 +28,16 @@ const ForgotPasswordForm = () => {
     onSuccess: (_, data) => {
       console.log(data, "data");
       localStorageService.setEmail(JSON.stringify(data.email));
-      // toast.success(t("otp_sent_successfully"));
+      toast.success(t("otp_sent_successfully"));
       localStorageService.setPath("forgot-password");
       navigate("/otp-verification");
     },
     onError: (error: AxiosError) => {
       if (error.response?.status === 412) {
-        // return toast.error(t("email_is_not_registered"));
+        return toast.error(t("email_is_not_registered"));
       }
       console.error("Error during sign in:", error.response?.status);
-      // return toast.error(t("otp_send_error"));
+      return toast.error(t("otp_send_error"));
     },
   });
 

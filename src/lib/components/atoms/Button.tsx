@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -9,6 +10,7 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button = ({ variant, className, disable, loading, ...props }: Props) => {
+  const {t}=useTranslation()
   const baseClasses =
     "text-base font-medium rounded-lg py-4 px-6 text-center w-full transition-all duration-300 ease-in-out transform hover:shadow-lg active:scale-95";
 
@@ -38,7 +40,7 @@ const Button = ({ variant, className, disable, loading, ...props }: Props) => {
       {loading ? (
         <div className="flex items-center justify-center">
           <div className="animate-spin h-5 w-5 border-2 border-current border-t-transparent rounded-full" />
-          <span className="ml-2">Loading...</span>
+          <span className="ml-2">{t("loading")}</span>
         </div>
       ) : (
         props.children
