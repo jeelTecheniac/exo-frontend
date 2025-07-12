@@ -86,11 +86,21 @@ import { ReactComponent as ChevronLeftIcon } from "./chevron-left.svg?react";
 import { ReactComponent as ChevronLeftLightIcon } from "./chevron-left-light.svg?react";
 import { ReactComponent as ChevronRightIcon } from "./chevron-right.svg?react";
 import { ReactComponent as ChevronRightLightIcon } from "./chevron-right-light.svg?react";
+import { ReactComponent as CdfCreamIcon } from "./cdf-cream.svg?react";
+import { ReactComponent as CdfPurpleIcon } from "./cdf-purple.svg?react";
+import { ReactComponent as CdfGreenIcon } from "./cdf-green.svg?react";
+import { ReactComponent as GreenRightIcon } from "./green-right.svg?react";
+import { ReactComponent as BlueNoteIcon } from "./blue-note.svg?react";
 
 import USFlag from "./USFlag";
 import CDFFlag from "./CDFFlag";
 
 export {
+  GreenRightIcon,
+  BlueNoteIcon,
+  CdfCreamIcon,
+  CdfPurpleIcon,
+  CdfGreenIcon,
   SearchIcon,
   InfoIcon,
   CloseYellowIcon,
@@ -177,5 +187,5 @@ export {
   ChevronLeftIcon,
   ChevronLeftLightIcon,
   ChevronRightIcon,
-  ChevronRightLightIcon
+  ChevronRightLightIcon,
 };

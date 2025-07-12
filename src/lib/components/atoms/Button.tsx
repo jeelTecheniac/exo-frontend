@@ -10,17 +10,17 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button = ({ variant, className, disable, loading, ...props }: Props) => {
-  const {t}=useTranslation()
+  const { t } = useTranslation();
   const baseClasses =
     "text-base font-medium rounded-lg py-4 px-6 text-center w-full transition-all duration-300 ease-in-out transform hover:shadow-lg active:scale-95";
 
   const variantClasses = {
     primary:
-      "bg-primary-150 text-white hover:bg-primary-200 hover:-translate-y-0.5 active:bg-primary-100",
+      "bg-primary-150 text-white hover:bg-primary-200 hover:shadow-lg active:bg-primary-100",
     secondary:
-      "text-primary-150 bg-white border border-secondary-50 hover:border-primary-150 hover:-translate-y-0.5 active:bg-gray-50",
+      "text-primary-150 bg-white border border-secondary-50 hover:border-primary-150 hover:shadow-lg active:bg-gray-50",
     outline:
-      "text-secondary-100 bg-white border border-secondary-30 hover:border-secondary-50 hover:-translate-y-0.5 active:bg-gray-50",
+      "text-secondary-100 bg-white border border-secondary-30 hover:border-secondary-50 hover:shadow-lg active:bg-gray-50",
   };
 
   const buttonClasses = twMerge(

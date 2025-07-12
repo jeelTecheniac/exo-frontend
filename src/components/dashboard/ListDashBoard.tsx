@@ -16,7 +16,6 @@ import {
   SearchIcon,
   UsdGreenIcon,
   UsdOrangeIcon,
-  UsdVioletIcon,
   WhitePlusIcon,
 } from "../../icons";
 import Typography from "../../lib/components/atoms/Typography.tsx";
@@ -31,8 +30,8 @@ const ListDashBoard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [data, setData] = useState<Data[]>([]);  
-  const {loading,setLoading}=useLoading()  
+  const [data, setData] = useState<Data[]>([]);
+  const { setLoading } = useLoading();
 
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(8);
@@ -40,16 +39,16 @@ const ListDashBoard = () => {
   // Dashboard card state
   const [totalProject, setTotalProject] = useState(0);
   const [totalAmountProject, setTotalAmountProject] = useState(0);
-  const [totalRequest, setTotalRequest] = useState(0);
+  // const [setTotalRequest] = useState(0);
   const [totalAmountRequest, setTotalAmountRequest] = useState(0);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-   const [range, setRange] = useState<{
-     startDate: Date | null;
-     endDate: Date | null;
-   }>({
-     startDate: null,
-     endDate: null,
-   });
+  const [range, setRange] = useState<{
+    startDate: Date | null;
+    endDate: Date | null;
+  }>({
+    startDate: null,
+    endDate: null,
+  });
 
   const datePickerRef = useRef<HTMLDivElement>(null);
 
@@ -65,15 +64,15 @@ const ListDashBoard = () => {
     };
   }, [searchTerm]);
 
-  const formateDate=(date:Date|null)=>{
+  const formateDate = (date: Date | null) => {
     if (!date) return;
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     const formattedDate = `${year}-${month}-${day}`;
     // const formattedDate = `${day}-${month}-${year}`;
-    return formattedDate
-  }
+    return formattedDate;
+  };
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -83,7 +82,7 @@ const ListDashBoard = () => {
           offset,
           debouncedSearchTerm,
           formateDate(range.startDate),
-          formateDate(range.endDate),
+          formateDate(range.endDate)
         );
         const dataArray = (res.data || []).map((item: any, idx: number) => ({
           id: idx + 1 + offset,
@@ -94,16 +93,16 @@ const ListDashBoard = () => {
           createdDate: item.created_at,
           noOfRequest: item.requests_count || 0,
           projectUuid: item.id,
-          status:item.status,
-          endDate:item.end_date,
-          financeBy:item.finance_by
+          status: item.status,
+          endDate: item.end_date,
+          financeBy: item.finance_by,
         }));
 
         setData(dataArray);
         setTotal(res.total_project || 0);
         setTotalProject(res.total_project || 0);
         setTotalAmountProject(res.total_amount_project || 0);
-        setTotalRequest(res.total_request || 0);
+        // setTotalRequest(res.total_request || 0);
         setTotalAmountRequest(res.total_amount_request || 0);
 
         if (res.total_project <= 0) {
@@ -118,7 +117,7 @@ const ListDashBoard = () => {
       }
     };
     fetchData();
-  }, [limit, offset, navigate, debouncedSearchTerm,range]);
+  }, [limit, offset, navigate, debouncedSearchTerm, range]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const currentPage = Math.floor(offset / limit) + 1;
@@ -133,17 +132,20 @@ const ListDashBoard = () => {
     setOffset(0); // Reset to first page when changing limit
   };
 
-   const handleApplyDateFilter = (newRange: {
-     startDate: Date | null;
-     endDate: Date | null;
-   }) => {
-     setRange(newRange);
-     setIsDatePickerOpen(false);
-   };
-     
+  const handleApplyDateFilter = (newRange: {
+    startDate: Date | null;
+    endDate: Date | null;
+  }) => {
+    setRange(newRange);
+    setIsDatePickerOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+      if (
+        datePickerRef.current &&
+        !datePickerRef.current.contains(event.target as Node)
+      ) {
         setIsDatePickerOpen(false);
       }
     };
@@ -154,10 +156,8 @@ const ListDashBoard = () => {
   }, []);
 
   return (
-    <AppLayout>      
-      <div
-        className={"relative"}
-      >
+    <AppLayout>
+      <div className={"relative"}>
         <motion.div
           className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4 px-4 sm:px-0"
           initial={{ opacity: 0, y: 20 }}
@@ -307,17 +307,20 @@ const ListDashBoard = () => {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2 }}>
+                  transition={{ duration: 0.2 }}
+                >
                   <Button
                     variant="outline"
                     className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[90px] sm:min-w-[120px] h-9 sm:h-10"
-                    onClick={() => setIsDatePickerOpen(true)}>
+                    onClick={() => setIsDatePickerOpen(true)}
+                  >
                     <FilterIcon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     <Typography
                       className="text-secondary-60"
                       element="span"
                       size="sm"
-                      weight="semibold">
+                      weight="semibold"
+                    >
                       {t("Filter")}
                     </Typography>
                   </Button>
@@ -325,7 +328,8 @@ const ListDashBoard = () => {
                 {isDatePickerOpen && (
                   <div
                     ref={datePickerRef}
-                    className="absolute top-[100%] right-0 w-max z-50 mt-2 bg-white border border-secondary-30 rounded-lg shadow-lg p-4">
+                    className="absolute top-[100%] right-0 w-max z-50 mt-2 bg-white border border-secondary-30 rounded-lg shadow-lg p-4"
+                  >
                     <Filter
                       startDate={range.startDate}
                       endDate={range.endDate}
@@ -363,17 +367,28 @@ const ListDashBoard = () => {
                   disabled={currentPage === 1}
                   onClick={() => handlePageChange(currentPage - 1)}
                 >
-                  {currentPage===1?<ChevronLeftLightIcon/>:<ChevronLeftIcon/>} 
+                  {currentPage === 1 ? (
+                    <ChevronLeftLightIcon />
+                  ) : (
+                    <ChevronLeftIcon />
+                  )}
                 </Button>
-                <div><span className="text-nowrap">Page {currentPage} of {totalPages}</span></div>
+                <div>
+                  <span className="text-nowrap">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                </div>
                 <Button
                   variant="outline"
                   className="px-2 py-1 min-w-[32px] border-0"
                   disabled={currentPage === totalPages}
                   onClick={() => handlePageChange(currentPage + 1)}
                 >
-                {currentPage===totalPages?<ChevronRightLightIcon/>:<ChevronRightIcon/>} 
-
+                  {currentPage === totalPages ? (
+                    <ChevronRightLightIcon />
+                  ) : (
+                    <ChevronRightIcon />
+                  )}
                 </Button>
               </div>
             </div>

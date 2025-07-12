@@ -10,9 +10,7 @@ import {
   ArchiveIconDark,
   BanIcon,
   CrossRedIcon,
-  EnglishFlag,
   EyeDarkIcon,
-  FrenchFlagIcon,
   PencilIcon,
   RightGreenIcon,
   XCircleIcon,
@@ -32,13 +30,10 @@ export interface Data {
   createdDate: string;
   noOfRequest: number;
   projectUuid: string;
-  status:StatusCode;
-  endDate:string;
-  financeBy:string
+  status: StatusCode;
+  endDate: string;
+  financeBy: string;
 }
-type SortOrder = "asc" | "desc" | null;
-
-
 
 const ListDashBoardTable = ({
   data,
@@ -51,7 +46,6 @@ const ListDashBoardTable = ({
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Data>>({});
-  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -150,14 +144,14 @@ const ListDashBoardTable = ({
     }
   };
 
-  const getSortIcon = () => {
-    if (sortOrder === "asc") {
-      return "↑";
-    } else if (sortOrder === "desc") {
-      return "↓";
-    }
-    return "↕";
-  };
+  // const getSortIcon = () => {
+  //   if (sortOrder === "asc") {
+  //     return "↑";
+  //   } else if (sortOrder === "desc") {
+  //     return "↓";
+  //   }
+  //   return "↕";
+  // };
   const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       setSelectedRows(tableData.map((order) => order.id));
@@ -174,27 +168,6 @@ const ListDashBoardTable = ({
         return [...prev, orderId];
       }
     });
-  };
-  const handleAmountSort = () => {
-    let newSortOrder: SortOrder;
-    if (sortOrder === null || sortOrder === "desc") {
-      newSortOrder = "asc";
-    } else {
-      newSortOrder = "desc";
-    }
-
-    setSortOrder(newSortOrder);
-
-    const sortedData = [...tableData].sort((a, b) => {
-      if (newSortOrder === "asc") {
-        return a.amount - b.amount;
-      } else {
-        // Fix the desc sorting comparison
-        return b.amount - a.amount; // Changed from b.amount - b.amount
-      }
-    });
-
-    setTableData(sortedData);
   };
 
   // Handler for viewing project details
@@ -235,7 +208,7 @@ const ListDashBoardTable = ({
       content: <div className="text-nowrap">Currency</div>,
       className: "min-w-[120px]",
     },
-    
+
     // {
     //   content: (
     //     <div className="flex items-center gap-1 cursor-pointer">
@@ -267,8 +240,7 @@ const ListDashBoardTable = ({
       className: "w-20",
     },
   ];
-  console.log(tableData,'tableData');
-  
+  console.log(tableData, "tableData");
 
   return (
     <div className="relative rounded-lg bg-white ">
@@ -363,7 +335,8 @@ const ListDashBoardTable = ({
                               handleInputChange("currency", e.target.value)
                             }
                             className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white"
-                            aria-label="Financial Authority">
+                            aria-label="Financial Authority"
+                          >
                             <option value="USD">USD</option>
                             <option value="CDF">CDF</option>
                           </select>
@@ -479,7 +452,8 @@ const ListDashBoardTable = ({
                       ) : (
                         <div
                           className="relative"
-                          ref={openMenuId === data.id ? menuRef : null}>
+                          ref={openMenuId === data.id ? menuRef : null}
+                        >
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -488,18 +462,21 @@ const ListDashBoardTable = ({
                             className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                             aria-label="Open actions menu"
                             aria-haspopup="true"
-                            aria-expanded={openMenuId === data.id}>
+                            aria-expanded={openMenuId === data.id}
+                          >
                             <svg
                               className="w-4 h-4"
                               fill="currentColor"
-                              viewBox="0 0 20 20">
+                              viewBox="0 0 20 20"
+                            >
                               <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                             </svg>
                           </button>
                           {openMenuId === data.id && (
                             <div
                               className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 p-2"
-                              role="menu">
+                              role="menu"
+                            >
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -507,8 +484,9 @@ const ListDashBoardTable = ({
                                 }}
                                 className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                                 role="menuitem"
-                                aria-label="View Project">
-                                <EyeDarkIcon  />
+                                aria-label="View Project"
+                              >
+                                <EyeDarkIcon />
                                 View Project
                               </button>
 
@@ -519,7 +497,8 @@ const ListDashBoardTable = ({
                                 }}
                                 className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                                 role="menuitem"
-                                aria-label="Edit">
+                                aria-label="Edit"
+                              >
                                 <PencilIcon />
                                 Edit
                               </button>
@@ -531,7 +510,8 @@ const ListDashBoardTable = ({
                                 }}
                                 className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                                 role="menuitem"
-                                aria-label="Archive">
+                                aria-label="Archive"
+                              >
                                 <ArchiveIconDark />
                                 Archive
                               </button>
@@ -543,8 +523,9 @@ const ListDashBoardTable = ({
                                 }}
                                 className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                                 role="menuitem"
-                                aria-label="Suspend">
-                                <BanIcon/>
+                                aria-label="Suspend"
+                              >
+                                <BanIcon />
                                 Suspend
                               </button>
 
@@ -555,7 +536,8 @@ const ListDashBoardTable = ({
                                 }}
                                 className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                                 role="menuitem"
-                                aria-label="Close">
+                                aria-label="Close"
+                              >
                                 <XCircleIcon />
                                 Close
                               </button>

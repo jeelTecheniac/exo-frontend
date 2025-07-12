@@ -16,11 +16,13 @@ import Help from "./pages/OtherPage/Help";
 import TestRequestDetails from "./pages/OtherPage/TestRequestDetails";
 import TestFilterData from "./pages/OtherPage/TestFilterData";
 import AddRequest from "./components/dashboard/AddRequest";
-import ProjectDetails from "./components/dashboard/ProjectDetails";
 import ListDashBoard from "./components/dashboard/ListDashBoard";
 import PublicRoute from "./utils/PublicRoute";
 import ProtectedRoute from "./utils/constant/ProtectedRoute";
-import CreateProject from "./pages/Dashboard/CreateProject";
+import ProjectHome from "./pages/Dashboard/project/ProjectHomePage";
+import CreateProjectPage from "./pages/Dashboard/project/CreateProjectPage";
+import ProjectDetailsPage from "./pages/Dashboard/project/ProjectDetailsPage";
+import ContractDetailsPage from "./pages/Dashboard/contractor/ContractDetailsPage";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -38,18 +40,46 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/project-home"
+              element={
+                <ProtectedRoute>
+                  <ProjectHome />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/project-create"
+              element={
+                <ProtectedRoute>
+                  <CreateProjectPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/contract-details"
+              element={
+                <ProtectedRoute>
+                  <ContractDetailsPage />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/create-project"
               element={
                 <ProtectedRoute>
-                  <CreateProject />
+                  <CreateProjectPage />
                 </ProtectedRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/edit-project/:projectId"
               element={<CreateProject />}
-            />
+            /> */}
             <Route
               path="/sign-in"
               element={
@@ -126,7 +156,7 @@ export default function App() {
               path="/project-details/:projectId"
               element={
                 <ProtectedRoute>
-                  <ProjectDetails />
+                  <ProjectDetailsPage />
                 </ProtectedRoute>
               }
             />

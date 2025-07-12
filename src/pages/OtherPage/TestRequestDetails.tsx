@@ -131,7 +131,7 @@ export const comments: CommentProps[] = [
 const TestRequestDetails = () => {
   const [userData, setUserData] = useState<UserData | undefined>();
   const [requestData, setRequestData] = useState<RequestDetails | null>(null);
-  const {loading,setLoading}=useLoading()
+  const { setLoading } = useLoading();
   const [steps, setSteps] = useState<ProgressStep[]>(progressSteps);
   const {
     isOpen: isOpenRequestDetails,
@@ -200,11 +200,12 @@ const TestRequestDetails = () => {
   useEffect(() => {
     const user = localStorageService.getUser() || "";
     setUserData(JSON.parse(user));
-  }, []);    
-  
+  }, []);
+
   return (
     <div>
-      {requestData && <AppLayout>
+      {requestData && (
+        <AppLayout>
           <div className="px-4 md:px-8 py-6">
             <div className="mb-6">
               <div className="cursor-pointer mb-4">
@@ -280,7 +281,9 @@ const TestRequestDetails = () => {
                       <DashBoardCard
                         icon={<UsdVioletIcon width={44} height={44} />}
                         count={
-                          requestData ? requestData?.amount_summary?.total_tax : 0
+                          requestData
+                            ? requestData?.amount_summary?.total_tax
+                            : 0
                         }
                         title={t("total_tax_amount")}
                       />
@@ -360,7 +363,7 @@ const TestRequestDetails = () => {
                             })}
                         </div>
                       </div>
-                    </div>                  
+                    </div>
                   </div>
                 </div>
                 <div className="border border-secondary-30 bg-white rounded-lg">
@@ -372,12 +375,15 @@ const TestRequestDetails = () => {
               </div>
             </div>
           </div>
-        </AppLayout>}
-      {requestData&&<RequestDetailModal
-        isOpen={isOpenRequestDetails}
-        onClose={closeRequestDetails}
-        requestDetails={requestData}
-      />}
+        </AppLayout>
+      )}
+      {requestData && (
+        <RequestDetailModal
+          isOpen={isOpenRequestDetails}
+          onClose={closeRequestDetails}
+          requestDetails={requestData}
+        />
+      )}
     </div>
   );
 };

@@ -17,7 +17,6 @@ import Security from "../../components/user/Security";
 import LogoutModal from "../../components/modal/LogoutModal";
 import { useModal } from "../../hooks/useModal";
 import { useQuery } from "@tanstack/react-query";
-import { UserData } from "../Dashboard/CreateProject";
 import localStorageService from "../../services/local.service";
 import authService from "../../services/auth.service";
 import { useLoading } from "../../context/LoaderProvider";
@@ -27,36 +26,36 @@ const EditProfile = () => {
   const [isActiveButton, setIsActiveButton] = useState<"info" | "security">(
     "info"
   );
-  const {setLoading}=useLoading()
-  const [userData, setUserData] = useState<UserData|null>(null);
+  const { setLoading } = useLoading();
+  const [userData, setUserData] = useState<any | null>(null);
 
   useEffect(() => {
     try {
       const userRaw = localStorageService.getUser();
       const user = typeof userRaw === "string" ? JSON.parse(userRaw) : userRaw;
       setUserData(user || null);
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
       console.error("Failed to parse user data from localStorage", error);
     }
   }, []);
   const isTokenAvailable = !!userData?.token;
 
-  const { data: profile,isLoading:loadingProfile } = useQuery({
+  const { data: profile } = useQuery({
     queryKey: ["userProfile", userData?.token],
     enabled: isTokenAvailable,
     queryFn: async () => {
-      setLoading(true)
+      setLoading(true);
       const res = await authService.getProfile();
-      console.log(res.data.data,"userProfileData");
-      setLoading(false)
-      setUserData((prev) => {
-        if (!prev) return prev; 
+      console.log(res.data.data, "userProfileData");
+      setLoading(false);
+      setUserData((prev: any) => {
+        if (!prev) return prev;
         return {
-          ...prev,          
+          ...prev,
           first_name: res.data.data.first_name,
           last_name: res.data.data.last_name,
-          company_name: res.data.data.company_name,  
+          company_name: res.data.data.company_name,
         };
       });
       return res.data;
@@ -69,17 +68,17 @@ const EditProfile = () => {
     closeModal: closeLogoutModal,
   } = useModal();
 
-  const handelSetUser=(data:UserData):void=>{
-    if(data){
-      setUserData((prev) => {
-        if (!prev) return prev; 
+  const handelSetUser = (data: any): void => {
+    if (data) {
+      setUserData((prev: any) => {
+        if (!prev) return prev;
         return {
           ...prev,
-          email: data.email,          
+          email: data.email,
         };
       });
     }
-  }
+  };
   return (
     <AppLayout>
       <div className="lg:px-10 px-4">
@@ -87,17 +86,24 @@ const EditProfile = () => {
           <Typography
             size="xl_2"
             weight="extrabold"
-            className="text-secondary-100">
+            className="text-secondary-100"
+          >
             {t("edit_profile")}
           </Typography>
-          {userData&&<ProfileHeader
-            email={(userData && userData.email) || ""}
-            fullName={
-              (userData && `${userData.first_name} ${userData.last_name}`) || ""
-            }
-            name={({firstName:userData.first_name||"",lastName:userData.last_name||""})}
-            // imageUrl="/images/user/thubmnail.png"
-          />}
+          {userData && (
+            <ProfileHeader
+              email={(userData && userData.email) || ""}
+              fullName={
+                (userData && `${userData.first_name} ${userData.last_name}`) ||
+                ""
+              }
+              name={{
+                firstName: userData.first_name || "",
+                lastName: userData.last_name || "",
+              }}
+              // imageUrl="/images/user/thubmnail.png"
+            />
+          )}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 mt-6">

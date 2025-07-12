@@ -8,21 +8,23 @@ import { useNavigate } from "react-router";
 interface ChangeEmailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  projectId:string
+  projectId: string;
 }
 const CreateProjectConfirmationModal = ({
-  projectId,
   isOpen,
   onClose,
 }: ChangeEmailModalProps) => {
   const { t } = useTranslation();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   return (
     <div className="flex w-full">
       <Modal
         className="w-[90%] md:max-w-[600px] mx-auto p-4 md:p-6 max-h-[90vh] md:max-h-[900px] flex justify-center items-center"
         isOpen={isOpen}
-        onClose={()=>{onClose();navigate("/dashboard");}}
+        onClose={() => {
+          onClose();
+          navigate("/dashboard");
+        }}
         isFullscreen={false}
         showCloseButton={false}
       >
@@ -43,7 +45,7 @@ const CreateProjectConfirmationModal = ({
             size="xl"
             className="text-secondary-100 text-center md:text-xl_2"
           >
-            {t("project_submitted_for_verification")}
+            {t("project_has_been_created_successfully")}
           </Typography>
           <Typography
             weight="normal"
@@ -58,16 +60,19 @@ const CreateProjectConfirmationModal = ({
             <Button
               variant="outline"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
-              onClick={()=>{navigate("/dashboard");onClose()}}
+              onClick={() => {
+                navigate("/project-home");
+                onClose();
+              }}
             >
               {t("go_to_dashboard")}
             </Button>
             <Button
               variant="primary"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
-              onClick={()=>navigate(`/add-request/${projectId}`)}
+              // onClick={() => navigate("project-create")}
             >
-              {t("create_request")}
+              {t("create_another_project")}
             </Button>
           </div>
         </div>
