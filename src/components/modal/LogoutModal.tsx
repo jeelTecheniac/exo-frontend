@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import localStorageService from "../../services/local.service";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 interface UserData {
   id: number;
   first_name: string;
@@ -29,6 +30,7 @@ interface ChangeEmailModalProps {
 const LogoutModal = ({ isOpen, onClose, userData }: ChangeEmailModalProps) => {
   const navigate = useNavigate();
   const [loading, setIsLoading] = useState<boolean>(false);
+  const {t}=useTranslation()
   const { logout } = useAuth();
   const logoutMutatioin = useMutation({
     mutationFn: async () => {
@@ -75,19 +77,19 @@ const LogoutModal = ({ isOpen, onClose, userData }: ChangeEmailModalProps) => {
             weight="bold"
             className="text-secondary-100 mt-4"
           >
-            Are you sure want to logout?
+            {t("logout_confirmation")}
           </Typography>
           <Typography
             size="base"
             weight="normal"
             className="text-secondary-60 mt-2"
           >
-            Logout of ExoTrack as {userData?.email}?
+            {t("logout_as")} {userData?.email}?
           </Typography>
 
           <div className="flex gap-4 mt-6">
             <Button variant="outline" className="w-fit py-3" onClick={onClose}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               variant="primary"
@@ -95,7 +97,7 @@ const LogoutModal = ({ isOpen, onClose, userData }: ChangeEmailModalProps) => {
               onClick={handelLogoutUser}
               loading={loading}
             >
-              Logout
+              {t("logout")}
             </Button>
           </div>
         </div>

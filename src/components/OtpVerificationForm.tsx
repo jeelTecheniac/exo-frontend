@@ -205,7 +205,7 @@ const OtpVerificationForm = () => {
             variant="primary"
             className="py-3 mt-4"
             type="submit"
-            disable={!formik.isValid || formik.isSubmitting}
+            disable={!formik.isValid || signUpMutation.isPending}
             loading={
               signUpMutation.isPending || otpVerificationMutation.isPending
             }

@@ -201,7 +201,10 @@ const Security = ({ userData,setUserDate }: UserInformationProps) => {
       setPasswordStrength("");
     },
     onError: (error: any) => {
-      toast.error(error?.message || t("password_update_error"));
+      if (error.status === 412) {
+        return toast.error(t("password_incorrect"));
+      }
+      return toast.error(error?.response.data.message || t("password_update_error"));
     },
   });
   return (
@@ -246,7 +249,7 @@ const Security = ({ userData,setUserDate }: UserInformationProps) => {
           <div className="mt-6">
             <Password
               labelProps={{
-                children: "Current Password",
+                children: t("current_password"),
               }}
               name="currentPassword"
               value={formik.values.currentPassword}

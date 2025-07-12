@@ -6,11 +6,14 @@ import { useModal } from "../../hooks/useModal";
 import LogoutModal from "../modal/LogoutModal";
 import localStorageService from "../../services/local.service";
 import { UserData } from "../../pages/Dashboard/CreateProject";
+import Avatar from "../common/Avatar";
+import { useTranslation } from "react-i18next";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [userData, setUserData] = useState<UserData | undefined>();
   const navigate = useNavigate();
+  const {t} = useTranslation()
 
   const {isOpen: isOpenLogoutModal,openModal: openLogoutModal,closeModal: closeLogoutModal} = useModal();
   
@@ -38,9 +41,12 @@ export default function UserDropdown() {
         onClick={toggleDropdown}
         className="flex items-center text-gray-700 dropdown-toggle"
       >
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
+        {/* <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
           <img src="/images/user/owner.jpg" alt="User" />
-        </span>
+        </span> */}
+        <div className="mr-3 overflow-hidden rounded-full h-11 w-11">
+        <Avatar firstName={userData?userData.first_name:""} lastName={userData?userData?.last_name:""} imageUrl={userData?userData.profile_image:""} size="w-full h-full"/>
+        </div>
 
         <svg
           className={`stroke-gray-500 transition-transform duration-200 ${
@@ -85,7 +91,7 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Edit profile
+              {t("edit_profile")}
             </DropdownItem>
           </li>
 
@@ -108,7 +114,7 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              Sign out
+              {t("sign_out")}
             </DropdownItem>
           </li>
         </ul>
