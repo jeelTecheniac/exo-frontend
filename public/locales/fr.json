@@ -228,5 +228,10 @@
   "number_of_request": "Number of Request",
   "sum_of_request": "Sum of Request",
   "accepted_requests": "Accepted Requests",
-  "requests": "Requests"
+  "requests": "Requests",  
+  "create_contract": "Créer un contrat",
+  "contracts": "Contrats",
+  "select_project_to_continue": "Sélectionnez un projet pour continuer",
+  "add_contract": "Ajouter un contrat",
+  "view_project": "Voir le projet"
 }

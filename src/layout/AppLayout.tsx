@@ -25,7 +25,7 @@ const LayoutContent: React.FC<LayoutContentProps> = ({
         </div>
       </div>
       <div
-        className={`flex-1 transition-all duration-300 ease-in-out ${
+        className={`w-full flex-1 transition-all duration-300 ease-in-out ${
           isMobileOpen ? "ml-0" : ""
         }`}
       >

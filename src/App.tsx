@@ -23,6 +23,8 @@ import ProjectHome from "./pages/Dashboard/project/ProjectHomePage";
 import CreateProjectPage from "./pages/Dashboard/project/CreateProjectPage";
 import ProjectDetailsPage from "./pages/Dashboard/project/ProjectDetailsPage";
 import ContractDetailsPage from "./pages/Dashboard/contractor/ContractDetailsPage";
+import ContractListPage from "./pages/Dashboard/contractor/ContractListPage";
+import ContractProjectListPage from "./pages/Dashboard/contractor/ContractProjectListPage";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -173,6 +175,22 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <TestFilterData />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/contract"
+              element={
+                <ProtectedRoute>
+                  <ContractListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/contract-project-list"
+              element={
+                <ProtectedRoute>
+                  <ContractProjectListPage />
                 </ProtectedRoute>
               }
             />
