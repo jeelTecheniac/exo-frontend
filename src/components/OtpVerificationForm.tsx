@@ -99,7 +99,7 @@ const OtpVerificationForm = () => {
       const userDataString = localStorageService.getUser() as string;
       const user = JSON.parse(userDataString);
       setUserData(user);
-      sendOtpMutation.mutate(user.email);
+      // sendOtpMutation.mutate(user.email);
     }
   }, []);
   const formik = useFormik({

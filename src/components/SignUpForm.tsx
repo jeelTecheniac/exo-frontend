@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Checkbox from "../lib/components/atoms/Checkbox";
 import Input from "../lib/components/atoms/Input";
 import Label from "../lib/components/atoms/Label";
@@ -16,6 +16,9 @@ import { useModal } from "../hooks/useModal";
 import TermsConditionModal from "./modal/TermsConditionModal";
 import localStorageService from "../services/local.service";
 import { mobileCountryCode } from "../utils/constant/apiRoutes";
+import { useMutation } from "@tanstack/react-query";
+import authService from "../services/auth.service";
+import { toast } from "react-toastify";
 
 const SignUpForm = () => {
   const [remember, setRemember] = useState(false);
@@ -53,7 +56,21 @@ const SignUpForm = () => {
       .oneOf([Yup.ref("password")], t("passwords_must_match"))
       .required(t("confirm_password_required")),
   });
-
+  const sendOtpMutation = useMutation({
+    mutationFn: async (email: string) => {
+      await authService.sendOtp(email);
+    },
+    onSuccess: () => {
+      toast.success(t("otp_sent_successfully"));
+      navigate("/otp-verification")
+    },
+    onError: (error: any) => {
+      if (error.status === 412) {
+        return toast.error(t("email_is_already_registered"));
+      }
+      return toast.error(t("otp_send_error"));
+    },
+  });
   const formik = useFormik({
     initialValues: {
       first_name: "",
@@ -66,19 +83,20 @@ const SignUpForm = () => {
       country_code: mobileCountryCode[0].value,
     },
     validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async(values) => {
       localStorageService.setUser(JSON.stringify(values));
       localStorageService.setPath("sign-up");
+      const res=await sendOtpMutation.mutateAsync(values.email);      
       // toast.success(t("account_created_successfully"), {
       //   autoClose: 800,
       // });
-      setTimeout(() => {
-        navigate("/otp-verification", {
-          state: {
-            path: "sign-up",
-          },
-        });
-      }, 300);
+      // setTimeout(() => {
+      //   navigate("/otp-verification", {
+      //     state: {
+      //       path: "sign-up",
+      //     },
+      //   });
+      // }, 300);
     },
   });
 
@@ -122,6 +140,20 @@ const SignUpForm = () => {
       opacity: 1,
     },
   };
+
+  useEffect(()=>{
+    const userData=localStorage.getItem("userData");
+    if(userData){
+      const data=JSON.parse(userData)
+      formik.setFieldValue("first_name",data.first_name)
+      formik.setFieldValue("last_name",data.last_name)
+      formik.setFieldValue("email",data.email)
+      formik.setFieldValue("mobile",data.mobile)
+      formik.setFieldValue("company_name",data.company_name)
+      formik.setFieldValue("country_code",data.country_code)
+      
+    }
+  },[])
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible">
@@ -309,6 +341,7 @@ const SignUpForm = () => {
             className="py-3 mt-4"
             type="submit"
             disable={!formik.isValid || !remember}
+            loading={sendOtpMutation.isPending}
           >
             {t("create_account")}
           </Button>
