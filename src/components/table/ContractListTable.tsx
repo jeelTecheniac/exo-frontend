@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import moment from "moment";
 import {
   ArchiveIconDark,
@@ -91,38 +91,42 @@ export interface ContractData {
 
 const ContractListTable = ({
   data,
-  onDataChange,
+  // onDataChange,
 }: {
   data: ContractData[];
   onDataChange?: (newData: ContractData[]) => void;
 }) => {
   const [tableData, setTableData] = useState<ContractData[]>(data);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  // const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelectedRows(tableData.map((order) => order.id));
-    } else {
-      setSelectedRows([]);
-    }
-  };
+  // const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.checked) {
+  //     setSelectedRows(tableData.map((order) => order.id));
+  //   } else {
+  //     setSelectedRows([]);
+  //   }
+  // };
 
-  const handleSelectRow = (orderId: number) => {
-    setSelectedRows((prev) => {
-      if (prev.includes(orderId)) {
-        return prev.filter((id) => id !== orderId);
-      } else {
-        return [...prev, orderId];
-      }
-    });
-  };
+  // const handleSelectRow = (orderId: number) => {
+  //   setSelectedRows((prev) => {
+  //     if (prev.includes(orderId)) {
+  //       return prev.filter((id) => id !== orderId);
+  //     } else {
+  //       return [...prev, orderId];
+  //     }
+  //   });
+  // };
 
   const handleMenuToggle = (orderId: number) => {
     setOpenMenuId(openMenuId === orderId ? null : orderId);
   };
+
+  useEffect(()=>{
+    setTableData(data)
+  },[])
 
   const tableHeader: TableHeader[] = [
     // {

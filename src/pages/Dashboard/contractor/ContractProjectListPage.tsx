@@ -9,9 +9,6 @@ import {
   FilterIcon,  
   SearchIcon,  
 } from "../../../icons";
-import { useNavigate } from "react-router";
-import { useLoading } from "../../../context/LoaderProvider";
-import homeService from "../../../services/home.service";
 import AppLayout from "../../../layout/AppLayout";
 import Typography from "../../../lib/components/atoms/Typography";
 import Button from "../../../lib/components/atoms/Button";
@@ -113,10 +110,10 @@ const projectData: Data[] = [
 
 const ContractProjectListPage = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [data, setData] = useState<Data[]>([]);
-  const { setLoading } = useLoading();
+  // const { setLoading } = useLoading();
 
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(8);
@@ -138,7 +135,7 @@ const ContractProjectListPage = () => {
   const datePickerRef = useRef<HTMLDivElement>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  // const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -148,60 +145,69 @@ const ContractProjectListPage = () => {
       clearTimeout(handler);
     };
   }, [searchTerm]);
+  console.log(totalProject,totalAmountProject,totalAmountRequest); 
 
-  const formateDate = (date: Date | null) => {
-    if (!date) return;
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    const formattedDate = `${year}-${month}-${day}`;    
-    return formattedDate;
-  };
+  // const formateDate = (date: Date | null) => {
+  //   if (!date) return;
+  //   const day = date.getDate().toString().padStart(2, "0");
+  //   const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  //   const year = date.getFullYear();
+  //   const formattedDate = `${year}-${month}-${day}`;    
+  //   return formattedDate;
+  // };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const res = await homeService.getHomeData(
+  //         limit,
+  //         offset,
+  //         debouncedSearchTerm,
+  //         formateDate(range.startDate),
+  //         formateDate(range.endDate)
+  //       );
+  //       const dataArray = (res.data || []).map((item: any, idx: number) => ({
+  //         id: idx + 1 + offset,
+  //         projectId: item.reference,
+  //         projectName: item.name,
+  //         currency: item.currency,
+  //         amount: Number(item.amount),
+  //         createdDate: item.created_at,
+  //         noOfRequest: item.requests_count || 0,
+  //         projectUuid: item.id,
+  //         status: item.status,
+  //         endDate: item.end_date,
+  //         financeBy: item.finance_by,
+  //       }));
+
+  //       setData(dataArray);
+  //       setTotal(res.total_project || 0);
+  //       setTotalProject(res.total_project || 0);
+  //       setTotalAmountProject(res.total_amount_project || 0);        
+  //       setTotalAmountRequest(res.total_amount_request || 0);
+
+  //       if (res.total_project <= 0) {
+  //         navigate("/");
+  //       }
+  //     } catch (e) {
+  //       console.log(e, "error");
+  //       setData([]);
+  //       navigate("/");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   // fetchData();
+    
+  // }, [limit, offset, navigate, debouncedSearchTerm, range]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await homeService.getHomeData(
-          limit,
-          offset,
-          debouncedSearchTerm,
-          formateDate(range.startDate),
-          formateDate(range.endDate)
-        );
-        const dataArray = (res.data || []).map((item: any, idx: number) => ({
-          id: idx + 1 + offset,
-          projectId: item.reference,
-          projectName: item.name,
-          currency: item.currency,
-          amount: Number(item.amount),
-          createdDate: item.created_at,
-          noOfRequest: item.requests_count || 0,
-          projectUuid: item.id,
-          status: item.status,
-          endDate: item.end_date,
-          financeBy: item.finance_by,
-        }));
-
-        setData(dataArray);
-        setTotal(res.total_project || 0);
-        setTotalProject(res.total_project || 0);
-        setTotalAmountProject(res.total_amount_project || 0);        
-        setTotalAmountRequest(res.total_amount_request || 0);
-
-        if (res.total_project <= 0) {
-          navigate("/");
-        }
-      } catch (e) {
-        console.log(e, "error");
-        setData([]);
-        navigate("/");
-      } finally {
-        setLoading(false);
-      }
-    };
-    // fetchData();
-    setData(projectData)
-  }, [limit, offset, navigate, debouncedSearchTerm, range]);
+    setData(projectData);
+    setTotal(0);
+    setTotalProject(0);
+    setTotalAmountProject(0);
+    setTotalAmountRequest(0);
+  }, []);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const currentPage = Math.floor(offset / limit) + 1;
@@ -220,7 +226,7 @@ const ContractProjectListPage = () => {
     startDate: Date | null;
     endDate: Date | null;
   }) => {
-    // setRange(newRange);
+    setRange(newRange);
     setIsDatePickerOpen(false);
   };
 

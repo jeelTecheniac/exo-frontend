@@ -236,5 +236,8 @@
   "contracts": "Contracts",
   "select_project_to_continue": "Select Project to Continue",
   "add_contract": "Add Contract",
-  "view_project":"View Project"
+  "view_project":"View Project",
+  "contract_info_description": "Fill in the details to complete the contract information form.",
+  "contract_submitted":"Contract submitted for verification",
+  "contract_update_message":"You will receive further updates regarding your contract via email at your registered email address."
 }

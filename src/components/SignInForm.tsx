@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Checkbox from "../lib/components/atoms/Checkbox";
 import Input from "../lib/components/atoms/Input";
 import Label from "../lib/components/atoms/Label";
@@ -114,6 +114,10 @@ const SignInForm = () => {
       opacity: 1,
     },
   };
+
+  useEffect(()=>{
+    localStorage.removeItem("userData")
+  },[])
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible">

@@ -25,6 +25,7 @@ import ProjectDetailsPage from "./pages/Dashboard/project/ProjectDetailsPage";
 import ContractDetailsPage from "./pages/Dashboard/contractor/ContractDetailsPage";
 import ContractListPage from "./pages/Dashboard/contractor/ContractListPage";
 import ContractProjectListPage from "./pages/Dashboard/contractor/ContractProjectListPage";
+import ContractCreatePage from "./pages/Dashboard/contractor/ContractCreatePage";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -183,6 +184,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <ContractListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create-contract"
+              element={
+                <ProtectedRoute>
+                  <ContractCreatePage />
                 </ProtectedRoute>
               }
             />
