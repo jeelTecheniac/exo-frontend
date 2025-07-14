@@ -19,8 +19,6 @@ import AppLayout from "../../layout/AppLayout.tsx";
 import localStorageService from "../../services/local.service.ts";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { UserData } from "../../pages/Dashboard/CreateProject.tsx";
-import { UploadArgs, UploadResponse } from "./ProjectInfoForm.tsx";
 import projectService from "../../services/project.service.ts";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../common/Loader.tsx";
@@ -55,7 +53,7 @@ interface CreateRequestPayload {
   request_letter: string;
   document_ids?: string;
   request_entity: string; // must be stringified JSON
-  request_id?:string
+  request_id?: string;
 }
 
 const AddRequest = () => {
@@ -64,7 +62,7 @@ const AddRequest = () => {
   const { requestId, projectId: newProjectId } = useParams();
 
   const [data, setData] = useState<Order[]>([]);
-  const [userData, setUserData] = useState<UserData | undefined>();
+  const [userData, setUserData] = useState<any | undefined>();
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [requestLetter, setRequestLetter] = useState("");
@@ -76,7 +74,7 @@ const AddRequest = () => {
     totalTaxAmount: 0,
     totalAmountWithTax: 0,
   });
-  const [financialAuthority,setFinancialAuthority]=useState<string>("DGI")
+  const [financialAuthority, setFinancialAuthority] = useState<string>("DGI");
   useEffect(() => {
     const user = localStorageService.getUser() || "";
     setUserData(JSON.parse(user));
@@ -151,9 +149,9 @@ const AddRequest = () => {
     setData(recalculateTableData([...data, newOrder]));
   };
 
-  const updateEntitys = (entitys: Entity[]) => {    
-    const newOrder: Order[] = entitys.map((entity: Entity,index:number) => ({
-      id: new Date().getTime()+index+1,      
+  const updateEntitys = (entitys: Entity[]) => {
+    const newOrder: Order[] = entitys.map((entity: Entity, index: number) => ({
+      id: new Date().getTime() + index + 1,
       label: entity.label,
       quantity: entity.quantity,
       unitPrice: entity.unit_price,
@@ -163,7 +161,9 @@ const AddRequest = () => {
       vatIncluded: entity.vat_included,
       financialAuthority: entity.financial_authority,
     }));
-    setFinancialAuthority(entitys.length!==0?entitys[0]?.financial_authority:"DGI")
+    setFinancialAuthority(
+      entitys.length !== 0 ? entitys[0]?.financial_authority : "DGI"
+    );
     setData(recalculateTableData([...data, ...newOrder]));
   };
 
@@ -213,7 +213,10 @@ const AddRequest = () => {
       project_id: projectId,
       address_id: selectedAddress,
       request_letter: requestLetter,
-      document_ids: uploadedFiles.length > 0 ? uploadedFiles.map(file=>file.id)?.join(",") : undefined,
+      document_ids:
+        uploadedFiles.length > 0
+          ? uploadedFiles.map((file) => file.id)?.join(",")
+          : undefined,
       request_entity: JSON.stringify(
         data.map((d) => ({
           label: d.label,
@@ -226,14 +229,14 @@ const AddRequest = () => {
           financial_authority: financialAuthority,
         }))
       ),
-      ...(requestId&&{request_id:requestId})
-    };    
+      ...(requestId && { request_id: requestId }),
+    };
     createRequestMutation.mutate(apiData);
   };
   const fileUploadMutation = async ({
     file,
     onProgress,
-  }: UploadArgs): Promise<UploadResponse> => {
+  }: any): Promise<any> => {
     console.log("Inside mutation file:", file);
     const formData = new FormData();
     formData.append("file", file);
@@ -379,34 +382,39 @@ const AddRequest = () => {
     setUploadedFiles(files);
   };
 
-  const financialAuthorityList:{name:string,value:string}[] = [
+  const financialAuthorityList: { name: string; value: string }[] = [
     { name: "DGI: Invoice Files", value: "DGI" },
     { name: "DGDA: DGDA Files", value: "DGDA" },
     { name: "DGRAD: DGRAD Files", value: "DGRAD" },
   ];
-  const handleFinancialAuthority=(event: React.ChangeEvent<HTMLSelectElement>)=>{
-    setFinancialAuthority(event.target.value)
-  }
-  if (isLoading) return <Loader/>;
+  const handleFinancialAuthority = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setFinancialAuthority(event.target.value);
+  };
+  if (isLoading) return <Loader />;
 
   return (
     <AppLayout className="bg-white">
       <div className="px-4 md:px-0">
         <div
           className="flex items-center gap-2 cursor-pointer mb-2"
-          onClick={() => window.history.back()}>
+          onClick={() => window.history.back()}
+        >
           <ArrowLeftIcon width={16} height={16} className="text-primary-150" />
           <Typography
             size="base"
             weight="semibold"
-            className="text-primary-150">
+            className="text-primary-150"
+          >
             {t("back_to_dashboard")}
           </Typography>
         </div>
         <Typography
           size="xl_2"
           weight="extrabold"
-          className="text-secondary-100 text-2xl md:text-3xl">
+          className="text-secondary-100 text-2xl md:text-3xl"
+        >
           {t("create_request")}
         </Typography>
 
@@ -419,7 +427,8 @@ const AddRequest = () => {
             value={selectedAddress}
             onChange={handleAddressChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-30 focus:border-transparent"
-            disabled={isLoadingAddresses}>
+            disabled={isLoadingAddresses}
+          >
             <option value="">
               {isLoadingAddresses ? t("loading") : t("select_address")}
             </option>
@@ -445,29 +454,31 @@ const AddRequest = () => {
 
         {/* Add Entity Button */}
         <div className="mb-3 md:mb-5 flex gap-2 justify-end">
-            <div className="mt-4 w-full md:w-fit">
-              <select
-                id="financialAuthority"
-                name="financialAuthority"
-                value={financialAuthority}
-                onChange={handleFinancialAuthority}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-30 focus:border-transparent">
-                {/* <option value="">
+          <div className="mt-4 w-full md:w-fit">
+            <select
+              id="financialAuthority"
+              name="financialAuthority"
+              value={financialAuthority}
+              onChange={handleFinancialAuthority}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-30 focus:border-transparent"
+            >
+              {/* <option value="">
                   {isLoadingAddresses ? t("loading") : t("select_address")}
                 </option> */}
-                {financialAuthorityList.map(
-                  (list: { name: string; value: string }) => (
-                    <option key={list.value} value={list.value}>
-                      {`${list.name}`}
-                    </option>
-                  )
-                )}
-              </select>
-            </div>          
+              {financialAuthorityList.map(
+                (list: { name: string; value: string }) => (
+                  <option key={list.value} value={list.value}>
+                    {`${list.name}`}
+                  </option>
+                )
+              )}
+            </select>
+          </div>
           <Button
             variant="secondary"
             className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center"
-            onClick={handleAddEntity}>
+            onClick={handleAddEntity}
+          >
             <PlusBlueIcon />
             <Typography>{t("add_entity")}</Typography>
           </Button>

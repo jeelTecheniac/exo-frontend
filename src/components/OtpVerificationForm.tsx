@@ -13,15 +13,14 @@ import localStorageService from "../services/local.service";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
-import { UserData } from "../pages/Dashboard/CreateProject";
 import { useAuth } from "../context/AuthContext";
 
 const OtpVerificationForm = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const {login} =useAuth()
+  const { login } = useAuth();
 
-  const [userData, setUserData] = useState<UserData | undefined>();
+  const [userData, setUserData] = useState<any | undefined>();
   const path = localStorageService.getPath();
 
   const validationSchema = Yup.object().shape({
@@ -47,7 +46,7 @@ const OtpVerificationForm = () => {
     },
     onError: (error) => {
       console.error("Error during sign up:", error);
-      toast.error(t("sign_up_error"));      
+      toast.error(t("sign_up_error"));
     },
   });
   const sendOtpMutation = useMutation({

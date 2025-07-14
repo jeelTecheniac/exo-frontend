@@ -1,32 +1,117 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import AppLayout from "../../layout/AppLayout";
-import Button from "../../lib/components/atoms/Button";
-import DashBoardCard from "../../lib/components/molecules/DashBoardCard.tsx";
 import {
   ChevronLeftIcon,
   ChevronLeftLightIcon,
   ChevronRightIcon,
-  ChevronRightLightIcon,
-  // ArchiveIcon,
-  FileVioletIcon,
-  FilterIcon,
-  // FilterIcon,
-  SearchIcon,
-  UsdGreenIcon,
-  UsdOrangeIcon,
-  WhitePlusIcon,
-} from "../../icons";
-import Typography from "../../lib/components/atoms/Typography.tsx";
-import Input from "../../lib/components/atoms/Input.tsx";
-import ListDashBoardTable, { Data } from "../table/ListDashboardTable.tsx";
-import homeService from "../../services/home.service.ts";
+  ChevronRightLightIcon,    
+  FilterIcon,  
+  SearchIcon,  
+} from "../../../icons";
 import { useNavigate } from "react-router";
-import Filter from "../../lib/components/molecules/Filter.tsx";
-import { useLoading } from "../../context/LoaderProvider.tsx";
+import { useLoading } from "../../../context/LoaderProvider";
+import homeService from "../../../services/home.service";
+import AppLayout from "../../../layout/AppLayout";
+import Typography from "../../../lib/components/atoms/Typography";
+import Button from "../../../lib/components/atoms/Button";
+import Filter from "../../../lib/components/molecules/Filter";
+import ContractProjectListTable, { Data } from "../../../components/table/ContractProjectListTable";
+import Input from "../../../lib/components/atoms/Input";
 
-const ListDashBoard = () => {
+
+const projectData: Data[] = [
+  {
+    id: 1,
+    projectId: "#25-00001",
+    projectName: "Renovation Project",
+    currency: "USD",
+    amount: 2500000,
+    createdDate: "2025/04/12",
+    noOfRequest: 0,
+    projectUuid: "uuid-0001",
+    status: "progress",
+    endDate: "2025/04/12",
+    financeBy: "Robert Fox",
+    projectManager: "Robert Fox"
+  },
+  {
+    id: 2,
+    projectId: "#25-00002",
+    projectName: "Road Project",
+    currency: "USD",
+    amount: 4500000,
+    createdDate: "2025/04/12",
+    noOfRequest: 0,
+    projectUuid: "uuid-0002",
+    status: "expired",
+    endDate: "2025/04/12",
+    financeBy: "Justin Bevan",
+    projectManager: "Justin Bevan"
+  },
+  {
+    id: 3,
+    projectId: "#25-00003",
+    projectName: "Construction Project",
+    currency: "USD",
+    amount: 2666000,
+    createdDate: "2025/04/12",
+    noOfRequest: 0,
+    projectUuid: "uuid-0003",
+    status: "schedule",
+    endDate: "2025/04/12",
+    financeBy: "Bill Client",
+    projectManager: "Bill Client"
+  },
+  {
+    id: 4,
+    projectId: "#25-00004",
+    projectName: "Taxi Project",
+    currency: "USD",
+    amount: 2999000,
+    createdDate: "2025/04/12",
+    noOfRequest: 0,
+    projectUuid: "uuid-0004",
+    status: "draft",
+    endDate: "2025/04/12",
+    financeBy: "Mark Fox",
+    projectManager: "Mark Fox"
+  },
+  {
+    id: 5,
+    projectId: "#25-00005",
+    projectName: "Maintenance Project",
+    currency: "USD",
+    amount: 7500000,
+    createdDate: "2025/04/12",
+    noOfRequest: 0,
+    projectUuid: "uuid-0005",
+    status: "schedule",
+    endDate: "2025/04/12",
+    financeBy: "Nayan Patel",
+    projectManager: "Nayan Patel"
+  },
+  {
+    id: 6,
+    projectId: "#25-00006",
+    projectName: "Redevelopment Project",
+    currency: "USD",
+    amount: 2500000,
+    createdDate: "2025/04/12",
+    noOfRequest: 0,
+    projectUuid: "uuid-0006",
+    status: "progress",
+    endDate: "2025/04/12",
+    financeBy: "Robert Josh",
+    projectManager: "Robert Josh"
+  }
+];
+
+
+
+
+
+const ContractProjectListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -57,7 +142,7 @@ const ListDashBoard = () => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
+    //   setDebouncedSearchTerm(searchTerm);
     }, 500);
     return () => {
       clearTimeout(handler);
@@ -69,8 +154,7 @@ const ListDashBoard = () => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
-    const formattedDate = `${year}-${month}-${day}`;
-    // const formattedDate = `${day}-${month}-${year}`;
+    const formattedDate = `${year}-${month}-${day}`;    
     return formattedDate;
   };
   useEffect(() => {
@@ -101,8 +185,7 @@ const ListDashBoard = () => {
         setData(dataArray);
         setTotal(res.total_project || 0);
         setTotalProject(res.total_project || 0);
-        setTotalAmountProject(res.total_amount_project || 0);
-        // setTotalRequest(res.total_request || 0);
+        setTotalAmountProject(res.total_amount_project || 0);        
         setTotalAmountRequest(res.total_amount_request || 0);
 
         if (res.total_project <= 0) {
@@ -116,7 +199,8 @@ const ListDashBoard = () => {
         setLoading(false);
       }
     };
-    fetchData();
+    // fetchData();
+    setData(projectData)
   }, [limit, offset, navigate, debouncedSearchTerm, range]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
@@ -136,7 +220,7 @@ const ListDashBoard = () => {
     startDate: Date | null;
     endDate: Date | null;
   }) => {
-    setRange(newRange);
+    // setRange(newRange);
     setIsDatePickerOpen(false);
   };
 
@@ -169,94 +253,11 @@ const ListDashBoard = () => {
             weight="extrabold"
             className="text-secondary-100 text-center sm:text-left"
           >
-            {t("dashboard")}
-          </Typography>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="w-full sm:w-auto"
-          >
-            <Button
-              variant="primary"
-              className="flex items-center justify-center w-full sm:w-fit gap-2 py-2.5 px-4"
-              onClick={() => navigate("/create-project")}
-            >
-              <WhitePlusIcon
-                width={12}
-                height={12}
-                className="sm:w-[13px] sm:h-[13px]"
-              />
-              <Typography size="sm" className="sm:text-base">
-                {t("create_project")}
-              </Typography>
-            </Button>
-          </motion.div>
+            {t("select_project_to_continue")}
+          </Typography>          
         </motion.div>
 
         <motion.div className="px-4 sm:px-0">
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6"
-            initial="hidden"
-            animate="visible"
-          >
-            {[
-              {
-                icon: (
-                  <FileVioletIcon
-                    width={36}
-                    height={36}
-                    className="sm:w-11 sm:h-11"
-                  />
-                ),
-                count: totalProject,
-                title: t("total_project"),
-              },
-              {
-                icon: (
-                  <UsdGreenIcon
-                    width={36}
-                    height={36}
-                    className="sm:w-11 sm:h-11"
-                  />
-                ),
-                count: totalAmountProject,
-                title: t("total_amount_of_project"),
-              },
-              // {
-              //   icon: (
-              //     <UsdVioletIcon
-              //       width={36}
-              //       height={36}
-              //       className="sm:w-11 sm:h-11"
-              //     />
-              //   ),
-              //   count: totalRequest,
-              //   title: t("total_request"),
-              // },
-              {
-                icon: (
-                  <UsdOrangeIcon
-                    width={36}
-                    height={36}
-                    className="sm:w-11 sm:h-11"
-                  />
-                ),
-                count: totalAmountRequest,
-                title: t("total_amount_requested"),
-              },
-            ].map((card, index) => (
-              <motion.div key={index} transition={{ duration: 0.3 }}>
-                <DashBoardCard
-                  icon={card.icon}
-                  count={card.count}
-                  title={card.title}
-                />
-              </motion.div>
-            ))}
-          </motion.div>
-
           <motion.div
             className="bg-white p-3 sm:p-4 rounded-lg shadow-sm"
             initial={{ opacity: 0, y: 20 }}
@@ -287,21 +288,7 @@ const ListDashBoard = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                >
-                  {/* <Button
-                    variant="outline"
-                    className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[90px] sm:min-w-[120px] h-9 sm:h-10"
-                  >
-                    <ArchiveIcon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-                    <Typography
-                      className="text-secondary-60"
-                      element="span"
-                      size="sm"
-                      weight="semibold"
-                    >
-                      {t("Archive")}
-                    </Typography>
-                  </Button> */}
+                >                  
                 </motion.div>
 
                 <motion.div
@@ -340,8 +327,8 @@ const ListDashBoard = () => {
               </div>
             </div>
 
-            <div className="sm:mx-0 overflow-x-auto">
-              <ListDashBoardTable data={data} />
+            <div className="sm:mx-0 overflow-x-auto">              
+              <ContractProjectListTable data={data} />
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4 px-4 sm:px-0">
@@ -397,6 +384,6 @@ const ListDashBoard = () => {
       </div>
     </AppLayout>
   );
-};
+}
 
-export default ListDashBoard;
+export default ContractProjectListPage

@@ -7,19 +7,17 @@ import {
   TableRow,
 } from "./CreateRequestTable.tsx";
 import {
-  ArchiveIconDark,
-  BanIcon,
   CrossRedIcon,
   EyeDarkIcon,
-  PencilIcon,
+  PluseDarkIcon,
   RightGreenIcon,
-  XCircleIcon,
 } from "../../icons";
 import { useNavigate } from "react-router-dom";
 import projectService from "../../services/project.service.ts";
 import { useMutation } from "@tanstack/react-query";
 import StatusBadge, { StatusCode } from "../common/StatusBadge.tsx";
 import moment from "moment";
+import { useTranslation } from "react-i18next";
 
 export interface Data {
   id: number;
@@ -33,9 +31,10 @@ export interface Data {
   status: StatusCode;
   endDate: string;
   financeBy: string;
+  projectManager?: string;
 }
 
-const ListDashBoardTable = ({
+const ContractProjectListTable = ({
   data,
   onDataChange,
 }: {
@@ -50,6 +49,8 @@ const ListDashBoardTable = ({
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleClickOutside = (event: Event) => {
@@ -70,10 +71,6 @@ const ListDashBoardTable = ({
 
   const handleMenuToggle = (orderId: number) => {
     setOpenMenuId(openMenuId === orderId ? null : orderId);
-  };
-
-  const handleEdit = (order: Data) => {
-    navigate(`/edit-project/${order.projectUuid}`);
   };
 
   const handleSaveEdit = (orderId: number) => {
@@ -174,20 +171,23 @@ const ListDashBoardTable = ({
   const handleViewProject = (projectId: string = "") => {
     navigate(`/project-details/${projectId}`);
   };
+  const addContract = (projectId: string = "") => {
+    navigate(`/add-contract/${projectId}`);
+  };
 
   const tableHeader: TableHeader[] = [
-    {
-      content: (
-        <input
-          type="checkbox"
-          checked={tableData && selectedRows.length === tableData.length}
-          onChange={handleSelectAll}
-          className="w-4 h-4 rounded border-secondary-30 text-blue-600 focus:ring-blue-500"
-          aria-label="Select all rows"
-        />
-      ),
-      className: "w-10", // Fixed width for checkbox
-    },
+    // {
+    //   content: (
+    //     <input
+    //       type="checkbox"
+    //       checked={tableData && selectedRows.length === tableData.length}
+    //       onChange={handleSelectAll}
+    //       className="w-4 h-4 rounded border-secondary-30 text-blue-600 focus:ring-blue-500"
+    //       aria-label="Select all rows"
+    //     />
+    //   ),
+    //   className: "w-10", // Fixed width for checkbox
+    // },
     {
       content: <div className="text-nowrap">Sr No</div>,
       className: "w-16",
@@ -201,32 +201,9 @@ const ListDashBoardTable = ({
       className: "min-w-[120px]",
     },
     {
-      content: <div className="text-nowrap">Finance By</div>,
-      className: "w-24",
-    },
-    {
       content: <div className="text-nowrap">Currency</div>,
       className: "min-w-[120px]",
     },
-
-    // {
-    //   content: (
-    //     <div className="flex items-center gap-1 cursor-pointer">
-    //       Amount
-    //       <span className="text-xs">{getSortIcon()}</span>
-    //     </div>
-    //   ),
-    //   onClick: handleAmountSort,
-    //   className: "w-24",
-    // },
-    // {
-    //   content: <div>Created Date</div>,
-    //   className: "w-28",
-    // },
-    // {
-    //   content: <div>No. of Request</div>,
-    //   className: "w-24",
-    // },
     {
       content: <div>End Date</div>,
       className: "w-24",
@@ -236,12 +213,14 @@ const ListDashBoardTable = ({
       className: "w-24",
     },
     {
+      content: <div className="text-nowrap">Project Manager</div>,
+      className: "w-24",
+    },
+    {
       content: <div>Actions</div>,
       className: "w-20",
     },
   ];
-  console.log(tableData, "tableData");
-
   return (
     <div className="relative rounded-lg bg-white ">
       <div className="relative min-h-[225px]">
@@ -254,8 +233,7 @@ const ListDashBoardTable = ({
                     key={index}
                     isHeader
                     className="px-5 py-4 font-semibold text-secondary-50 text-left text-sm cursor-pointer"
-                    onClick={header.onClick}
-                  >
+                    onClick={header.onClick}>
                     {header.content}
                   </TableCell>
                 );
@@ -268,7 +246,7 @@ const ListDashBoardTable = ({
               tableData.map((data) => {
                 return (
                   <TableRow key={data.id}>
-                    <TableCell className="px-5 py-4 w-10">
+                    {/* <TableCell className="px-5 py-4 w-10">
                       <input
                         type="checkbox"
                         checked={selectedRows.includes(data.id)}
@@ -276,151 +254,30 @@ const ListDashBoardTable = ({
                         className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         aria-label={`Select row ${data.id}`}
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className="px-5 py-4 text-gray-500 text-sm">
                       {data.id}
                     </TableCell>
                     <TableCell className="px-5 py-4 sm:px-6">
-                      {editingId === data.id ? (
-                        <div className="flex flex-col gap-1">
-                          <input
-                            type="text"
-                            value={editFormData.projectId ?? ""}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleInputChange("projectId", e.target.value)
-                            }
-                            className="block w-full px-2 py-1 text-sm rounded-md bg-secondary-10 focus:border focus:outline-none border-secondary-30"
-                            placeholder="Add Label"
-                            aria-label="Label"
-                          />
-                        </div>
-                      ) : (
-                        <span className="block font-medium text-secondary-100 text-sm text-nowrap truncate">
-                          {data.projectId}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 sm:px-6">
-                      {editingId === data.id ? (
-                        <div className="flex flex-col gap-1">
-                          <input
-                            type="text"
-                            value={editFormData.projectName ?? ""}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleInputChange("projectName", e.target.value)
-                            }
-                            className="block w-full px-2 py-1 text-sm rounded-md bg-secondary-10 focus:border focus:outline-none border-secondary-30"
-                            placeholder="Add Project Name"
-                            aria-label="Label"
-                          />
-                        </div>
-                      ) : (
-                        <span className="block font-medium text-secondary-100 text-sm text-nowrap truncate">
-                          {data.projectName}
-                        </span>
-                      )}
-                    </TableCell>
-
-                    <TableCell className="px-5 py-4 sm:px-6">
                       <span className="block font-medium text-secondary-100 text-sm text-nowrap truncate">
-                        {data.financeBy}
+                        {data.projectId}
                       </span>
                     </TableCell>
                     <TableCell className="px-5 py-4 sm:px-6">
-                      {editingId === data.id ? (
-                        <div className="flex flex-col gap-1">
-                          <select
-                            value={editFormData.currency ?? ""}
-                            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                              handleInputChange("currency", e.target.value)
-                            }
-                            className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white"
-                            aria-label="Financial Authority"
-                          >
-                            <option value="USD">USD</option>
-                            <option value="CDF">CDF</option>
-                          </select>
-                        </div>
-                      ) : (
-                        <div className="font-medium text-secondary-100 text-sm flex gap-2 items-center">
-                          {/* {data.currency === "USD" ? (
-                            <EnglishFlag width={24} height={14} />
-                          ) : (
-                            <FrenchFlagIcon width={24} height={14} />
-                          )} */}
-                          <span className="text-gray-600">{data.currency}</span>
-                          <span className="block font-medium text-secondary-100 text-sm">
-                            {Number(data.amount).toLocaleString()}
-                          </span>
-                        </div>
-                      )}
+                      <span className="block font-medium text-secondary-100 text-sm text-nowrap truncate">
+                        {data.projectName}
+                      </span>
                     </TableCell>
 
-                    {/* <TableCell className="px-5 py-4 sm:px-6">
-                      {editingId === data.id ? (
-                        <div className="flex flex-col gap-1">
-                          <input
-                            type="text"
-                            value={editFormData.amount ?? ""}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleInputChange("amount", e.target.value)
-                            }
-                            className="block w-full px-2 py-1 text-sm rounded-md bg-secondary-10 focus:border focus:outline-none border-secondary-30"
-                            placeholder="Add Tax Rate"
-                            aria-label="Tax Rate"
-                          />
-                        </div>
-                      ) : (
+                    
+                    <TableCell className="px-5 py-4 sm:px-6">
+                      <div className="font-medium text-secondary-100 text-sm flex gap-2 items-center">                        
+                        <span className="text-gray-600">{data.currency}</span>
                         <span className="block font-medium text-secondary-100 text-sm">
                           {Number(data.amount).toLocaleString()}
                         </span>
-                      )}
-                    </TableCell> */}
-
-                    {/* <TableCell className="px-5 py-4 sm:px-6">
-                      {editingId === data.id ? (
-                        <div className="flex flex-col gap-1">
-                          <input
-                            type="text"
-                            value={editFormData.createdDate ?? ""}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleInputChange("createdDate", e.target.value)
-                            }
-                            className="block w-full px-2 py-1 text-sm rounded-md bg-secondary-10 focus:border focus:outline-none border-secondary-30"
-                            placeholder="Add Project Name"
-                            aria-label="Label"
-                          />
-                        </div>
-                      ) : (
-                        <span className="block font-medium text-secondary-100 text-sm">
-                          {data.createdDate
-                            ? new Date(data.createdDate).toLocaleDateString(
-                                "en-US"
-                              )
-                            : ""}
-                        </span>
-                      )}
+                      </div>
                     </TableCell>
-                    <TableCell className="px-5 py-4 sm:px-6">
-                      {editingId === data.id ? (
-                        <div className="flex flex-col gap-1">
-                          <input
-                            type="text"
-                            value={editFormData.noOfRequest ?? ""}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                              handleInputChange("noOfRequest", e.target.value)
-                            }
-                            className="block w-full px-2 py-1 text-sm rounded-md bg-secondary-10 focus:border focus:outline-none border-secondary-30"
-                            placeholder="Add Project Name"
-                            aria-label="Label"
-                          />
-                        </div>
-                      ) : (
-                        <span className="block font-medium text-secondary-100 text-sm">
-                          {data.noOfRequest}
-                        </span>
-                      )}
-                    </TableCell> */}
 
                     <TableCell className="px-5 py-4 sm:px-6">
                       <span className="block font-medium text-secondary-100 text-sm text-nowrap">
@@ -430,6 +287,11 @@ const ListDashBoardTable = ({
                     <TableCell className="px-5 py-4 sm:px-6">
                       <span className="block font-medium text-secondary-100 text-sm">
                         <StatusBadge code={data.status} />
+                      </span>
+                    </TableCell>
+                    <TableCell className="px-5 py-4 sm:px-6">
+                      <span className="block font-medium text-secondary-100 text-sm">
+                        {data.projectManager}
                       </span>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-sm">
@@ -452,8 +314,7 @@ const ListDashBoardTable = ({
                       ) : (
                         <div
                           className="relative"
-                          ref={openMenuId === data.id ? menuRef : null}
-                        >
+                          ref={openMenuId === data.id ? menuRef : null}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -462,21 +323,18 @@ const ListDashBoardTable = ({
                             className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                             aria-label="Open actions menu"
                             aria-haspopup="true"
-                            aria-expanded={openMenuId === data.id}
-                          >
+                            aria-expanded={openMenuId === data.id}>
                             <svg
                               className="w-4 h-4"
                               fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
+                              viewBox="0 0 20 20">
                               <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                             </svg>
                           </button>
                           {openMenuId === data.id && (
                             <div
                               className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 p-2"
-                              role="menu"
-                            >
+                              role="menu">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -484,62 +342,21 @@ const ListDashBoardTable = ({
                                 }}
                                 className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                                 role="menuitem"
-                                aria-label="View Project"
-                              >
+                                aria-label="View Project">
                                 <EyeDarkIcon />
-                                View Project
+                                {t("view_project")}
                               </button>
 
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleEdit(data);
+                                  addContract(data?.projectUuid);
                                 }}
                                 className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                                 role="menuitem"
-                                aria-label="Edit"
-                              >
-                                <PencilIcon />
-                                Edit
-                              </button>
-
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // handleArchive(data.id);
-                                }}
-                                className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                                role="menuitem"
-                                aria-label="Archive"
-                              >
-                                <ArchiveIconDark />
-                                Archive
-                              </button>
-
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // handleSuspend(data.id);
-                                }}
-                                className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                                role="menuitem"
-                                aria-label="Suspend"
-                              >
-                                <BanIcon />
-                                Suspend
-                              </button>
-
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDelete(data.id, data.projectUuid);
-                                }}
-                                className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
-                                role="menuitem"
-                                aria-label="Close"
-                              >
-                                <XCircleIcon />
-                                Close
+                                aria-label="Edit">
+                                <PluseDarkIcon />
+                                {t("add_contract")}
                               </button>
                             </div>
                           )}
@@ -556,4 +373,4 @@ const ListDashBoardTable = ({
   );
 };
 
-export default ListDashBoardTable;
+export default ContractProjectListTable;

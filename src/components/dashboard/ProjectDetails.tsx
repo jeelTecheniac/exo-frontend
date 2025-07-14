@@ -22,7 +22,7 @@ const ProjectDetails = () => {
   const { t } = useTranslation();
   const [project, setProject] = useState<any>(null);
   // const [loading, setLoading] = useState(true);
-  const {loading,setLoading}=useLoading()
+  const { setLoading } = useLoading();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -99,9 +99,7 @@ const ProjectDetails = () => {
   return (
     <div>
       <AppLayout>
-        <div
-          className={"relative px-4 sm:px-6 md:px-8"}
-        >
+        <div className={"relative px-4 sm:px-6 md:px-8"}>
           <motion.div
             className="flex flex-col sm:flex-row sm:justify-between sm:items-center"
             variants={containerVariants}
