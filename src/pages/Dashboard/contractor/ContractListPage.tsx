@@ -124,6 +124,11 @@ const ContractListPage = () => {
     setOffset(0); // Reset to first page when changing limit
   };
 
+  useEffect(()=>{
+    setTotal(0)
+    setData(contracts)
+  },[])
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -138,6 +143,7 @@ const ContractListPage = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
     <AppLayout>
       <div className="relative">

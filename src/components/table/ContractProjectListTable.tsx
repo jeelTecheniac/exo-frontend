@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,8 +13,8 @@ import {
   RightGreenIcon,
 } from "../../icons";
 import { useNavigate } from "react-router-dom";
-import projectService from "../../services/project.service.ts";
-import { useMutation } from "@tanstack/react-query";
+// import projectService from "../../services/project.service.ts";
+// import { useMutation } from "@tanstack/react-query";
 import StatusBadge, { StatusCode } from "../common/StatusBadge.tsx";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
@@ -45,7 +45,7 @@ const ContractProjectListTable = ({
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Data>>({});
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  // const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
@@ -100,46 +100,46 @@ const ContractProjectListTable = ({
     setEditingId(null);
     setEditFormData({});
   };
-  const deleteProjectMutation = useMutation({
-    mutationFn: async (projectIds: any) => {
-      const res = await projectService.deleteProject(projectIds);
-      return res;
-    },
-    onSuccess: (data) => {
-      console.log(data);
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
-  const handleDelete = async (orderId: number, projectId: string) => {
-    if (window.confirm("Are you sure you want to delete this record?")) {
-      const response = await deleteProjectMutation.mutateAsync(projectId);
-      if (response.data.status === 200) {
-        setTableData((prev) => prev.filter((order) => order.id !== orderId));
-        setSelectedRows((prev) => prev.filter((id) => id !== orderId));
-      }
-    }
-    setOpenMenuId(null);
-  };
+  // const deleteProjectMutation = useMutation({
+  //   mutationFn: async (projectIds: any) => {
+  //     const res = await projectService.deleteProject(projectIds);
+  //     return res;
+  //   },
+  //   onSuccess: (data) => {
+  //     console.log(data);
+  //   },
+  //   onError: (error) => {
+  //     console.error(error);
+  //   },
+  // });
+  // const handleDelete = async (orderId: number, projectId: string) => {
+  //   if (window.confirm("Are you sure you want to delete this record?")) {
+  //     const response = await deleteProjectMutation.mutateAsync(projectId);
+  //     if (response.data.status === 200) {
+  //       setTableData((prev) => prev.filter((order) => order.id !== orderId));
+  //       setSelectedRows((prev) => prev.filter((id) => id !== orderId));
+  //     }
+  //   }
+  //   setOpenMenuId(null);
+  // };
 
-  const handleInputChange = (field: keyof Data, value: string | number) => {
-    // Handle numeric fields
-    if (field === "amount" || field === "noOfRequest" || field === "id") {
-      const parsedValue = value === "" ? 0 : parseFloat(value as string);
-      setEditFormData((prev) => ({
-        ...prev,
-        [field]: isNaN(parsedValue) ? 0 : parsedValue,
-      }));
-    }
-    // Handle string fields
-    else {
-      setEditFormData((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
-    }
-  };
+  // const handleInputChange = (field: keyof Data, value: string | number) => {
+  //   // Handle numeric fields
+  //   if (field === "amount" || field === "noOfRequest" || field === "id") {
+  //     const parsedValue = value === "" ? 0 : parseFloat(value as string);
+  //     setEditFormData((prev) => ({
+  //       ...prev,
+  //       [field]: isNaN(parsedValue) ? 0 : parsedValue,
+  //     }));
+  //   }
+  //   // Handle string fields
+  //   else {
+  //     setEditFormData((prev) => ({
+  //       ...prev,
+  //       [field]: value,
+  //     }));
+  //   }
+  // };
 
   // const getSortIcon = () => {
   //   if (sortOrder === "asc") {
@@ -149,23 +149,23 @@ const ContractProjectListTable = ({
   //   }
   //   return "↕";
   // };
-  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelectedRows(tableData.map((order) => order.id));
-    } else {
-      setSelectedRows([]);
-    }
-  };
+  // const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.checked) {
+  //     setSelectedRows(tableData.map((order) => order.id));
+  //   } else {
+  //     setSelectedRows([]);
+  //   }
+  // };
 
-  const handleSelectRow = (orderId: number) => {
-    setSelectedRows((prev) => {
-      if (prev.includes(orderId)) {
-        return prev.filter((id) => id !== orderId);
-      } else {
-        return [...prev, orderId];
-      }
-    });
-  };
+  // const handleSelectRow = (orderId: number) => {
+  //   setSelectedRows((prev) => {
+  //     if (prev.includes(orderId)) {
+  //       return prev.filter((id) => id !== orderId);
+  //     } else {
+  //       return [...prev, orderId];
+  //     }
+  //   });
+  // };
 
   // Handler for viewing project details
   const handleViewProject = (projectId: string = "") => {
