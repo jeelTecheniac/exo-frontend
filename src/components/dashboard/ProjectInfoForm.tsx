@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import Input from "../../lib/components/atoms/Input";
@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 interface ProjectInfoFormProps {
   initialValues?: ProjectFormValues;
   onSubmit: (values: ProjectFormValues) => void;
+  children?:ReactNode
 }
 
 interface Address {
@@ -27,18 +28,28 @@ interface Address {
 
 interface ProjectFormValues {
   projectName: string;
-  financeBy: string;
+  fundedBy: string;
   projectReference: string;
   amount: string;
   currency: string;
-  beginDate: string;
-  endDate: string;
+  beginDate: string | Date;
+  endDate: string | Date;
   description: string;
   addresses: Address[];
   files: UploadedFile[];
 }
 
-const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
+export interface UploadResponse {
+  id: string;
+  url: string;
+}
+
+export interface UploadArgs {
+  file: File;
+  onProgress: (percent: number) => void;
+}
+
+const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormProps) => {
   const { t } = useTranslation();
   const [editingState, setEditingState] = useState<{
     addressId: number;
@@ -84,7 +95,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
 
   const defaultInitialValues: ProjectFormValues = {
     projectName: "",
-    financeBy: "",
+    fundedBy: "",
     projectReference: "",
     amount: "",
     currency: "USD",
@@ -100,8 +111,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
     projectName: Yup.string()
       .required(t("project_name_is_required"))
       .min(3, t("project_name_must_be_at_least_3_characters")),
-    financeBy: Yup.string()
-      .required(t("finance_by_is_required"))
+    fundedBy: Yup.string()
+      .required(t("funded_by_is_required"))
       .min(2, t("finance_by_must_be_at_least_2_characters")),
     projectReference: Yup.string().required(t("project_reference_is_required")),
     amount: Yup.string()
@@ -271,12 +282,55 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
     </select>
   );
 
+  //  const fileUploadMutation = async ({
+  //    file,
+  //    onProgress,
+  //  }: UploadArgs): Promise<UploadResponse> => {
+  //    console.log("Inside mutation file:", file);
+  //    const formData = new FormData();
+  //    formData.append("file", file);
+  //    formData.append("type", "document");
+  //    formData.append("object_type", "project");
+
+  //    const response = await projectService.uploadFile(formData, {
+  //      headers: {
+  //        "Content-Type": "multipart/form-data",
+  //      },
+  //      onUploadProgress: (event: ProgressEvent) => {
+  //        if (event.total) {
+  //          const percent = Math.round((event.loaded * 100) / event.total);
+  //          onProgress(percent);
+  //        }
+  //      },
+  //    });
+
+  //    return {
+  //      id: response.data.data?.id ?? Date.now().toString(),
+  //      url: response.data.data?.url ?? "",
+  //    };
+  //  };
+
+  //  const uploadMutation = useMutation({
+  //    mutationFn: fileUploadMutation,
+  //    onSuccess: (data) => {
+  //      // toast.success("File uploaded successfully!");
+  //      console.log("Upload result:", data);
+  //    },
+  //    onError: () => {
+  //      // toast.error("Failed to upload file.");
+  //    },
+  //  });
+  //  const handleUploadFile = async (file: any, onProgress: any) => {
+  //    const response = await uploadMutation.mutateAsync({ file, onProgress });     
+  //    return response;
+  //  };
+
+
   return (
     <Formik
       initialValues={initialValues || defaultInitialValues}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}
-    >
+      onSubmit={handleSubmit}      >
       {({ values, setFieldValue, errors, touched, handleBlur }) => (
         <Form>
           <div>
@@ -284,15 +338,13 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
               <Typography
                 size="lg"
                 weight="semibold"
-                className="text-secondary-100"
-              >
+                className="text-secondary-100">
                 {t("call_for_tenders")}
               </Typography>
               <Typography
                 size="base"
                 weight="normal"
-                className="text-secondary-60"
-              >
+                className="text-secondary-60">
                 {t("enter_key_details_about_your_project_to_continue")}
               </Typography>
             </div>
@@ -317,18 +369,18 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
               </div>
 
               <div>
-                <Label htmlFor="financeBy">
+                <Label htmlFor="fundedBy">
                   {t("finance_by")} <span className="text-red-500">*</span>
                 </Label>
                 <Field
                   as={Input}
-                  id="financeBy"
-                  name="financeBy"
+                  id="fundedBy"
+                  name="fundedBy"
                   placeholder={t("finance_by")}
-                  error={touched.financeBy && !!errors.financeBy}
+                  error={touched.fundedBy && !!errors.fundedBy}
                 />
                 <ErrorMessage
-                  name="financeBy"
+                  name="fundedBy"
                   component="p"
                   className="mt-1 text-sm text-red-500"
                 />
@@ -411,12 +463,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                         ? errors.beginDate
                         : false
                     }
-                  />
-                  <ErrorMessage
-                    name="beginDate"
-                    component="p"
-                    className="mt-1 text-sm text-red-500"
-                  />
+                  />                  
                 </div>
 
                 <div>
@@ -448,11 +495,6 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                       touched.endDate && errors.endDate ? errors.endDate : false
                     }
                   />
-                  <ErrorMessage
-                    name="endDate"
-                    component="p"
-                    className="mt-1 text-sm text-red-500"
-                  />
                 </div>
               </div>
 
@@ -479,8 +521,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                   <button
                     type="button"
                     className="flex items-center gap-1 text-primary-150 text-sm font-medium px-3 py-1 border border-primary-150 rounded-lg hover:bg-blue-50"
-                    onClick={() => addAddress(setFieldValue, values.addresses)}
-                  >
+                    onClick={() => addAddress(setFieldValue, values.addresses)}>
                     <span className="text-base">+</span>
                     {t("add_address")}
                   </button>
@@ -501,8 +542,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                       {values.addresses.map((address, index) => (
                         <tr
                           key={address.id}
-                          className="border-b border-secondary-30 last:border-0"
-                        >
+                          className="border-b border-secondary-30 last:border-0">
                           <td className="p-2">{index + 1}</td>
 
                           {/* Country */}
@@ -530,8 +570,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                                 onClick={() =>
                                   startEditing(address.id, "country")
                                 }
-                                className="cursor-pointer hover:bg-secondary-5 p-1 rounded"
-                              >
+                                className="cursor-pointer hover:bg-secondary-5 p-1 rounded">
                                 {address.country || "—"}
                               </div>
                             )}
@@ -568,8 +607,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                                   address.country
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}
-                              >
+                                }`}>
                                 {address.province || "—"}
                               </div>
                             )}
@@ -606,8 +644,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                                   address.province
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}
-                              >
+                                }`}>
                                 {address.city || "—"}
                               </div>
                             )}
@@ -644,8 +681,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                                   address.city
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}
-                              >
+                                }`}>
                                 {address.municipality || "—"}
                               </div>
                             )}
@@ -662,8 +698,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                                   values.addresses,
                                   address.id
                                 )
-                              }
-                            >
+                              }>
                               <TrashIcon width={20} height={20} />
                             </button>
                           </td>
@@ -673,8 +708,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                         <tr>
                           <td
                             colSpan={6}
-                            className="p-4 text-center text-secondary-60"
-                          >
+                            className="p-4 text-center text-secondary-60">
                             {t("no_addresses_added_yet")}
                           </td>
                         </tr>
@@ -710,6 +744,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
                       }
                     );
                   }}
+                  // onUploadFile={handleUploadFile}
                   onDeleteFile={async (fileId: string) => {
                     const filteredFiles = values.files.filter(
                       (file: UploadedFile) => file.id !== fileId
@@ -721,6 +756,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit }: ProjectInfoFormProps) => {
               </div>
             </div>
           </div>
+          {children && <>{children}</>}
         </Form>
       )}
     </Formik>

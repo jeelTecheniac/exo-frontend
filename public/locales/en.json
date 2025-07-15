@@ -70,6 +70,7 @@
   "back_to_dashboard": "Back to Dashboard",
   "project_name_is_required": "Project name is required",
   "finance_by_is_required": "Finance By is required",
+  "funded_by_is_required": "Funded By is required",
   "project_reference_is_required": "Project reference is required",
   "amount_is_required_and_must_be_greater_than_zero": "Amount is required and must be greater than zero",
   "begin_date_is_required": "Begin date is required",
@@ -211,6 +212,7 @@
   "password_incorrect": "The provided password is incorrect.",
   "project_name_must_be_at_least_3_characters": "Project name must be at least 3 characters",
   "finance_by_must_be_at_least_2_characters": "Finance by must be at least 2 characters",
+  "funded_by_must_be_at_least_2_characters": "Funded By must be at least 2 characters",
   "amount_must_be_positive": "Amount must be a positive number",
   "currency_is_required": "Currency is required",
   "begin_date_cannot_be_in_past": "Begin date cannot be in the past",
@@ -239,5 +241,6 @@
   "view_project":"View Project",
   "contract_info_description": "Fill in the details to complete the contract information form.",
   "contract_submitted":"Contract submitted for verification",
-  "contract_update_message":"You will receive further updates regarding your contract via email at your registered email address."
+  "contract_update_message":"You will receive further updates regarding your contract via email at your registered email address.",
+  "failed_to_create_project": "Failed to create project."
 }

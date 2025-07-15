@@ -67,6 +67,7 @@
   "back_to_dashboard": "Retour au tableau de bord",
   "project_name_is_required": "Le nom du projet est requis",
   "finance_by_is_required": "Le champ 'Financé par' est requis",
+  "funded_by_is_required": "Le champ 'Financé par' est requis",
   "project_reference_is_required": "La référence du projet est requise",
   "amount_is_required_and_must_be_greater_than_zero": "Le montant est requis et doit être supérieur à zéro",
   "begin_date_is_required": "La date de début est requise",
@@ -208,6 +209,7 @@
   "password_incorrect": "Le mot de passe fourni est incorrect.",
   "project_name_must_be_at_least_3_characters": "Project name must be at least 3 characters",
   "finance_by_must_be_at_least_2_characters": "Finance by must be at least 2 characters",
+  "funded_by_must_be_at_least_2_characters": "Le nom du bailleur doit comporter au moins 2 caractères",
   "amount_must_be_positive": "Amount must be a positive number",
   "currency_is_required": "Currency is required",
   "begin_date_cannot_be_in_past": "Begin date cannot be in the past",
@@ -236,5 +238,7 @@
   "view_project": "Voir le projet",
   "contract_info_description": "Remplissez les informations pour compléter le formulaire de contrat.",
   "contract_submitted": "Contrat soumis pour vérification",
-  "contract_update_message" :"Vous recevrez d'autres mises à jour concernant votre contrat par e-mail à votre adresse e-mail enregistrée."
+  "contract_update_message" :"Vous recevrez d'autres mises à jour concernant votre contrat par e-mail à votre adresse e-mail enregistrée.",
+  "failed_to_create_project": "Échec de la création du projet."
+
 }

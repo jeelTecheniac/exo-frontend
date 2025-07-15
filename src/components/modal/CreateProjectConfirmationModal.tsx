@@ -23,7 +23,7 @@ const CreateProjectConfirmationModal = ({
         isOpen={isOpen}
         onClose={() => {
           onClose();
-          navigate("/dashboard");
+          // navigate("/dashboard");
         }}
         isFullscreen={false}
         showCloseButton={false}
@@ -70,7 +70,7 @@ const CreateProjectConfirmationModal = ({
             <Button
               variant="primary"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
-              // onClick={() => navigate("project-create")}
+              onClick={() => onClose()}
             >
               {t("create_another_project")}
             </Button>
