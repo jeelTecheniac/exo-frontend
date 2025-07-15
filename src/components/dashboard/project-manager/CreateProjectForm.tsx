@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import Typography from "../../../lib/components/atoms/Typography";
 import Button from "../../../lib/components/atoms/Button";
@@ -11,15 +11,21 @@ import {
 import { useModal } from "../../../hooks/useModal";
 import CreateProjectConfirmationModal from "../../modal/CreateProjectConfirmationModal";
 import { UploadedFile } from "../../common/UploadFile";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import projectService from "../../../services/project.service";
+import moment from "moment";
+import { toast } from "react-toastify";
+import { useLoading } from "../../../context/LoaderProvider";
 
 interface ProjectFormValues {
   projectName: string;
-  financeBy: string;
+  fundedBy: string;
   projectReference: string;
   amount: string;
   currency: string;
-  beginDate: string;
-  endDate: string;
+  beginDate: string | Date;
+  endDate: string | Date;
   description: string;
   addresses: Array<{
     id: number;
@@ -31,22 +37,112 @@ interface ProjectFormValues {
   files: UploadedFile[];
 }
 
+const initialValues: ProjectFormValues = {
+  projectName: "",
+  fundedBy: "",
+  projectReference: "",
+  amount: "",
+  currency: "USD",
+  beginDate: "",
+  endDate: "",
+  description: "",
+  addresses: [],
+  files: [],
+};
+
 const CreateProjectForm = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isOpen, openModal, closeModal } = useModal();
+  const [formValue, setFormValue] = useState<ProjectFormValues>(initialValues);
+  const { projectId } = useParams();
+  const { setLoading, loading } = useLoading();
+
+  const createProjectMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await projectService.createProject(data);
+    },
+    onSuccess: (data) => {
+      console.log(data)
+      openModal();      
+    },
+    onError: (error) => {
+      console.error("Error during project creation:", error);
+      return toast.error(t("failed_to_create_project"));
+    },
+  });
 
   const handleSubmit = (values: ProjectFormValues) => {
-    console.log("Form submitted with values:", values);
-    // Here you would typically make an API call to create the project
-    // For now, we'll just show the confirmation modal
-    openModal();
+    const payload = {
+      name: values.projectName,
+      funded_by: values.fundedBy,
+      reference: values.projectReference,
+      currency: values.currency,
+      amount: values.amount,
+      begin_date: moment(values.beginDate, "DD-MM-YYYY").format("YYYY-MM-DD"),
+      end_date: moment(values.endDate, "DD-MM-YYYY").format("YYYY-MM-DD"),
+      description: values.description,
+      address: JSON.stringify(
+        values.addresses.map((address) => ({
+          country: address.country,
+          city: address.city,
+          providence: address.province,
+          municipality: address.municipality,
+        }))
+      ),
+      document_ids: "",
+      // document_ids: values.files,
+      status: "publish",
+      ...(projectId && { project_id: projectId }),
+    };
+    createProjectMutation.mutate(payload);
   };
 
+  const handelCloseModal = () => {
+    closeModal();
+    navigate("/project-home");
+  };
   const handleSaveDraft = () => {
     console.log("Save draft button clicked");
-    // This will be handled by the form's onSaveDraft prop
   };
+
+  const fetchProject = async (projectId: string) => {
+    try {
+      setLoading(true);
+      const data = await projectService.getProjectDetails(projectId);
+      console.log(data, "projectData");
+      const newData = {
+        projectName: data.name,
+        fundedBy: data.funded_by,
+        projectReference: data.reference,
+        amount: data.amount,
+        currency: data.currency,
+        beginDate: moment(data.begin_date, "YYYY-MM-DD").toDate(),
+        endDate: moment(data.end_date, "YYYY-MM-DD").toDate(),
+        description: data.description,
+        addresses: data.address.map((address: any, index: number) => ({
+          id: index + 1,
+          country: address.country,
+          province: address.providence,
+          city: address.city,
+          municipality: address.municipality,
+        })),
+        files: [],
+      };      
+      setFormValue(newData);      
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log(projectId, "projectId");
+    if (projectId) {
+      fetchProject(projectId);
+    }
+  }, []);
 
   return (
     <div className="bg-secondary-5 h-full p-4 md:p-6">
@@ -56,8 +152,7 @@ const CreateProjectForm = () => {
           <div className="p-4 md:p-6">
             <div
               className="flex items-center gap-2 cursor-pointer mb-2"
-              onClick={() => navigate("/project-home")}
-            >
+              onClick={() => navigate("/project-home")}>
               <ArrowLeftIcon
                 width={16}
                 height={16}
@@ -66,8 +161,7 @@ const CreateProjectForm = () => {
               <Typography
                 size="base"
                 weight="semibold"
-                className="text-primary-150"
-              >
+                className="text-primary-150">
                 {t("back_to_dashboard")}
               </Typography>
             </div>
@@ -79,42 +173,44 @@ const CreateProjectForm = () => {
           <div className="h-[1px] w-full bg-gray-200"></div>
 
           <div className="p-4 md:p-6">
-            <ProjectInfoForm onSubmit={handleSubmit} />
+            {!loading && (
+              <ProjectInfoForm
+                initialValues={formValue}
+                onSubmit={handleSubmit}>
+                <div className="flex flex-col-reverse md:flex-row justify-end gap-4 mt-8">
+                  <Button
+                    variant="secondary"
+                    onClick={handleSaveDraft}
+                    className="px-6 py-3 bg-white rounded-lg text-primary-150 font-medium flex items-center justify-center gap-2 shadow-md hover:bg-gray-50 w-full md:w-auto">
+                    <SaveDraftIcon
+                      width={20}
+                      height={20}
+                      className="text-primary-150"
+                    />
+                    {t("save_as_draft")}
+                  </Button>
 
-            <div className="flex flex-col-reverse md:flex-row justify-end gap-4 mt-8">
-              <Button
-                variant="secondary"
-                onClick={handleSaveDraft}
-                className="px-6 py-3 bg-white rounded-lg text-primary-150 font-medium flex items-center justify-center gap-2 shadow-md hover:bg-gray-50 w-full md:w-auto"
-              >
-                <SaveDraftIcon
-                  width={20}
-                  height={20}
-                  className="text-primary-150"
-                />
-                {t("save_as_draft")}
-              </Button>
-
-              <Button
-                variant="primary"
-                type="submit"
-                form="project-form"
-                className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
-              >
-                {t("submit")}
-                <ArrowRightIconButton
-                  width={18}
-                  height={18}
-                  className="text-white"
-                />
-              </Button>
-            </div>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    // form="project-form"
+                    className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto">
+                    {t("submit")}
+                    <ArrowRightIconButton
+                      width={18}
+                      height={18}
+                      className="text-white"
+                    />
+                  </Button>
+                </div>
+              </ProjectInfoForm>
+            )}
           </div>
         </div>
       </div>
       <CreateProjectConfirmationModal
         isOpen={isOpen}
-        onClose={closeModal}
+        onClose={handelCloseModal}
         projectId=""
       />
     </div>

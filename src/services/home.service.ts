@@ -10,7 +10,7 @@ class HomeService extends ApiBaseService {
       formData.append("start_date",startDate);
       formData.append("end_date",endDate)
     }
-    const response = await this.authorizedRequest.post("/home", formData, {
+    const response = await this.authorizedRequest.post("/project/list", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

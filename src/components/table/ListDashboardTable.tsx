@@ -8,12 +8,10 @@ import {
 } from "./CreateRequestTable.tsx";
 import {
   ArchiveIconDark,
-  BanIcon,
   CrossRedIcon,
   EyeDarkIcon,
   PencilIcon,
   RightGreenIcon,
-  XCircleIcon,
 } from "../../icons";
 import { useNavigate } from "react-router-dom";
 import projectService from "../../services/project.service.ts";
@@ -32,7 +30,7 @@ export interface Data {
   projectUuid: string;
   status: StatusCode;
   endDate: string;
-  financeBy: string;
+  fundedBy: string;
 }
 
 const ListDashBoardTable = ({
@@ -103,28 +101,28 @@ const ListDashBoardTable = ({
     setEditingId(null);
     setEditFormData({});
   };
-  const deleteProjectMutation = useMutation({
-    mutationFn: async (projectIds: any) => {
-      const res = await projectService.deleteProject(projectIds);
-      return res;
-    },
-    onSuccess: (data) => {
-      console.log(data);
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
-  const handleDelete = async (orderId: number, projectId: string) => {
-    if (window.confirm("Are you sure you want to delete this record?")) {
-      const response = await deleteProjectMutation.mutateAsync(projectId);
-      if (response.data.status === 200) {
-        setTableData((prev) => prev.filter((order) => order.id !== orderId));
-        setSelectedRows((prev) => prev.filter((id) => id !== orderId));
-      }
-    }
-    setOpenMenuId(null);
-  };
+  // const deleteProjectMutation = useMutation({
+  //   mutationFn: async (projectIds: any) => {
+  //     const res = await projectService.deleteProject(projectIds);
+  //     return res;
+  //   },
+  //   onSuccess: (data) => {
+  //     console.log(data);
+  //   },
+  //   onError: (error) => {
+  //     console.error(error);
+  //   },
+  // });
+  // const handleDelete = async (orderId: number, projectId: string) => {
+  //   if (window.confirm("Are you sure you want to delete this record?")) {
+  //     const response = await deleteProjectMutation.mutateAsync(projectId);
+  //     if (response.data.status === 200) {
+  //       setTableData((prev) => prev.filter((order) => order.id !== orderId));
+  //       setSelectedRows((prev) => prev.filter((id) => id !== orderId));
+  //     }
+  //   }
+  //   setOpenMenuId(null);
+  // };
 
   const handleInputChange = (field: keyof Data, value: string | number) => {
     // Handle numeric fields
@@ -201,7 +199,7 @@ const ListDashBoardTable = ({
       className: "min-w-[120px]",
     },
     {
-      content: <div className="text-nowrap">Finance By</div>,
+      content: <div className="text-nowrap">Funded By</div>,
       className: "w-24",
     },
     {
@@ -323,7 +321,7 @@ const ListDashBoardTable = ({
 
                     <TableCell className="px-5 py-4 sm:px-6">
                       <span className="block font-medium text-secondary-100 text-sm text-nowrap truncate">
-                        {data.financeBy}
+                        {data.fundedBy}
                       </span>
                     </TableCell>
                     <TableCell className="px-5 py-4 sm:px-6">
@@ -516,7 +514,7 @@ const ListDashBoardTable = ({
                                 Archive
                               </button>
 
-                              <button
+                              {/* <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   // handleSuspend(data.id);
@@ -540,7 +538,7 @@ const ListDashBoardTable = ({
                               >
                                 <XCircleIcon />
                                 Close
-                              </button>
+                              </button> */}
                             </div>
                           )}
                         </div>

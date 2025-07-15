@@ -79,10 +79,10 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            {/* <Route
+            <Route
               path="/edit-project/:projectId"
-              element={<CreateProject />}
-            /> */}
+              element={<ProtectedRoute><CreateProjectPage /></ProtectedRoute>}
+            />
             <Route
               path="/sign-in"
               element={
