@@ -172,7 +172,7 @@ const ContractProjectListTable = ({
     navigate(`/project-details/${projectId}`);
   };
   const addContract = (projectId: string = "") => {
-    navigate(`/add-contract/${projectId}`);
+    navigate(`/create-contract/${projectId}`);
   };
 
   const tableHeader: TableHeader[] = [
@@ -272,7 +272,7 @@ const ContractProjectListTable = ({
                     
                     <TableCell className="px-5 py-4 sm:px-6">
                       <div className="font-medium text-secondary-100 text-sm flex gap-2 items-center">                        
-                        <span className="text-gray-600">{data.currency}</span>
+                        <span className="text-gray-500">{data.currency}</span>
                         <span className="block font-medium text-secondary-100 text-sm">
                           {Number(data.amount).toLocaleString()}
                         </span>

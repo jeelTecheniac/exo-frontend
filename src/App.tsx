@@ -63,7 +63,7 @@ export default function App() {
             />
 
             <Route
-              path="/contract-details"
+              path="/contract-details/:contractId"
               element={
                 <ProtectedRoute>
                   <ContractDetailsPage />
@@ -188,7 +188,7 @@ export default function App() {
               }
             />
             <Route
-              path="/create-contract"
+              path="/create-contract/:projectId"
               element={
                 <ProtectedRoute>
                   <ContractCreatePage />

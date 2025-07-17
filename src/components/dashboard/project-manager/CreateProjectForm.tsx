@@ -62,8 +62,7 @@ const CreateProjectForm = () => {
     mutationFn: async (data: any) => {
       return await projectService.createProject(data);
     },
-    onSuccess: (data) => {
-      console.log(data)
+    onSuccess: (data) => {      
       openModal();      
     },
     onError: (error) => {
@@ -109,24 +108,25 @@ const CreateProjectForm = () => {
   const fetchProject = async (projectId: string) => {
     try {
       setLoading(true);
-      const data = await projectService.getProjectDetails(projectId);
-      console.log(data, "projectData");
+      const data = await projectService.getProjectDetails(projectId);      
+      const projectData=data.data
+
       const newData = {
-        projectName: data.name,
-        fundedBy: data.funded_by,
-        projectReference: data.reference,
-        amount: data.amount,
-        currency: data.currency,
-        beginDate: moment(data.begin_date, "YYYY-MM-DD").toDate(),
-        endDate: moment(data.end_date, "YYYY-MM-DD").toDate(),
-        description: data.description,
-        addresses: data.address.map((address: any, index: number) => ({
+        projectName: projectData.name,
+        fundedBy: projectData.funded_by,
+        projectReference: projectData.reference,
+        amount: projectData.amount,
+        currency: projectData.currency,
+        beginDate: moment(projectData.begin_date, "YYYY-MM-DD").toDate(),
+        endDate: moment(projectData.end_date, "YYYY-MM-DD").toDate(),
+        description: projectData.description,
+        addresses: projectData.address&&projectData.address?.length?[...(projectData.address&&projectData.address)]?.map((address: any, index: number) => ({
           id: index + 1,
           country: address.country,
           province: address.providence,
           city: address.city,
           municipality: address.municipality,
-        })),
+        })):[],
         files: [],
       };      
       setFormValue(newData);      
@@ -137,8 +137,7 @@ const CreateProjectForm = () => {
     }
   };
 
-  useEffect(() => {
-    console.log(projectId, "projectId");
+  useEffect(() => {    
     if (projectId) {
       fetchProject(projectId);
     }
@@ -167,7 +166,7 @@ const CreateProjectForm = () => {
             </div>
 
             <Typography size="xl" weight="bold" className="text-secondary-100">
-              {t("create_request")}
+              {t("create_project")}
             </Typography>
           </div>
           <div className="h-[1px] w-full bg-gray-200"></div>

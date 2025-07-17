@@ -18,7 +18,7 @@ export interface Data {
 const AddressTable = ({
   data,
 }: {
-  data: Data[];
+  data: Data[] | [];
   onDataChange?: (newData: Data[]) => void;
 }) => {
   const [tableData, setTableData] = useState<Data[]>(data);

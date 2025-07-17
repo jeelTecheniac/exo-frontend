@@ -23,7 +23,7 @@ const CreateContractConfirmationModal = ({
         isOpen={isOpen}
         onClose={() => {
           onClose();
-          navigate("/dashboard");
+          navigate("/contract");
         }}
         isFullscreen={false}
         showCloseButton={false}
@@ -61,7 +61,7 @@ const CreateContractConfirmationModal = ({
               variant="outline"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
               onClick={() => {
-                navigate("/project-home");
+                navigate("/contract");
                 onClose();
               }}
             >
@@ -70,7 +70,7 @@ const CreateContractConfirmationModal = ({
             <Button
               variant="primary"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
-              // onClick={() => navigate("project-create")}
+              onClick={() => navigate("create-request")}
             >
               {t("create_request")}
             </Button>

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AppLayout from "../../../layout/AppLayout";
 import Stepper from "../../../components/common/Stepper";
@@ -9,27 +9,98 @@ import Typography from "../../../lib/components/atoms/Typography";
 import Button from "../../../lib/components/atoms/Button";
 import ContractInfoForm from "../../../components/dashboard/contractor/ContractInfoForm";
 import ContractReviewForm from "../../../components/dashboard/contractor/ContractReviewForm";
-import CreateContractConfirmationModal from "../../../components/modal/createContractConfirmationModal";
+import CreateContractConfirmationModal from "../../../components/modal/CreateContractConfirmationModal";
+import projectService from "../../../services/project.service";
+import { UploadedFile } from "../../../components/common/UploadFile";
+import { useLoading } from "../../../context/LoaderProvider";
+import { useMutation } from "@tanstack/react-query";
+import contractService from "../../../services/contract.service";
+import moment from "moment";
+interface Address {
+  id: string;
+  country?: string;
+  providence?: string;
+  city?: string;
+  municipality?: string;
+}
 
+export interface ContractReviewData {
+  projectName:string;
+  reference:string;
+  projectAmount:string;
+  projectCurrency:string;
+  signedBy: string;
+  position: string;
+  beginDate:string;
+  endDate:string;
+  description:string;
+  projectFiles:UploadedFile[];
+  address:Address[];
+  // projectManager: string;
+  organization: string;
+  amount: string;
+  currency: string;
+  dateOfSigning: string;
+  contractFiles: UploadedFile[];
+  place:string
+}
+
+const ContractReviewInitialValue ={
+  projectName:"",
+  reference:"",
+  projectAmount:"",
+  projectCurrency:"",
+  signedBy: "",
+  position: "",
+  beginDate:"",
+  endDate:"",
+  description:"",
+  projectFiles:[],
+  address:[],
+  // projectManager: "",
+  organization: "",
+  amount: "",
+  currency: "",
+  dateOfSigning: "",
+  contractFiles: [],
+  place:"",
+}
+
+interface FormDataProps {
+  signedBy: string,
+  position: string,
+  // projectManager: string,
+  organization: string,
+  amount: string,
+  currency: string,
+  dateOfSigning: string,
+  contractFiles: UploadedFile[],
+  place:string
+};
 
 const initialValue = {
   signedBy: "",
   position: "",
-  projectManager: "",
+  // projectManager: "",
   organization: "",
   amount: "",
   currency: "USD",
   dateOfSigning: "",
   contractFiles: [],
+  place:""
 };
 
-const ContractCreatePage = () => {
+const ContractCreatePage = () => {  
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isOpen, openModal, closeModal } = useModal();
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState(initialValue);
+  const [formData, setFormData] = useState<FormDataProps| undefined>(initialValue);
+  const [contractReview,setContractReview]=useState<ContractReviewData>(ContractReviewInitialValue);
+
+  const { projectId } = useParams();
+  const {setLoading}=useLoading()
 
   const steps = [
     { id: 1, title: "Contract Info" },
@@ -43,14 +114,70 @@ const ContractCreatePage = () => {
   };
 
   const handleFormSubmit = (values:any) => {
+    setContractReview((preve)=>({...preve,...values}))
     setFormData(values);
     setCurrentStep(1);
   };
 
-  const handleFinalSubmit = () => {
-    console.log("Final Submitted Data:", formData);
-    openModal();
+  const contractCreateMutation=useMutation({
+    mutationFn:async(data:any)=>{
+      let payload=new FormData()
+      payload.append("signed_by",data.signedBy)
+      payload.append("position",data.position)
+      payload.append("currency",data.currency);
+      payload.append("amount",data.amount);
+      payload.append("organization",data.organization);
+      payload.append("place",data.place);
+      payload.append("date_of_signing",moment(data.dateOfSigning,"DD-MM-YYYY").format("YYYY-MM-DD"));
+      payload.append("document_ids",data.contractFiles.join(","))
+      if(projectId){
+        payload.append("project_id",projectId)
+      }      
+      const response=await contractService.creteContract(payload);
+      return response.data
+    },onSuccess:async(data)=>{
+      openModal()
+    },onError:(error)=>{console.error(error);
+    }
+  })
+
+  const handleFinalSubmit = () => {    
+    contractCreateMutation.mutate(formData)
+    // openModal();
   };
+
+  useEffect(() => {
+    const fetchProject = async () => {      
+      try {
+        setLoading(true)
+        const data = await projectService.getProjectDetails(projectId!);                        
+        const project=data.data
+        setContractReview((preve) => ({
+          ...preve,
+          projectAmount: project.amount,
+          projectName: project.name,
+          currency: project.currency,
+          beginDate: project.begin_date,
+          endDate: project.end_date,
+          description: project.description,
+          projectFiles:project.documents,
+          reference:project.reference,
+          address: project.address.map((address: Address, index: number) => ({
+            id: index + 1,
+            city: address.city,
+            providence: address.providence,
+            municipality: address.municipality,
+            country: address.country,
+          })),
+        }));
+      } catch (err: any) {
+        console.error(err, "erro");        
+      } finally {        
+        setLoading(false)
+      }
+    };
+    if (projectId) fetchProject();
+  }, [projectId, t]);  
 
   return (
     <AppLayout>
@@ -84,7 +211,7 @@ const ContractCreatePage = () => {
               {currentStep === 1 && (
                 <>
                     <ContractReviewForm
-                    projectData={formData}                
+                      projectData={contractReview}                
                     />
                     <div className="flex justify-end pt-4">
                     <Button

@@ -167,7 +167,7 @@ const ContractListPage = () => {
                 <Button
                   variant="primary"
                   className="flex items-center justify-center w-full sm:w-fit gap-2 py-2.5 px-4"
-                  onClick={() => navigate("/create-contract")}>
+                  onClick={() => navigate("/contract-project-list")}>
                   <WhitePlusIcon
                     width={12}
                     height={12}

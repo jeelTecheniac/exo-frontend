@@ -15,13 +15,30 @@ import DashBoardCard from "../../../lib/components/molecules/DashBoardCard";
 import RequestTable from "../../table/RequestTable";
 import Input from "../../../lib/components/atoms/Input";
 import Button from "../../../lib/components/atoms/Button";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Filter from "../../../lib/components/molecules/Filter";
+import { useParams } from "react-router";
+import { useMutation } from "@tanstack/react-query";
+import contractService from "../../../services/contract.service";
+import moment from "moment";
+import { useLoading } from "../../../context/LoaderProvider";
+
+interface ContractProps{
+  signed_by:string
+  organization:string  
+  created_at:string
+  requests_count:0;
+  position:string;
+  documents:[];
+  requests:[];
+}
+
 
 const ContractDetails = () => {
   const { t } = useTranslation();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
+  const [contractData,setContractData]=useState<ContractProps>()
   const [range, setRange] = useState<{
     startDate: Date | null;
     endDate: Date | null;
@@ -29,6 +46,8 @@ const ContractDetails = () => {
     startDate: null,
     endDate: null,
   });
+  const { contractId } =useParams();
+  const {setLoading}=useLoading()
 
   const handleApplyDateFilter = (newRange: {
     startDate: Date | null;
@@ -37,6 +56,34 @@ const ContractDetails = () => {
     setRange(newRange);
     setIsDatePickerOpen(false);
   };
+
+  const contractMutation=useMutation({
+    mutationFn:async()=>{
+      setLoading(true);
+      const formData = new FormData();
+      if(contractId){
+        formData.append("contract_id", contractId);
+      }
+      const respopnse= await contractService.getContractDetails(formData);
+      const contract:ContractProps=respopnse.data.data      
+      setContractData(contract)
+      setLoading(false)
+      return contract
+    },
+    onSuccess:async(data)=>{      
+      setLoading(false)
+    },
+    onError:async(error)=>{
+      console.error(error);
+      setLoading(false)
+    }
+  })
+
+  useEffect(()=>{
+    if(contractId){
+      contractMutation.mutate()
+    }
+  },[contractId])
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -221,7 +268,7 @@ const ContractDetails = () => {
                   className="text-gray-900 break-words text-sm sm:text-base"
                   weight="normal"
                 >
-                  Jeel Vachhni
+                  {contractData?.signed_by}
                 </Typography>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
@@ -235,7 +282,7 @@ const ContractDetails = () => {
                   className="text-gray-900 break-words text-sm sm:text-base"
                   weight="normal"
                 >
-                  ABC Organization
+                  {contractData?.organization}
                 </Typography>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
@@ -249,7 +296,7 @@ const ContractDetails = () => {
                   className="text-gray-900 break-words text-sm sm:text-base"
                   weight="normal"
                 >
-                  24-10-2001
+                  {moment(contractData?.created_at).format("YYYY/MM/DD")}
                 </Typography>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">
@@ -263,14 +310,14 @@ const ContractDetails = () => {
                   className="text-gray-900 break-words text-sm sm:text-base"
                   weight="normal"
                 >
-                  2
+                  {contractData?.requests_count}
                 </Typography>
               </div>
             </div>
 
             {/* Right Column */}
             <div className="border border-gray-200 rounded-lg p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 w-full lg:w-1/2">
-              <div className="flex flex-col sm:flex-row sm:gap-4">
+              {/* <div className="flex flex-col sm:flex-row sm:gap-4">
                 <Typography
                   className="text-gray-600 min-w-[120px] sm:min-w-[140px] text-sm"
                   weight="semibold"
@@ -281,9 +328,9 @@ const ContractDetails = () => {
                   className="text-gray-900 break-words text-sm sm:text-base"
                   weight="normal"
                 >
-                  Hello Description
+                  -
                 </Typography>
-              </div>
+              </div> */}
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <Typography
                   className="text-gray-600 min-w-[120px] sm:min-w-[140px] text-sm"
@@ -295,7 +342,7 @@ const ContractDetails = () => {
                   className="text-gray-900 break-words text-sm sm:text-base"
                   weight="normal"
                 >
-                  Project Manager
+                  {contractData?.position}
                 </Typography>
               </div>
               <div className="flex flex-col sm:flex-row sm:gap-4">

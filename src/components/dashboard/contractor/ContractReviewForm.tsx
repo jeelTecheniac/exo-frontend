@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import Typography from "../../../lib/components/atoms/Typography";
 import Label from "../../../lib/components/atoms/Label";
+import { ContractReviewData } from "../../../pages/Dashboard/contractor/ContractCreatePage";
 
 interface Address {
   id: string;
@@ -11,7 +12,7 @@ interface Address {
 }
 
 interface ReviewFormProps {
-  projectData: any;
+  projectData: ContractReviewData;
 }
 
 const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
@@ -124,7 +125,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("project_reference")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {projectData.projectReference || "-"}
+                {projectData.reference || "-"}
               </div>
             </div>
             <div className="flex">
@@ -132,8 +133,8 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("amount")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                <span className="text-gray-400">{projectData.currency || "USD"}{" "}</span>
-                {formatAmount(projectData.amount) || "-"}
+                <span className="text-gray-400">{projectData?.currency || "USD"}{" "}</span>
+                {formatAmount(projectData?.projectAmount)}
               </div>
             </div>
             <div className="flex">
@@ -141,7 +142,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("project_begin_date")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {formatDate(projectData.beginDate)}
+                {formatDate(projectData?.beginDate)||"-"}
               </div>
             </div>
             <div className="flex">
@@ -149,7 +150,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("project_end_date")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {formatDate(projectData.endDate)}
+                {formatDate(projectData?.endDate)||"-"}
               </div>
             </div>
             <div className="flex">
@@ -168,7 +169,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("upload_files")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {renderFileList(projectData.files)}
+                {renderFileList(projectData.projectFiles)}
               </div>
             </div>
             <div className="flex flex-col">
@@ -190,8 +191,8 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                     <div>{t("municipality")}</div>
                   </div>
 
-                  {projectData.addresses && projectData.addresses.length > 0 ? (
-                    projectData.addresses.map(
+                  {projectData.address && projectData.address.length > 0 ? (
+                    projectData.address.map(
                       (address: Address, index: number) => (
                         <div
                           key={address.id}
@@ -275,7 +276,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("place")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {projectData.place || "-"}
+                {projectData.place||"-"}
               </div>
             </div>
 

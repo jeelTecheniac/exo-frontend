@@ -346,7 +346,7 @@ const ListDashBoardTable = ({
                           ) : (
                             <FrenchFlagIcon width={24} height={14} />
                           )} */}
-                          <span className="text-gray-600">{data.currency}</span>
+                          <span className="text-gray-500">{data.currency}</span>
                           <span className="block font-medium text-secondary-100 text-sm">
                             {Number(data.amount).toLocaleString()}
                           </span>
