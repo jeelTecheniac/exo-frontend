@@ -18,6 +18,10 @@ export const ApiRoutes = {
   DELETE_REQUEST: "/project/delete-request",
   DELETE_PROJECT: "/project/delete",
   ADDRESS_LIST: "project/list-address",
+  // contract routes
+  LIST_ALL_PPROJECT: "/project/get-list-all",
+  CONTRACT_DETAILS:"/contract/view",
+  CREATE_CONTRACT:"/contract/create",
 };
 
 export const mobileCountryCode = [

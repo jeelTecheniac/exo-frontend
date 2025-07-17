@@ -17,9 +17,10 @@ export interface ContractData {
   dateCreated: string;
   noOfRequest: number;
   contract_id: string;
+  currency:string
 }
 
-const ContractTable = ({ data }: { data: ContractData[] }) => {
+const ContractTable = ({ data }: { data: ContractData[] | [] }) => {
   const [tableData, setTableData] = useState<ContractData[]>(data);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const ContractTable = ({ data }: { data: ContractData[] }) => {
     });
   };
 
-  const handleViewContract = (contractId: string) => {
+  const handleViewContract = (contractId: string) => {    
     navigate(`/contract-details/${contractId}`);
   };
 
@@ -147,7 +148,8 @@ const ContractTable = ({ data }: { data: ContractData[] }) => {
                     </TableCell>
                     <TableCell className="px-5 py-4 sm:px-6">
                       <span className="block font-medium text-secondary-100 text-sm">
-                        ${data.amountByContract.toLocaleString()}
+                        <span className="text-gray-500">{data.currency} </span>
+                        {data.amountByContract.toLocaleString()}
                       </span>
                     </TableCell>
                     <TableCell className="px-5 py-4 sm:px-6">

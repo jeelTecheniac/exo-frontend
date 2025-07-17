@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, number } from "framer-motion";
 import {
   ArrowLeftIcon,
   CdfCreamIcon,
@@ -13,10 +13,109 @@ import Button from "../../../lib/components/atoms/Button";
 import DashBoardCard from "../../../lib/components/molecules/DashBoardCard";
 import AddressTable from "../../table/AddressTable";
 import ContractTable from "../../table/ContractTable";
+import { useLoading } from "../../../context/LoaderProvider";
+import projectService from "../../../services/project.service";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import moment from "moment";
+
+export interface ProjectProps {
+  id: string;
+  userId: string;
+  name: string;
+  funded_by: string;
+  reference: string;
+  currency: string;
+  amount: string;
+  begin_date: string;
+  end_date: string;
+  description: string;
+  status: string;
+  created_at: string;
+  documents: any[]; 
+  address: ProjectAddress[];
+  user: ProjectUser;
+  contracts:Contract[]
+  requests: any[]; 
+}
+
+export interface ProjectAddress {
+  id: string;
+  user_id: string;
+  project_id: string;
+  country: string;
+  providence: string;
+  city: string;
+  municipality: string;
+}
+
+export interface ProjectUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  name: string;
+  email: string;
+  countryCode: string;
+  mobile: string;
+  companyName: string;
+  profileImage: string;
+  status: string;
+}
+
+export interface Contract {
+  id: string;
+  project_id: string;
+  signed_by: string;
+  position: string;
+  currency: string;
+  amount: string;
+  organization: string;
+  place: string;
+  date_of_signing: string; 
+  status: "draft" | "publish" | string; 
+  created_at: string;
+  requests_count:number 
+}
+
+interface cardProps{
+  project_amount: string,
+  contracts_total: number,
+  requests_total: number
+}
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
-  // const [loading, setLoading] = useState(true);
+  const {projectId}=useParams();
+  const [projectData,setProjectData]=useState<ProjectProps|null>(null)
+  const [cardData, setCardData] = useState<cardProps>({
+    project_amount: "0",
+    contracts_total: 0,
+    requests_total: 0,
+  });
+
+  const { setLoading } = useLoading();
+
+  const fetchProject = async (projectId: string) => {
+    try {
+      setLoading(true);
+      const res = await projectService.getProjectDetails(projectId);       
+      setProjectData(res.data)
+      setCardData(res.summary)
+                
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {    
+    if (projectId) {
+      fetchProject(projectId);
+    }
+  }, []);
+
+  // animations
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -74,15 +173,13 @@ const ProjectDetails = () => {
             className="flex flex-col sm:flex-row sm:justify-between sm:items-start lg:items-center gap-4"
             variants={containerVariants}
             initial="hidden"
-            animate="visible"
-          >
+            animate="visible">
             <div className="flex-1 min-w-0">
               <motion.div
                 className="flex items-center gap-2 cursor-pointer mb-2"
                 onClick={() => window.history.back()}
                 whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
+                transition={{ type: "spring", stiffness: 300 }}>
                 <ArrowLeftIcon
                   width={16}
                   height={16}
@@ -91,21 +188,18 @@ const ProjectDetails = () => {
                 <Typography
                   size="base"
                   weight="semibold"
-                  className="text-primary-150 truncate"
-                >
+                  className="text-primary-150 truncate">
                   {t("back_to_dashboard")}
                 </Typography>
               </motion.div>
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.2, type: "spring" }}
-              >
+                transition={{ duration: 0.6, delay: 0.2, type: "spring" }}>
                 <Typography
                   size="xl_2"
                   weight="extrabold"
-                  className="text-secondary-100 break-words"
-                >
+                  className="text-secondary-100 break-words">
                   {t("project_details")}{" "}
                   {/* {project?.reference ? `#${project.reference}` : ""} */}
                 </Typography>
@@ -113,20 +207,17 @@ const ProjectDetails = () => {
               <Typography
                 size="base"
                 weight="normal"
-                className="text-secondary-60"
-              >
+                className="text-secondary-60">
                 {t("last_updated")}
               </Typography>
             </div>
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex-shrink-0"
-            >
+              className="flex-shrink-0">
               <Button
                 variant="outline"
-                className="flex items-center justify-center w-full sm:w-fit gap-2 py-2 sm:py-3 h-fit hover:bg-primary-50 transition-colors"
-              >
+                className="flex items-center justify-center w-full sm:w-fit gap-2 py-2 sm:py-3 h-fit hover:bg-primary-50 transition-colors">
                 <CommentIcon width={13} height={13} />
                 <Typography size="base">{t("comment")}(s)</Typography>
               </Button>
@@ -137,26 +228,25 @@ const ProjectDetails = () => {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mt-3 md:mt-5"
             variants={staggerContainer}
             initial="hidden"
-            animate="visible"
-          >
+            animate="visible">
             <motion.div variants={cardVariants}>
               <DashBoardCard
                 icon={<CdfCreamIcon width={44} height={44} />}
-                count={10}
+                count={Number(cardData?.project_amount)||0}
                 title={t("project_amount")}
               />
             </motion.div>
             <motion.div variants={cardVariants}>
               <DashBoardCard
                 icon={<CdfPurpleIcon width={44} height={44} />}
-                count={10}
+                count={Number(cardData.contracts_total)}
                 title={t("sum_of_contracts_amount")}
               />
             </motion.div>
             <motion.div variants={cardVariants}>
               <DashBoardCard
                 icon={<CdfCreamIcon width={44} height={44} />}
-                count={10}
+                count={Number(cardData.requests_total)}
                 title={t("sum_of_requests_amount")}
               />
             </motion.div>
@@ -174,8 +264,7 @@ const ProjectDetails = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.3 }}
-          >
+            transition={{ delay: 0.3 }}>
             <motion.div className="p-6" variants={itemVariants}>
               <Typography element="p" size="base" weight="bold">
                 {t("project_info")}
@@ -183,72 +272,65 @@ const ProjectDetails = () => {
             </motion.div>
             <motion.div
               className="flex flex-col lg:flex-row w-full gap-4 pb-6 px-6"
-              variants={staggerContainer}
-            >
+              variants={staggerContainer}>
               <div className="border border-secondary-30 rounded-lg p-6 flex flex-col gap-4 w-full">
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal"
-                  >
+                    weight="normal">
                     Project Name :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal"
-                  >
-                    Renovation Project
+                    weight="normal">
+                    {projectData?.name || ""}
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal"
-                  >
+                    weight="normal">
                     Funded By :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal"
-                  >
-                    ABC Organization
+                    weight="normal">
+                    {projectData?.funded_by || ""}
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal"
-                  >
+                    weight="normal">
                     Amount :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal"
-                  >
-                    <span className="text-secondary-60">USD</span>
-                    24,6000
+                    weight="normal">
+                    <span className="text-secondary-60">
+                      {projectData?.currency}{" "}
+                    </span>
+                    {projectData?.amount || 0}
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal"
-                  >
+                    weight="normal">
                     Project End Date :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal"
-                  >
-                    24-10-2020
+                    weight="normal">
+                    {projectData?.end_date || ""}
                   </Typography>
                 </div>
               </div>
@@ -257,56 +339,50 @@ const ProjectDetails = () => {
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal"
-                  >
+                    weight="normal">
                     Project Reference :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal"
-                  >
-                    PRJ-433
+                    weight="normal">
+                    {projectData?.reference || ""}
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal"
-                  >
+                    weight="normal">
                     Project Begin Date :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal"
-                  >
-                    23-12-2030
+                    weight="normal">
+                    {projectData?.begin_date || ""}
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal"
-                  >
+                    weight="normal">
                     Description :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal"
-                  >
-                    Hello Description
+                    weight="normal">
+                    {projectData?.description&&<div dangerouslySetInnerHTML=
+                    {{__html:projectData?.description||"-"}}></div>}                    
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal"
-                  >
+                    weight="normal">
                     Uploaded Files :
                   </Typography>
 
@@ -315,8 +391,7 @@ const ProjectDetails = () => {
                     // href={doc.file}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-blue-600 hover:underline break-all"
-                  >
+                    className="flex items-center gap-1 text-blue-600 hover:underline break-all">
                     <PdfIcon width={16} height={16} />
                     {"test.pdf"}
                   </a>
@@ -330,8 +405,7 @@ const ProjectDetails = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.4 }}
-          >
+            transition={{ delay: 0.4 }}>
             <motion.div className="p-6" variants={itemVariants}>
               <Typography element="p" size="base" weight="bold">
                 {t("location")}
@@ -339,18 +413,15 @@ const ProjectDetails = () => {
             </motion.div>
             <motion.div
               className="p-6 overflow-x-auto"
-              variants={tableVariants}
-            >
+              variants={tableVariants}>
               <AddressTable
-                data={[
-                  {
-                    city: "Ahmedabad",
-                    country: "India",
-                    id: 1,
-                    municipality: "AMC",
-                    providence: "AMC",
-                  },
-                ]}
+                data={(projectData?.address ?? []).map((address, index) => ({
+                  id: index + 1,
+                  country: address.country,
+                  providence: address.providence,
+                  city: address.city,
+                  municipality: address.municipality,
+                }))}
               />
             </motion.div>
           </motion.div>
@@ -359,8 +430,7 @@ const ProjectDetails = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.5 }}
-          >
+            transition={{ delay: 0.5 }}>
             <motion.div className="p-6" variants={itemVariants}>
               <Typography element="p" size="base" weight="bold">
                 {t("contracts")}
@@ -368,41 +438,19 @@ const ProjectDetails = () => {
             </motion.div>
             <motion.div
               className="p-6 overflow-x-auto"
-              variants={tableVariants}
-            >
+              variants={tableVariants}>
               <ContractTable
-                data={[
-                  {
-                    id: 1,
-                    signedBy: "John Smith",
-                    position: "Project Manager",
-                    amountByContract: 150000,
-                    organization: "Tech Solutions Inc.",
-                    dateCreated: "2024-01-15",
-                    noOfRequest: 12,
-                    contract_id: "CTR-2024-001",
-                  },
-                  {
-                    id: 2,
-                    signedBy: "Sarah Johnson",
-                    position: "Senior Developer",
-                    amountByContract: 85000,
-                    organization: "Digital Innovations Ltd.",
-                    dateCreated: "2024-01-20",
-                    noOfRequest: 8,
-                    contract_id: "CTR-2024-002",
-                  },
-                  {
-                    id: 3,
-                    signedBy: "Michael Brown",
-                    position: "Business Analyst",
-                    amountByContract: 120000,
-                    organization: "Global Systems Corp.",
-                    dateCreated: "2024-01-25",
-                    noOfRequest: 15,
-                    contract_id: "CTR-2024-003",
-                  },
-                ]}
+                data={(projectData?.contracts??[]).map((contract,index)=>({
+                  id:index+1,
+                  signedBy:contract.signed_by,
+                  position:contract.position,
+                  amountByContract:Number(contract.amount),
+                  dateCreated:moment(contract.created_at).format("YYYY/MM/DD"),
+                  noOfRequest:contract.requests_count,
+                  contract_id:contract.id,
+                  organization:contract.organization,
+                  currency:contract.currency
+                }))}
               />
             </motion.div>
           </motion.div>

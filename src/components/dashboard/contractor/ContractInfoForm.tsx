@@ -13,11 +13,12 @@ import Typography from "../../../lib/components/atoms/Typography";
 interface ContractFormValues {
   signedBy: string;
   position: string;
-  projectManager: string;
+  // projectManager: string;
   organization: string;
   amount: string;
   currency: string;
   dateOfSigning: string;
+  place:string;
   contractFiles: UploadedFile[];
 }
 
@@ -32,12 +33,13 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
   const defaultValues: ContractFormValues = {
     signedBy: "",
     position: "",
-    projectManager: "",
+    // projectManager: "",
     organization: "",
     amount: "",
     currency: "USD",
     dateOfSigning: "",
     contractFiles: [],
+    place:""
   };
 
   const currencyOptions = [
@@ -56,9 +58,10 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
   const validationSchema = Yup.object().shape({
     signedBy: Yup.string().required("Signed By is required"),
     position: Yup.string().required("Position is required"),
-    projectManager: Yup.string().required("Project Manager is required"),
+    // projectManager: Yup.string().required("Project Manager is required"),
     organization: Yup.string().required("Organization is required"),
     amount: Yup.string().required("Amount is required"),
+    place: Yup.string().required("Place is required"),
     dateOfSigning: Yup.string().required("Date is required"),
   });
 
@@ -139,7 +142,7 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
             </div>
           </div>
 
-          <div>
+          {/* <div>
             <Label htmlFor="projectManager">
               Project Manager <span className="text-red-500">*</span>
             </Label>
@@ -154,7 +157,7 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
               component="div"
               className="text-red-500 text-sm"
             />
-          </div>
+          </div> */}
 
           <div>
             <Label htmlFor="organization">
@@ -168,6 +171,22 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
             />
             <ErrorMessage
               name="organization"
+              component="div"
+              className="text-red-500 text-sm"
+            />
+          </div>
+          <div>
+            <Label htmlFor="place">
+              Place <span className="text-red-500">*</span>
+            </Label>
+            <Field
+              as={Input}
+              name="place"
+              id="place"
+              placeholder="Frace"
+            />
+            <ErrorMessage
+              name="place"
               component="div"
               className="text-red-500 text-sm"
             />

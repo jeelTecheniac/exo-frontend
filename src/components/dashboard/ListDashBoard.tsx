@@ -86,7 +86,7 @@ const ListDashBoard = () => {
         );
         const dataArray = (res.data || []).map((item: any, idx: number) => ({
           id: idx + 1 + offset,
-          projectId: item.project_id || "-",
+          projectId: item.reference || "-",
           projectName: item.name,
           currency: item.currency,
           amount: Number(item.amount),

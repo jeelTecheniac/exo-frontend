@@ -31,7 +31,7 @@ class ProjectService extends ApiBaseService {
         "Content-Type": "multipart/form-data",
       },
     });
-    return response.data.data;
+    return response.data;
   }
 
   async deleteRequest(requestIds:string){
