@@ -5,15 +5,17 @@ import {
   ChevronLeftIcon,
   ChevronLeftLightIcon,
   ChevronRightIcon,
-  ChevronRightLightIcon,    
-  FilterIcon,  
-  SearchIcon,  
+  ChevronRightLightIcon,
+  FilterIcon,
+  SearchIcon,
 } from "../../../icons";
 import AppLayout from "../../../layout/AppLayout";
 import Typography from "../../../lib/components/atoms/Typography";
 import Button from "../../../lib/components/atoms/Button";
 import Filter from "../../../lib/components/molecules/Filter";
-import ContractProjectListTable, { Data } from "../../../components/table/ContractProjectListTable";
+import ContractProjectListTable, {
+  Data,
+} from "../../../components/table/ContractProjectListTable";
 import Input from "../../../lib/components/atoms/Input";
 import { useMutation } from "@tanstack/react-query";
 import contractService from "../../../services/contract.service";
@@ -45,11 +47,9 @@ interface projectResponseProps {
   end_date: string;
   description: string;
   status: StatusCode;
-  created_at: string;  
-  user:User
+  created_at: string;
+  user: User;
 }
-
-
 
 const ContractProjectListPage = () => {
   const { t } = useTranslation();
@@ -59,13 +59,14 @@ const ContractProjectListPage = () => {
   const { setLoading } = useLoading();
 
   const [total, setTotal] = useState(0);
+  setTotal(0);
   const [limit, setLimit] = useState(8);
   const [offset, setOffset] = useState(0);
   // Dashboard card state
-  const [totalProject, setTotalProject] = useState(0);
-  const [totalAmountProject, setTotalAmountProject] = useState(0);
+  // const [totalProject, setTotalProject] = useState(0);
+  // const [totalAmountProject, setTotalAmountProject] = useState(0);
   // const [setTotalRequest] = useState(0);
-  const [totalAmountRequest, setTotalAmountRequest] = useState(0);
+  // const [totalAmountRequest, setTotalAmountRequest] = useState(0);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [range, setRange] = useState<{
     startDate: Date | null;
@@ -94,13 +95,13 @@ const ContractProjectListPage = () => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
-    const formattedDate = `${year}-${month}-${day}`;    
+    const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
   };
 
-  const contractMutation=useMutation({
-    mutationFn:async()=>{
-      setLoading(true)
+  const contractMutation = useMutation({
+    mutationFn: async () => {
+      setLoading(true);
       const data = {
         limit,
         offset,
@@ -108,37 +109,39 @@ const ContractProjectListPage = () => {
         start_date: formateDate(range.startDate),
         end_date: formateDate(range.endDate),
       };
-      const res = await contractService.getProjects(data);      
-      const projects=res.data.data;      
-      const newProjectData:Data[] =projects.map((project:projectResponseProps,index:number)=>({
-        id:index+1,
-        projectId:project.reference,
-        projectName:project.name,
-        currency:project.currency,
-        amount:project.amount,
-        createdDate:project.created_at,        
-        status:project.status,
-        endDate:project.end_date,
-        financeBy:project.funded_by,
-        projectUuid:project.id,
-        projectManager:`${project.user.first_name} ${project.user.last_name}`
-      }))      
+      const res = await contractService.getProjects(data);
+      const projects = res.data.data;
+      const newProjectData: Data[] = projects.map(
+        (project: projectResponseProps, index: number) => ({
+          id: index + 1,
+          projectId: project.reference,
+          projectName: project.name,
+          currency: project.currency,
+          amount: project.amount,
+          createdDate: project.created_at,
+          status: project.status,
+          endDate: project.end_date,
+          financeBy: project.funded_by,
+          projectUuid: project.id,
+          projectManager: `${project.user.first_name} ${project.user.last_name}`,
+        })
+      );
       setData(newProjectData);
-      setLoading(false)
+      setLoading(false);
       return res;
     },
-    onSuccess:async(data)=>{      
-      setLoading(false)
+    onSuccess: async () => {
+      setLoading(false);
     },
-    onError:(error)=>{
+    onError: (error) => {
       console.error(error);
-      setLoading(false)
-    }
-  })
+      setLoading(false);
+    },
+  });
 
-  useEffect(()=>{
-    contractMutation.mutate()
-  },[limit, offset, navigate, debouncedSearchTerm, range])
+  useEffect(() => {
+    contractMutation.mutate();
+  }, [limit, offset, navigate, debouncedSearchTerm, range]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const currentPage = Math.floor(offset / limit) + 1;
@@ -191,7 +194,7 @@ const ContractProjectListPage = () => {
             className="text-secondary-100 text-center sm:text-left"
           >
             {t("select_project_to_continue")}
-          </Typography>          
+          </Typography>
         </motion.div>
 
         <motion.div className="px-4 sm:px-0">
@@ -225,8 +228,7 @@ const ContractProjectListPage = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                >                  
-                </motion.div>
+                ></motion.div>
 
                 <motion.div
                   whileHover={{ scale: 1.05 }}
@@ -264,7 +266,7 @@ const ContractProjectListPage = () => {
               </div>
             </div>
 
-            <div className="sm:mx-0 overflow-x-auto">              
+            <div className="sm:mx-0 overflow-x-auto">
               <ContractProjectListTable data={data} />
             </div>
 
@@ -321,6 +323,6 @@ const ContractProjectListPage = () => {
       </div>
     </AppLayout>
   );
-}
+};
 
-export default ContractProjectListPage
+export default ContractProjectListPage;

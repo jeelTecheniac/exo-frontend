@@ -23,22 +23,21 @@ import contractService from "../../../services/contract.service";
 import moment from "moment";
 import { useLoading } from "../../../context/LoaderProvider";
 
-interface ContractProps{
-  signed_by:string
-  organization:string  
-  created_at:string
-  requests_count:0;
-  position:string;
-  documents:[];
-  requests:[];
+interface ContractProps {
+  signed_by: string;
+  organization: string;
+  created_at: string;
+  requests_count: 0;
+  position: string;
+  documents: [];
+  requests: [];
 }
-
 
 const ContractDetails = () => {
   const { t } = useTranslation();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
-  const [contractData,setContractData]=useState<ContractProps>()
+  const [contractData, setContractData] = useState<ContractProps>();
   const [range, setRange] = useState<{
     startDate: Date | null;
     endDate: Date | null;
@@ -46,8 +45,8 @@ const ContractDetails = () => {
     startDate: null,
     endDate: null,
   });
-  const { contractId } =useParams();
-  const {setLoading}=useLoading()
+  const { contractId } = useParams();
+  const { setLoading } = useLoading();
 
   const handleApplyDateFilter = (newRange: {
     startDate: Date | null;
@@ -57,33 +56,33 @@ const ContractDetails = () => {
     setIsDatePickerOpen(false);
   };
 
-  const contractMutation=useMutation({
-    mutationFn:async()=>{
+  const contractMutation = useMutation({
+    mutationFn: async () => {
       setLoading(true);
       const formData = new FormData();
-      if(contractId){
+      if (contractId) {
         formData.append("contract_id", contractId);
       }
-      const respopnse= await contractService.getContractDetails(formData);
-      const contract:ContractProps=respopnse.data.data      
-      setContractData(contract)
-      setLoading(false)
-      return contract
+      const respopnse = await contractService.getContractDetails(formData);
+      const contract: ContractProps = respopnse.data.data;
+      setContractData(contract);
+      setLoading(false);
+      return contract;
     },
-    onSuccess:async(data)=>{      
-      setLoading(false)
+    onSuccess: async () => {
+      setLoading(false);
     },
-    onError:async(error)=>{
+    onError: async (error) => {
       console.error(error);
-      setLoading(false)
-    }
-  })
+      setLoading(false);
+    },
+  });
 
-  useEffect(()=>{
-    if(contractId){
-      contractMutation.mutate()
+  useEffect(() => {
+    if (contractId) {
+      contractMutation.mutate();
     }
-  },[contractId])
+  }, [contractId]);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },

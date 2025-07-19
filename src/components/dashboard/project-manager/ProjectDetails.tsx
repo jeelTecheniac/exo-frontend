@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { motion, number } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
   CdfCreamIcon,
@@ -32,11 +32,11 @@ export interface ProjectProps {
   description: string;
   status: string;
   created_at: string;
-  documents: any[]; 
+  documents: any[];
   address: ProjectAddress[];
   user: ProjectUser;
-  contracts:Contract[]
-  requests: any[]; 
+  contracts: Contract[];
+  requests: any[];
 }
 
 export interface ProjectAddress {
@@ -71,22 +71,22 @@ export interface Contract {
   amount: string;
   organization: string;
   place: string;
-  date_of_signing: string; 
-  status: "draft" | "publish" | string; 
+  date_of_signing: string;
+  status: "draft" | "publish" | string;
   created_at: string;
-  requests_count:number 
+  requests_count: number;
 }
 
-interface cardProps{
-  project_amount: string,
-  contracts_total: number,
-  requests_total: number
+interface cardProps {
+  project_amount: string;
+  contracts_total: number;
+  requests_total: number;
 }
 
 const ProjectDetails = () => {
   const { t } = useTranslation();
-  const {projectId}=useParams();
-  const [projectData,setProjectData]=useState<ProjectProps|null>(null)
+  const { projectId } = useParams();
+  const [projectData, setProjectData] = useState<ProjectProps | null>(null);
   const [cardData, setCardData] = useState<cardProps>({
     project_amount: "0",
     contracts_total: 0,
@@ -98,10 +98,9 @@ const ProjectDetails = () => {
   const fetchProject = async (projectId: string) => {
     try {
       setLoading(true);
-      const res = await projectService.getProjectDetails(projectId);       
-      setProjectData(res.data)
-      setCardData(res.summary)
-                
+      const res = await projectService.getProjectDetails(projectId);
+      setProjectData(res.data);
+      setCardData(res.summary);
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -109,7 +108,7 @@ const ProjectDetails = () => {
     }
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     if (projectId) {
       fetchProject(projectId);
     }
@@ -173,13 +172,15 @@ const ProjectDetails = () => {
             className="flex flex-col sm:flex-row sm:justify-between sm:items-start lg:items-center gap-4"
             variants={containerVariants}
             initial="hidden"
-            animate="visible">
+            animate="visible"
+          >
             <div className="flex-1 min-w-0">
               <motion.div
                 className="flex items-center gap-2 cursor-pointer mb-2"
                 onClick={() => window.history.back()}
                 whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300 }}>
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 <ArrowLeftIcon
                   width={16}
                   height={16}
@@ -188,18 +189,21 @@ const ProjectDetails = () => {
                 <Typography
                   size="base"
                   weight="semibold"
-                  className="text-primary-150 truncate">
+                  className="text-primary-150 truncate"
+                >
                   {t("back_to_dashboard")}
                 </Typography>
               </motion.div>
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.2, type: "spring" }}>
+                transition={{ duration: 0.6, delay: 0.2, type: "spring" }}
+              >
                 <Typography
                   size="xl_2"
                   weight="extrabold"
-                  className="text-secondary-100 break-words">
+                  className="text-secondary-100 break-words"
+                >
                   {t("project_details")}{" "}
                   {/* {project?.reference ? `#${project.reference}` : ""} */}
                 </Typography>
@@ -207,17 +211,20 @@ const ProjectDetails = () => {
               <Typography
                 size="base"
                 weight="normal"
-                className="text-secondary-60">
+                className="text-secondary-60"
+              >
                 {t("last_updated")}
               </Typography>
             </div>
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex-shrink-0">
+              className="flex-shrink-0"
+            >
               <Button
                 variant="outline"
-                className="flex items-center justify-center w-full sm:w-fit gap-2 py-2 sm:py-3 h-fit hover:bg-primary-50 transition-colors">
+                className="flex items-center justify-center w-full sm:w-fit gap-2 py-2 sm:py-3 h-fit hover:bg-primary-50 transition-colors"
+              >
                 <CommentIcon width={13} height={13} />
                 <Typography size="base">{t("comment")}(s)</Typography>
               </Button>
@@ -228,11 +235,12 @@ const ProjectDetails = () => {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mt-3 md:mt-5"
             variants={staggerContainer}
             initial="hidden"
-            animate="visible">
+            animate="visible"
+          >
             <motion.div variants={cardVariants}>
               <DashBoardCard
                 icon={<CdfCreamIcon width={44} height={44} />}
-                count={Number(cardData?.project_amount)||0}
+                count={Number(cardData?.project_amount) || 0}
                 title={t("project_amount")}
               />
             </motion.div>
@@ -264,7 +272,8 @@ const ProjectDetails = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.3 }}>
+            transition={{ delay: 0.3 }}
+          >
             <motion.div className="p-6" variants={itemVariants}>
               <Typography element="p" size="base" weight="bold">
                 {t("project_info")}
@@ -272,19 +281,22 @@ const ProjectDetails = () => {
             </motion.div>
             <motion.div
               className="flex flex-col lg:flex-row w-full gap-4 pb-6 px-6"
-              variants={staggerContainer}>
+              variants={staggerContainer}
+            >
               <div className="border border-secondary-30 rounded-lg p-6 flex flex-col gap-4 w-full">
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     Project Name :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     {projectData?.name || ""}
                   </Typography>
                 </div>
@@ -292,13 +304,15 @@ const ProjectDetails = () => {
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     Funded By :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     {projectData?.funded_by || ""}
                   </Typography>
                 </div>
@@ -306,13 +320,15 @@ const ProjectDetails = () => {
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     Amount :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     <span className="text-secondary-60">
                       {projectData?.currency}{" "}
                     </span>
@@ -323,13 +339,15 @@ const ProjectDetails = () => {
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     Project End Date :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     {projectData?.end_date || ""}
                   </Typography>
                 </div>
@@ -339,13 +357,15 @@ const ProjectDetails = () => {
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     Project Reference :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     {projectData?.reference || ""}
                   </Typography>
                 </div>
@@ -353,13 +373,15 @@ const ProjectDetails = () => {
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     Project Begin Date :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     {projectData?.begin_date || ""}
                   </Typography>
                 </div>
@@ -367,22 +389,30 @@ const ProjectDetails = () => {
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     Description :
                   </Typography>
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal">
-                    {projectData?.description&&<div dangerouslySetInnerHTML=
-                    {{__html:projectData?.description||"-"}}></div>}                    
+                    weight="normal"
+                  >
+                    {projectData?.description && (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: projectData?.description || "-",
+                        }}
+                      ></div>
+                    )}
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">
                   <Typography
                     className="text-secondary-60 min-w-[140px]"
                     size="sm"
-                    weight="normal">
+                    weight="normal"
+                  >
                     Uploaded Files :
                   </Typography>
 
@@ -391,7 +421,8 @@ const ProjectDetails = () => {
                     // href={doc.file}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-blue-600 hover:underline break-all">
+                    className="flex items-center gap-1 text-blue-600 hover:underline break-all"
+                  >
                     <PdfIcon width={16} height={16} />
                     {"test.pdf"}
                   </a>
@@ -405,7 +436,8 @@ const ProjectDetails = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.4 }}>
+            transition={{ delay: 0.4 }}
+          >
             <motion.div className="p-6" variants={itemVariants}>
               <Typography element="p" size="base" weight="bold">
                 {t("location")}
@@ -413,7 +445,8 @@ const ProjectDetails = () => {
             </motion.div>
             <motion.div
               className="p-6 overflow-x-auto"
-              variants={tableVariants}>
+              variants={tableVariants}
+            >
               <AddressTable
                 data={(projectData?.address ?? []).map((address, index) => ({
                   id: index + 1,
@@ -430,7 +463,8 @@ const ProjectDetails = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.5 }}>
+            transition={{ delay: 0.5 }}
+          >
             <motion.div className="p-6" variants={itemVariants}>
               <Typography element="p" size="base" weight="bold">
                 {t("contracts")}
@@ -438,18 +472,19 @@ const ProjectDetails = () => {
             </motion.div>
             <motion.div
               className="p-6 overflow-x-auto"
-              variants={tableVariants}>
+              variants={tableVariants}
+            >
               <ContractTable
-                data={(projectData?.contracts??[]).map((contract,index)=>({
-                  id:index+1,
-                  signedBy:contract.signed_by,
-                  position:contract.position,
-                  amountByContract:Number(contract.amount),
-                  dateCreated:moment(contract.created_at).format("YYYY/MM/DD"),
-                  noOfRequest:contract.requests_count,
-                  contract_id:contract.id,
-                  organization:contract.organization,
-                  currency:contract.currency
+                data={(projectData?.contracts ?? []).map((contract, index) => ({
+                  id: index + 1,
+                  signedBy: contract.signed_by,
+                  position: contract.position,
+                  amountByContract: Number(contract.amount),
+                  dateCreated: moment(contract.created_at).format("YYYY/MM/DD"),
+                  noOfRequest: contract.requests_count,
+                  contract_id: contract.id,
+                  organization: contract.organization,
+                  currency: contract.currency,
                 }))}
               />
             </motion.div>

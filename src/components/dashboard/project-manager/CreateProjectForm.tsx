@@ -62,8 +62,8 @@ const CreateProjectForm = () => {
     mutationFn: async (data: any) => {
       return await projectService.createProject(data);
     },
-    onSuccess: (data) => {      
-      openModal();      
+    onSuccess: () => {
+      openModal();
     },
     onError: (error) => {
       console.error("Error during project creation:", error);
@@ -108,8 +108,8 @@ const CreateProjectForm = () => {
   const fetchProject = async (projectId: string) => {
     try {
       setLoading(true);
-      const data = await projectService.getProjectDetails(projectId);      
-      const projectData=data.data
+      const data = await projectService.getProjectDetails(projectId);
+      const projectData = data.data;
 
       const newData = {
         projectName: projectData.name,
@@ -120,16 +120,21 @@ const CreateProjectForm = () => {
         beginDate: moment(projectData.begin_date, "YYYY-MM-DD").toDate(),
         endDate: moment(projectData.end_date, "YYYY-MM-DD").toDate(),
         description: projectData.description,
-        addresses: projectData.address&&projectData.address?.length?[...(projectData.address&&projectData.address)]?.map((address: any, index: number) => ({
-          id: index + 1,
-          country: address.country,
-          province: address.providence,
-          city: address.city,
-          municipality: address.municipality,
-        })):[],
+        addresses:
+          projectData.address && projectData.address?.length
+            ? [...(projectData.address && projectData.address)]?.map(
+                (address: any, index: number) => ({
+                  id: index + 1,
+                  country: address.country,
+                  province: address.providence,
+                  city: address.city,
+                  municipality: address.municipality,
+                })
+              )
+            : [],
         files: [],
-      };      
-      setFormValue(newData);      
+      };
+      setFormValue(newData);
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -137,7 +142,7 @@ const CreateProjectForm = () => {
     }
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     if (projectId) {
       fetchProject(projectId);
     }
@@ -151,7 +156,8 @@ const CreateProjectForm = () => {
           <div className="p-4 md:p-6">
             <div
               className="flex items-center gap-2 cursor-pointer mb-2"
-              onClick={() => navigate("/project-home")}>
+              onClick={() => navigate("/project-home")}
+            >
               <ArrowLeftIcon
                 width={16}
                 height={16}
@@ -160,7 +166,8 @@ const CreateProjectForm = () => {
               <Typography
                 size="base"
                 weight="semibold"
-                className="text-primary-150">
+                className="text-primary-150"
+              >
                 {t("back_to_dashboard")}
               </Typography>
             </div>
@@ -175,12 +182,14 @@ const CreateProjectForm = () => {
             {!loading && (
               <ProjectInfoForm
                 initialValues={formValue}
-                onSubmit={handleSubmit}>
+                onSubmit={handleSubmit}
+              >
                 <div className="flex flex-col-reverse md:flex-row justify-end gap-4 mt-8">
                   <Button
                     variant="secondary"
                     onClick={handleSaveDraft}
-                    className="px-6 py-3 bg-white rounded-lg text-primary-150 font-medium flex items-center justify-center gap-2 shadow-md hover:bg-gray-50 w-full md:w-auto">
+                    className="px-6 py-3 bg-white rounded-lg text-primary-150 font-medium flex items-center justify-center gap-2 shadow-md hover:bg-gray-50 w-full md:w-auto"
+                  >
                     <SaveDraftIcon
                       width={20}
                       height={20}
@@ -193,7 +202,8 @@ const CreateProjectForm = () => {
                     variant="primary"
                     type="submit"
                     // form="project-form"
-                    className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto">
+                    className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
+                  >
                     {t("submit")}
                     <ArrowRightIconButton
                       width={18}

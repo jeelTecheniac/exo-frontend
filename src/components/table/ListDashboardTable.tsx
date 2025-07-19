@@ -14,8 +14,6 @@ import {
   RightGreenIcon,
 } from "../../icons";
 import { useNavigate } from "react-router-dom";
-import projectService from "../../services/project.service.ts";
-import { useMutation } from "@tanstack/react-query";
 import StatusBadge, { StatusCode } from "../common/StatusBadge.tsx";
 import moment from "moment";
 

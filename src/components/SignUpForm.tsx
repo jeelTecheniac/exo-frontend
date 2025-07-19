@@ -62,7 +62,7 @@ const SignUpForm = () => {
     },
     onSuccess: () => {
       toast.success(t("otp_sent_successfully"));
-      navigate("/otp-verification")
+      navigate("/otp-verification");
     },
     onError: (error: any) => {
       if (error.status === 412) {
@@ -83,10 +83,10 @@ const SignUpForm = () => {
       country_code: mobileCountryCode[0].value,
     },
     validationSchema,
-    onSubmit: async(values) => {
+    onSubmit: async (values) => {
       localStorageService.setUser(JSON.stringify(values));
       localStorageService.setPath("sign-up");
-      const res=await sendOtpMutation.mutateAsync(values.email);      
+      await sendOtpMutation.mutateAsync(values.email);
       // toast.success(t("account_created_successfully"), {
       //   autoClose: 800,
       // });
@@ -141,19 +141,18 @@ const SignUpForm = () => {
     },
   };
 
-  useEffect(()=>{
-    const userData=localStorage.getItem("userData");
-    if(userData){
-      const data=JSON.parse(userData)
-      formik.setFieldValue("first_name",data.first_name)
-      formik.setFieldValue("last_name",data.last_name)
-      formik.setFieldValue("email",data.email)
-      formik.setFieldValue("mobile",data.mobile)
-      formik.setFieldValue("company_name",data.company_name)
-      formik.setFieldValue("country_code",data.country_code)
-      
+  useEffect(() => {
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      const data = JSON.parse(userData);
+      formik.setFieldValue("first_name", data.first_name);
+      formik.setFieldValue("last_name", data.last_name);
+      formik.setFieldValue("email", data.email);
+      formik.setFieldValue("mobile", data.mobile);
+      formik.setFieldValue("company_name", data.company_name);
+      formik.setFieldValue("country_code", data.country_code);
     }
-  },[])
+  }, []);
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible">

@@ -10,6 +10,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-01-15",
     noOfRequest: 12,
     contract_id: "CTR-2024-001",
+    currency: "",
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-01-20",
     noOfRequest: 8,
     contract_id: "CTR-2024-002",
+    currency: "",
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-01-25",
     noOfRequest: 15,
     contract_id: "CTR-2024-003",
+    currency: "",
   },
   {
     id: 4,
@@ -40,6 +43,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-02-01",
     noOfRequest: 6,
     contract_id: "CTR-2024-004",
+    currency: "",
   },
   {
     id: 5,
@@ -50,6 +54,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-02-05",
     noOfRequest: 10,
     contract_id: "CTR-2024-005",
+    currency: "",
   },
   {
     id: 6,
@@ -60,6 +65,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-02-10",
     noOfRequest: 20,
     contract_id: "CTR-2024-006",
+    currency: "",
   },
   {
     id: 7,
@@ -70,6 +76,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-02-15",
     noOfRequest: 9,
     contract_id: "CTR-2024-007",
+    currency: "",
   },
   {
     id: 8,
@@ -80,6 +87,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-02-20",
     noOfRequest: 14,
     contract_id: "CTR-2024-008",
+    currency: "",
   },
   {
     id: 9,
@@ -90,6 +98,7 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-02-25",
     noOfRequest: 11,
     contract_id: "CTR-2024-009",
+    currency: "",
   },
   {
     id: 10,
@@ -100,5 +109,6 @@ export const fakeContractData: ContractData[] = [
     dateCreated: "2024-03-01",
     noOfRequest: 7,
     contract_id: "CTR-2024-010",
+    currency: "",
   },
 ];
