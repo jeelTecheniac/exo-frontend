@@ -7,6 +7,7 @@ import {
   PencilIcon,
   XCircleIcon,
 } from "../../icons";
+import { useNavigate } from "react-router";
 
 export interface TableHeader {
   content: React.ReactNode;
@@ -83,10 +84,11 @@ export interface ContractData {
   signedBy: string;
   position: string;
   amountOfContract: number;
-  currency:string,
+  currency: string;
   organization: string;
   dateOfSigning: string;
-  numberOfRequests: string;
+  numberOfRequests: number;
+  contractId:string
 }
 
 const ContractListTable = ({
@@ -101,6 +103,8 @@ const ContractListTable = ({
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  const navigate=useNavigate()
 
   // const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
   //   if (event.target.checked) {
@@ -120,13 +124,21 @@ const ContractListTable = ({
   //   });
   // };
 
+  const handleViewContract=(contractId:string)=>{
+    navigate("/contract-details/"+contractId)
+  }
+
+  const handelEditContract=(contractId:string)=>{
+    navigate("/edit-contract/"+contractId)
+  }
+
   const handleMenuToggle = (orderId: number) => {
     setOpenMenuId(openMenuId === orderId ? null : orderId);
   };
 
   useEffect(()=>{
     setTableData(data)
-  },[])
+  },[data])
 
   const tableHeader: TableHeader[] = [
     // {
@@ -294,19 +306,19 @@ const ContractListTable = ({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                //   handleViewProject(data?.projectUuid);
+                                  handleViewContract(data?.contractId);
                               }}
                               className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                               role="menuitem"
-                              aria-label="View Project">
+                              aria-label="View Contract">
                               <EyeDarkIcon />
-                              View Project
+                              View Contract
                             </button>
 
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                //   handleEdit(data);
+                                  handelEditContract(data.contractId);
                               }}
                               className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                               role="menuitem"
@@ -327,7 +339,7 @@ const ContractListTable = ({
                               Archive
                             </button>
 
-                            <button
+                            {/* <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 // handleSuspend(data.id);
@@ -349,7 +361,7 @@ const ContractListTable = ({
                               aria-label="Close">
                               <XCircleIcon />
                               Close
-                            </button>
+                            </button> */}
                           </div>
                         )}
                       </div>

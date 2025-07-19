@@ -35,8 +35,9 @@ export interface ProjectProps {
   documents: any[];
   address: ProjectAddress[];
   user: ProjectUser;
-  contracts: Contract[];
+  contracts:Contract[]
   requests: any[];
+  updated_at:string 
 }
 
 export interface ProjectAddress {
@@ -211,9 +212,8 @@ const ProjectDetails = () => {
               <Typography
                 size="base"
                 weight="normal"
-                className="text-secondary-60"
-              >
-                {t("last_updated")}
+                className="text-secondary-60">
+                {t("last_updated")}: {projectData&&moment(projectData.updated_at).format("MMMM D, YYYY")}
               </Typography>
             </div>
             <motion.div
@@ -396,15 +396,10 @@ const ProjectDetails = () => {
                   <Typography
                     className="text-secondary-100 break-words"
                     size="sm"
-                    weight="normal"
-                  >
-                    {projectData?.description && (
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: projectData?.description || "-",
-                        }}
-                      ></div>
-                    )}
+                    element="div"
+                    weight="normal">
+                    {projectData?.description&&<div dangerouslySetInnerHTML=
+                    {{__html:projectData?.description || "-"}}></div>}                    
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">

@@ -11,6 +11,9 @@ class ContractService extends ApiBaseService {
   async creteContract(data: any) {
     return await this.authorizedRequest.post(ApiRoutes.CREATE_CONTRACT, data);
   }
+  async getAllContractList(data:any){
+    return await this.authorizedRequest.post(ApiRoutes.ALL_CONTRACT_LIST,data)
+  }
 }
 
 const contractService = new ContractService();
