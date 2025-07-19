@@ -9,7 +9,7 @@ type Size =
   | "xl_4"
   | "xl_5";
 type Weight = "normal" | "semibold" | "bold" | "extrabold";
-type Element = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span" | "p";
+type Element = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span" | "p" | "div";
 
 export type TypographyProps = {
   size?: Size;
@@ -47,6 +47,7 @@ const AvailableTag = {
   h4: (props: ElementProp) => <h4 {...props} />,
   h5: (props: ElementProp) => <h5 {...props} />,
   h6: (props: ElementProp) => <h6 {...props} />,
+  div: (props: ElementProp) => <div {...props} />,
   p: (props: ElementProp) => <p {...props} />,
   span: (props: ElementProp) => <span {...props} />,
 };

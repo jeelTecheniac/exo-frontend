@@ -58,8 +58,7 @@ const ContractProjectListPage = () => {
   const [data, setData] = useState<Data[]>([]);
   const { setLoading } = useLoading();
 
-  const [total, setTotal] = useState(0);
-  setTotal(0);
+  const [total, setTotal] = useState(0);  
   const [limit, setLimit] = useState(8);
   const [offset, setOffset] = useState(0);
   // Dashboard card state
@@ -140,6 +139,7 @@ const ContractProjectListPage = () => {
   });
 
   useEffect(() => {
+    setTotal(0);
     contractMutation.mutate();
   }, [limit, offset, navigate, debouncedSearchTerm, range]);
 
