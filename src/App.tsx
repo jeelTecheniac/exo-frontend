@@ -196,6 +196,14 @@ export default function App() {
               }
             />
             <Route
+              path="/edit-contract/:contractId"
+              element={
+                <ProtectedRoute>
+                  <ContractCreatePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/contract-project-list"
               element={
                 <ProtectedRoute>

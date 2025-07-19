@@ -96,11 +96,12 @@ const ContractCreatePage = () => {
   const { isOpen, openModal, closeModal } = useModal();
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<FormDataProps| undefined>(initialValue);
+  const [formData, setFormData] = useState<FormDataProps>(initialValue);
   const [contractReview,setContractReview]=useState<ContractReviewData>(ContractReviewInitialValue);
+  const [editProjectId,setEditProjectId]=useState("")
 
-  const { projectId } = useParams();
-  const {setLoading}=useLoading()
+  const { projectId, contractId } = useParams();
+  const {loading,setLoading}=useLoading()
 
   const steps = [
     { id: 1, title: "Contract Info" },
@@ -132,6 +133,10 @@ const ContractCreatePage = () => {
       payload.append("document_ids",data.contractFiles.join(","))
       if(projectId){
         payload.append("project_id",projectId)
+      }
+      if(contractId&&editProjectId){
+        payload.append("project_id",editProjectId)
+        payload.append("contract_id",contractId)
       }      
       const response=await contractService.creteContract(payload);
       return response.data
@@ -146,38 +151,84 @@ const ContractCreatePage = () => {
     // openModal();
   };
 
+  const fetchProject = async (projectId:string) => {      
+    try {
+      setLoading(true)
+      const data = await projectService.getProjectDetails(projectId!);                        
+      const project=data.data
+      setContractReview((preve) => ({
+        ...preve,
+        projectAmount: project.amount,
+        projectName: project.name,
+        currency: project.currency,
+        beginDate: project.begin_date,
+        endDate: project.end_date,
+        description: project.description,
+        projectFiles:project.documents,
+        reference:project.reference,
+        address: project.address.map((address: Address, index: number) => ({
+          id: index + 1,
+          city: address.city,
+          providence: address.providence,
+          municipality: address.municipality,
+          country: address.country,
+        })),
+      }));
+      return project;
+    } catch (err: any) {
+      console.error(err, "erro");        
+    } finally {        
+      setLoading(false)
+    }
+  };
+  
   useEffect(() => {
-    const fetchProject = async () => {      
-      try {
-        setLoading(true)
-        const data = await projectService.getProjectDetails(projectId!);                        
-        const project=data.data
-        setContractReview((preve) => ({
-          ...preve,
-          projectAmount: project.amount,
-          projectName: project.name,
-          currency: project.currency,
-          beginDate: project.begin_date,
-          endDate: project.end_date,
-          description: project.description,
-          projectFiles:project.documents,
-          reference:project.reference,
-          address: project.address.map((address: Address, index: number) => ({
-            id: index + 1,
-            city: address.city,
-            providence: address.providence,
-            municipality: address.municipality,
-            country: address.country,
-          })),
+    if (projectId) fetchProject(projectId);
+  }, [projectId, t]);
+  
+  const getContractMutation=useMutation({
+    mutationFn:async(contractId:string)=>{
+      setLoading(true);
+      const response=await contractService.getContractDetails({contract_id:contractId});
+      if(response.data.status===200){
+        const contractData: {
+          project_id: string;
+          signed_by: string;
+          position: string;
+          currency: string;
+          amount: string;
+          organization: string;
+          place: string;
+          date_of_signing: string;
+          documents: UploadedFile[] | []; 
+        } = response.data.data;
+        setEditProjectId(contractData.project_id)
+        fetchProject(contractData.project_id);        
+        setFormData((prev: FormDataProps) => ({
+          ...prev,
+          amount: parseFloat(contractData.amount).toString(),
+          contractFiles: response.data.data.documents || [],
+          currency: contractData.currency,
+          dateOfSigning: contractData.date_of_signing,
+          organization: contractData.organization,
+          place: contractData.place,
+          signedBy: contractData.signed_by,
+          position: contractData.position,
         }));
-      } catch (err: any) {
-        console.error(err, "erro");        
-      } finally {        
-        setLoading(false)
       }
-    };
-    if (projectId) fetchProject();
-  }, [projectId, t]);  
+      console.log(response.data.data,"contract Data")
+    },
+    onError:async(error)=>{
+      setLoading(true);
+      console.error(error);
+    }
+  })
+  
+  useEffect(()=>{
+    if(contractId){
+      getContractMutation.mutate(contractId)
+    }
+  },[contractId])
 
   return (
     <AppLayout>
@@ -204,7 +255,7 @@ const ContractCreatePage = () => {
             </div>
             <div className="p-4 md:p-6">
               <Stepper variant="outline" steps={steps} currentStep={currentStep} onStepClick={handleStepClick} />
-              {currentStep === 0 && (
+              {currentStep === 0 && !loading && (
                 <ContractInfoForm initialValues={formData} onSubmit={handleFormSubmit} />
               )}
 
