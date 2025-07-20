@@ -55,8 +55,8 @@ const Filter: React.FC<FilterProps> = ({ startDate, endDate, onApply, onReset })
   const handleReset = () => {
     setLocalStartDate(null);
     setLocalEndDate(null);
-    onReset?.();
     onApply({ startDate: null, endDate: null });
+    onReset?.();
   };
 
   const handleApply = () => {
@@ -119,13 +119,16 @@ const Filter: React.FC<FilterProps> = ({ startDate, endDate, onApply, onReset })
             <Button
               variant="secondary"
               className="w-full sm:w-fit py-3 order-2 sm:order-1"
-              onClick={handleReset}>
+              onClick={handleReset}
+              disable={!localStartDate && !localEndDate}>
               Reset All
             </Button>
             <Button
               variant="primary"
               className="w-full sm:w-fit py-3 order-1 sm:order-2"
-              onClick={handleApply}>
+              onClick={handleApply}
+              disable={!localStartDate || !localEndDate}
+              >
               Apply Filter
             </Button>
           </div>

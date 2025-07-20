@@ -115,7 +115,7 @@ const CreateProjectForm = () => {
         projectName: projectData.name,
         fundedBy: projectData.funded_by,
         projectReference: projectData.reference,
-        amount: projectData.amount,
+        amount: Number(projectData.amount).toFixed(0).toString(),
         currency: projectData.currency,
         beginDate: moment(projectData.begin_date, "YYYY-MM-DD").toDate(),
         endDate: moment(projectData.end_date, "YYYY-MM-DD").toDate(),
@@ -156,7 +156,7 @@ const CreateProjectForm = () => {
           <div className="p-4 md:p-6">
             <div
               className="flex items-center gap-2 cursor-pointer mb-2"
-              onClick={() => navigate("/project-home")}
+              onClick={() => navigate("/dashboard")}
             >
               <ArrowLeftIcon
                 width={16}

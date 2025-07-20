@@ -14,7 +14,7 @@ export const ApiRoutes = {
   CREATE_PROJECT: "/project/create",
   UPLOAD_FILE: "/project/upload-file",
   REMOVE_FILE: "/project/delete-file",
-  REQUEST_DETAILS: "/project/view-request",
+  // REQUEST_DETAILS: "/project/view-request",
   DELETE_REQUEST: "/project/delete-request",
   DELETE_PROJECT: "/project/delete",
   ADDRESS_LIST: "project/list-address",
@@ -22,7 +22,10 @@ export const ApiRoutes = {
   LIST_ALL_PPROJECT: "/project/get-list-all",
   CONTRACT_DETAILS:"/contract/view",
   CREATE_CONTRACT:"/contract/create",
-  ALL_CONTRACT_LIST:"/contract/list"
+  ALL_CONTRACT_LIST:"/contract/list",
+  // Request routes
+  GET_ALL_REQUEST:"/request/list",
+  REQUEST_DETAILS: "/request/view"
 };
 
 export const mobileCountryCode = [

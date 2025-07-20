@@ -22,8 +22,11 @@ import { useMutation } from "@tanstack/react-query";
 import contractService from "../../../services/contract.service";
 import moment from "moment";
 import { useLoading } from "../../../context/LoaderProvider";
+import requestService from "../../../services/request.service";
 
 interface ContractProps {
+  id: string;
+  project_id: string;
   signed_by: string;
   organization: string;
   created_at: string;
@@ -33,11 +36,72 @@ interface ContractProps {
   requests: [];
 }
 
+interface Address {
+  id: string;
+  project_id: string;
+  user_id: string;
+  country: string;
+  providence: string;
+  city?: string;
+  street?: string;
+  [key: string]: any;
+}
+
+interface Entity {
+  [key: string]: any;
+}
+
+interface RequestData {
+  id: string;
+  project_id: string;
+  contract_id: string;
+  user_id: string;
+  address_id: string;
+  address: Address;
+  request_letter: string;
+  request_unique_number: string;
+  unique_id: string | null;
+  status: string;
+  current_status: string;
+  entities: Entity[];
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  amount: string;
+}
+
+interface RequestTableData {
+  id: number;
+  amount: string;
+  createdDate: string;
+  request_id: string;
+  status: string;
+  requestNo: string;
+}
+
+interface CardDateProps {
+  approved_requests: number;
+  pending_requests: number;
+  rejected_requests: number;
+  requests_total: number;
+  total_requests: number;
+}
+
 const ContractDetails = () => {
   const { t } = useTranslation();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
   const [contractData, setContractData] = useState<ContractProps>();
+  const [requestData, setRequestData] = useState<RequestTableData[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [cardData, setCardData] = useState<CardDateProps>({
+    approved_requests: 0,
+    pending_requests: 0,
+    rejected_requests: 0,
+    requests_total: 0,
+    total_requests: 0,
+  });
   const [range, setRange] = useState<{
     startDate: Date | null;
     endDate: Date | null;
@@ -56,6 +120,24 @@ const ContractDetails = () => {
     setIsDatePickerOpen(false);
   };
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (contractData) {
+      requestMutation.mutate({
+        contractId: contractData?.id,
+        projectId: contractData.project_id,
+      });
+    }
+  }, [debouncedSearchTerm]);
+
   const contractMutation = useMutation({
     mutationFn: async () => {
       setLoading(true);
@@ -63,8 +145,16 @@ const ContractDetails = () => {
       if (contractId) {
         formData.append("contract_id", contractId);
       }
-      const respopnse = await contractService.getContractDetails(formData);
-      const contract: ContractProps = respopnse.data.data;
+      const response = await contractService.getContractDetails(formData);
+      const contract: ContractProps = response.data.data;
+      const card = response.data.summary;
+
+      setCardData(card)
+
+      requestMutation.mutate({
+        contractId: contract.id,
+        projectId: contract.project_id,
+      });
       setContractData(contract);
       setLoading(false);
       return contract;
@@ -75,6 +165,34 @@ const ContractDetails = () => {
     onError: async (error) => {
       console.error(error);
       setLoading(false);
+    },
+  });
+
+  const requestMutation = useMutation({
+    mutationFn: async (data: { projectId: string; contractId: string }) => {
+      const payload = {
+        contract_id: data.contractId,
+        project_id: data.projectId,
+        search: debouncedSearchTerm,
+      };
+      const response = await requestService.getAllRequestList(payload);
+      const requests: RequestData[] = response.data.data;
+
+      const newRequests: RequestTableData[] = requests.map(
+        (request, index: number) => ({
+          amount: Number(request.amount)?.toFixed(0),
+          createdDate: moment(request.created_at).format("YYYY/MM/DD"),
+          id: index + 1,
+          request_id: request.id,
+          requestNo: request.request_unique_number,
+          status: request.status,
+        })
+      );
+      setRequestData(newRequests);
+      console.log(response, "response");
+    },
+    onError: async (error) => {
+      console.log(error);
     },
   });
 
@@ -194,7 +312,7 @@ const ContractDetails = () => {
                   className="sm:w-11 sm:h-11"
                 />
               }
-              count={10}
+              count={cardData.total_requests}
               title={t("number_of_request")}
             />
           </motion.div>
@@ -207,7 +325,7 @@ const ContractDetails = () => {
                   className="sm:w-11 sm:h-11"
                 />
               }
-              count={10}
+              count={cardData.requests_total}
               title={t("sum_of_request")}
             />
           </motion.div>
@@ -223,7 +341,7 @@ const ContractDetails = () => {
                   className="sm:w-11 sm:h-11"
                 />
               }
-              count={10}
+              count={cardData.approved_requests}
               title={t("accepted_requests")}
             />
           </motion.div>
@@ -406,7 +524,7 @@ const ContractDetails = () => {
                     type="text"
                     placeholder="Search by request no..."
                     className="pl-10 pr-4 bg-white border-gray-200 text-sm w-full h-10 focus:border-blue-500 focus:ring-blue-500"
-                    //   onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
               </motion.div>
@@ -415,15 +533,13 @@ const ContractDetails = () => {
               <div className="flex gap-2 sm:gap-3 justify-end relative">
                 <Button
                   variant="outline"
-                  className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[80px] sm:min-w-[100px] h-9 sm:h-10 text-xs sm:text-sm"
-                >
+                  className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[80px] sm:min-w-[100px] h-9 sm:h-10 text-xs sm:text-sm">
                   <ArchiveIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <Typography
                     className="text-gray-600"
                     element="span"
                     size="sm"
-                    weight="semibold"
-                  >
+                    weight="semibold">
                     {t("Archive")}
                   </Typography>
                 </Button>
@@ -431,8 +547,7 @@ const ContractDetails = () => {
                 <Button
                   variant="outline"
                   className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[80px] sm:min-w-[100px] h-9 sm:h-10 text-xs sm:text-sm"
-                  onClick={() => setIsDatePickerOpen(true)}
-                >
+                  onClick={() => setIsDatePickerOpen(true)}>
                   <FilterIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <Typography
                     className="text-gray-600"
@@ -462,18 +577,7 @@ const ContractDetails = () => {
 
             {/* Table */}
             <div className="overflow-x-auto">
-              <RequestTable
-                data={[
-                  {
-                    amount: 23,
-                    createdDate: "24-10-2001",
-                    id: 1,
-                    request_id: "1",
-                    requestNo: 23,
-                    status: "pending",
-                  },
-                ]}
-              />
+              <RequestTable data={requestData} />
             </div>
           </motion.div>
         </motion.div>
