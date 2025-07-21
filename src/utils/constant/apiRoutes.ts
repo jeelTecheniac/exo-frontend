@@ -23,6 +23,8 @@ export const ApiRoutes = {
   CONTRACT_DETAILS: "/contract/view",
   CREATE_CONTRACT: "/contract/create",
   ALL_CONTRACT_LIST: "/contract/list",
+  // Request routes
+  GET_ALL_REQUEST: "/request/list",
 };
 
 export const mobileCountryCode = [

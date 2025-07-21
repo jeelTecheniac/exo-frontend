@@ -15,8 +15,8 @@ import { useAuth } from "../../context/AuthContext.tsx";
 
 export interface Data {
   id: number;
-  requestNo: number;
-  amount: number;
+  requestNo: string;
+  amount: string;
   createdDate: string;
   status: string;
   request_id: string;
@@ -26,7 +26,7 @@ const RequestTable = ({
   data,
   onDataChange,
 }: {
-  data: Data[];
+  data: Data[] | [];
   onDataChange?: (newData: Data[]) => void;
 }) => {
   const [tableData, setTableData] = useState<Data[]>(data);
@@ -267,7 +267,7 @@ const RequestTable = ({
                         </div>
                       ) : (
                         <span className="block font-medium text-secondary-100 text-sm">
-                          {data.amount}
+                          {Number(data.amount).toLocaleString()}
                         </span>
                       )}
                     </TableCell>

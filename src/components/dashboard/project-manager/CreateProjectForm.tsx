@@ -119,7 +119,7 @@ const CreateProjectForm = () => {
         projectName: projectData.name,
         fundedBy: projectData.funded_by,
         projectReference: projectData.reference,
-        amount: projectData.amount,
+        amount: Number(projectData.amount).toFixed(0).toString(),
         currency: projectData.currency,
         beginDate: moment(projectData.begin_date, "YYYY-MM-DD").toDate(),
         endDate: moment(projectData.end_date, "YYYY-MM-DD").toDate(),
