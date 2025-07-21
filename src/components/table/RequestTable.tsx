@@ -11,6 +11,7 @@ import Typography from "../../lib/components/atoms/Typography.tsx";
 import { useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service.ts";
+import { useAuth } from "../../context/AuthContext.tsx";
 
 export interface Data {
   id: number;
@@ -36,6 +37,7 @@ const RequestTable = ({
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: Event) => {
@@ -387,33 +389,39 @@ const RequestTable = ({
                               >
                                 View Request
                               </button>
-                              <button
-                                onClick={(
-                                  e: React.MouseEvent<HTMLButtonElement>
-                                ) => {
-                                  e.stopPropagation();
-                                  navigate(`/edit-request/${data.request_id}`);
-                                }}
-                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                                role="menuitem"
-                                aria-label="Edit row"
-                              >
-                                Edit
-                              </button>
+                              {user?.type === "user" && (
+                                <button
+                                  onClick={(
+                                    e: React.MouseEvent<HTMLButtonElement>
+                                  ) => {
+                                    e.stopPropagation();
+                                    navigate(
+                                      `/edit-request/${data.request_id}`
+                                    );
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                  role="menuitem"
+                                  aria-label="Edit row"
+                                >
+                                  Edit
+                                </button>
+                              )}
 
-                              <button
-                                onClick={(
-                                  e: React.MouseEvent<HTMLButtonElement>
-                                ) => {
-                                  e.stopPropagation();
-                                  handleDelete(data.id, data.request_id);
-                                }}
-                                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
-                                role="menuitem"
-                                aria-label="Delete row"
-                              >
-                                Delete
-                              </button>
+                              {user?.type === "user" && (
+                                <button
+                                  onClick={(
+                                    e: React.MouseEvent<HTMLButtonElement>
+                                  ) => {
+                                    e.stopPropagation();
+                                    handleDelete(data.id, data.request_id);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
+                                  role="menuitem"
+                                  aria-label="Delete row"
+                                >
+                                  Delete
+                                </button>
+                              )}
                             </div>
                           )}
                         </div>

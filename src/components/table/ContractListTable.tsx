@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import moment from "moment";
-import {
-  ArchiveIconDark,
-  BanIcon,
-  EyeDarkIcon,
-  PencilIcon,
-  XCircleIcon,
-} from "../../icons";
+import { ArchiveIconDark, EyeDarkIcon, PencilIcon } from "../../icons";
 import { useNavigate } from "react-router";
 
 export interface TableHeader {
@@ -72,7 +66,8 @@ export const TableCell: React.FC<TableCellProps> = ({
     <Tag
       className={className}
       onClick={onClick}
-      {...(isHeader ? { scope: "col" } : {})}>
+      {...(isHeader ? { scope: "col" } : {})}
+    >
       {children}
     </Tag>
   );
@@ -88,13 +83,14 @@ export interface ContractData {
   organization: string;
   dateOfSigning: string;
   numberOfRequests: number;
-  contractId:string
+  contractId: string;
+  projectId?: string;
 }
 
 const ContractListTable = ({
   data,
-  // onDataChange,
-}: {
+}: // onDataChange,
+{
   data: ContractData[];
   onDataChange?: (newData: ContractData[]) => void;
 }) => {
@@ -104,7 +100,7 @@ const ContractListTable = ({
 
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   // const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
   //   if (event.target.checked) {
@@ -124,35 +120,32 @@ const ContractListTable = ({
   //   });
   // };
 
-  const handleViewContract=(contractId:string)=>{
-    navigate("/contract-details/"+contractId)
-  }
+  const handleViewContract = (contractId: string) => {
+    navigate("/contract-details/" + contractId);
+  };
 
-  const handelEditContract=(contractId:string)=>{
-    navigate("/edit-contract/"+contractId)
-  }
+  const handelEditContract = (contractId: string) => {
+    navigate("/edit-contract/" + contractId);
+  };
 
   const handleMenuToggle = (orderId: number) => {
     setOpenMenuId(openMenuId === orderId ? null : orderId);
   };
 
-  useEffect(()=>{
-    setTableData(data)
-  },[data])
+  const handleAddRequest = (projectId: string, contractId: string) => {
+    console.log(projectId, "projectId in contract list table");
+    console.log(contractId, "contractId in contract list table");
+
+    navigate(`/add-request/${projectId}/${contractId}`);
+  };
+
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
+
+  console.log(data, "data in contract list table");
 
   const tableHeader: TableHeader[] = [
-    // {
-    //   content: (
-    //     <input
-    //       type="checkbox"
-    //       checked={tableData && selectedRows.length === tableData.length}
-    //       onChange={handleSelectAll}
-    //       className="w-4 h-4 rounded border-secondary-30 text-blue-600 focus:ring-blue-500"
-    //       aria-label="Select all rows"
-    //     />
-    //   ),
-    //   className: "w-10", // Fixed width for checkbox
-    // },
     {
       content: <div className="text-nowrap">Sr No</div>,
       className: "w-16",
@@ -214,7 +207,8 @@ const ContractListTable = ({
                     key={index}
                     isHeader
                     className="px-5 py-4 font-semibold text-secondary-50 text-left text-sm cursor-pointer"
-                    onClick={header.onClick}>
+                    onClick={header.onClick}
+                  >
                     {header.content}
                   </TableCell>
                 );
@@ -264,7 +258,7 @@ const ContractListTable = ({
                       </div>
                     </TableCell>
                     <TableCell className="px-5 py-4 sm:px-6">
-                      <span className="block font-medium text-secondary-100 text-sm text-nowrap">                        
+                      <span className="block font-medium text-secondary-100 text-sm text-nowrap">
                         {data.organization}
                       </span>
                     </TableCell>
@@ -278,11 +272,12 @@ const ContractListTable = ({
                         {data.numberOfRequests}
                       </span>
                     </TableCell>
-                    
+
                     <TableCell className="px-4 py-3 text-gray-500 text-sm">
                       <div
                         className="relative"
-                        ref={openMenuId === data.id ? menuRef : null}>
+                        ref={openMenuId === data.id ? menuRef : null}
+                      >
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -291,26 +286,30 @@ const ContractListTable = ({
                           className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                           aria-label="Open actions menu"
                           aria-haspopup="true"
-                          aria-expanded={openMenuId === data.id}>
+                          aria-expanded={openMenuId === data.id}
+                        >
                           <svg
                             className="w-4 h-4"
                             fill="currentColor"
-                            viewBox="0 0 20 20">
+                            viewBox="0 0 20 20"
+                          >
                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                           </svg>
                         </button>
                         {openMenuId === data.id && (
                           <div
                             className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 p-2"
-                            role="menu">
+                            role="menu"
+                          >
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                  handleViewContract(data?.contractId);
+                                handleViewContract(data?.contractId);
                               }}
                               className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                               role="menuitem"
-                              aria-label="View Contract">
+                              aria-label="View Contract"
+                            >
                               <EyeDarkIcon />
                               View Contract
                             </button>
@@ -318,13 +317,30 @@ const ContractListTable = ({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                  handelEditContract(data.contractId);
+                                handelEditContract(data.contractId);
                               }}
                               className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                               role="menuitem"
-                              aria-label="Edit">
+                              aria-label="Edit"
+                            >
                               <PencilIcon />
                               Edit
+                            </button>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddRequest(
+                                  data.projectId || "",
+                                  data.contractId
+                                );
+                              }}
+                              className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                              role="menuitem"
+                              aria-label="Edit"
+                            >
+                              <PencilIcon />
+                              Add Request
                             </button>
 
                             <button
@@ -334,7 +350,8 @@ const ContractListTable = ({
                               }}
                               className="rounded-sm flex items-center gap-2 w-full px-2 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                               role="menuitem"
-                              aria-label="Archive">
+                              aria-label="Archive"
+                            >
                               <ArchiveIconDark />
                               Archive
                             </button>

@@ -56,7 +56,7 @@ const AppHeader: React.FC = () => {
                   ? "hover:bg-primary-10"
                   : "hover:text-primary-150"
               } hover:bg-primary-10 rounded-lg`}
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/project-dashboard")}
             >
               {t("dashboard")}
             </Button>

@@ -1,10 +1,22 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import localStorageService from "../services/local.service";
 
+interface User {
+  id?: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  company_name?: string;
+  type?: "project_manager" | "user";
+  token?: string;
+}
+
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  user: User | null;
+  login: (token: string, userData: User) => void;
   logout: () => void;
+  updateUser: (userData: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,18 +28,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     !!localStorageService.getLogin()
   );
 
-  const login = (token: string) => {
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const userData = localStorageService.getUser();
+      return userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.error("Failed to parse user data from localStorage", error);
+      return null;
+    }
+  });
+
+  const login = (token: string, userData: User) => {
     localStorage.setItem("isLogin", token);
+    localStorageService.setUser(JSON.stringify(userData));
     setIsAuthenticated(true);
+    setUser(userData);
   };
 
   const logout = () => {
     localStorage.removeItem("isLogin");
+    localStorageService.removeUser();
     setIsAuthenticated(false);
+    setUser(null);
+  };
+
+  const updateUser = (userData: Partial<User>) => {
+    const updatedUser = { ...user, ...userData };
+    setUser(updatedUser);
+    localStorageService.setUser(JSON.stringify(updatedUser));
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, login, logout, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

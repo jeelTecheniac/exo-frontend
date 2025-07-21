@@ -64,6 +64,7 @@ const CreateProjectForm = () => {
     },
     onSuccess: () => {
       openModal();
+      setFormValue(initialValues); // Clear the form after successful creation
     },
     onError: (error) => {
       console.error("Error during project creation:", error);
@@ -71,7 +72,7 @@ const CreateProjectForm = () => {
     },
   });
 
-  const handleSubmit = (values: ProjectFormValues) => {
+  const createProject = (values: ProjectFormValues, status: string) => {
     const payload = {
       name: values.projectName,
       funded_by: values.fundedBy,
@@ -89,20 +90,23 @@ const CreateProjectForm = () => {
           municipality: address.municipality,
         }))
       ),
-      document_ids: "",
-      // document_ids: values.files,
-      status: "publish",
+      document_ids: values.files.map((file) => file.id).join(","),
+      status,
       ...(projectId && { project_id: projectId }),
     };
     createProjectMutation.mutate(payload);
   };
 
+  const handleSubmit = (values: ProjectFormValues) => {
+    createProject(values, "publish");
+  };
+
   const handelCloseModal = () => {
     closeModal();
-    navigate("/project-home");
+    navigate("/create-project");
   };
   const handleSaveDraft = () => {
-    console.log("Save draft button clicked");
+    createProject(formValue, "draft");
   };
 
   const fetchProject = async (projectId: string) => {
@@ -156,7 +160,7 @@ const CreateProjectForm = () => {
           <div className="p-4 md:p-6">
             <div
               className="flex items-center gap-2 cursor-pointer mb-2"
-              onClick={() => navigate("/project-home")}
+              onClick={() => navigate("/project-dashboard")}
             >
               <ArrowLeftIcon
                 width={16}
@@ -201,7 +205,6 @@ const CreateProjectForm = () => {
                   <Button
                     variant="primary"
                     type="submit"
-                    // form="project-form"
                     className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
                   >
                     {t("submit")}

@@ -124,7 +124,7 @@ const ContactInfoForm = ({
 
     if (name === "place") {
       if (!value.trim()) {
-        newErrors.place = `${t("place_name_is_requir")}`;
+        newErrors.place = `${t("place_name_is_required")}`;
       } else {
         delete newErrors.place;
       }

@@ -35,9 +35,9 @@ export interface ProjectProps {
   documents: any[];
   address: ProjectAddress[];
   user: ProjectUser;
-  contracts:Contract[]
+  contracts: Contract[];
   requests: any[];
-  updated_at:string 
+  updated_at: string;
 }
 
 export interface ProjectAddress {
@@ -75,7 +75,7 @@ export interface Contract {
   date_of_signing: string;
   status: "draft" | "publish" | string;
   created_at: string;
-  requests_count: number;
+  requests_data_count: number;
 }
 
 interface cardProps {
@@ -212,8 +212,11 @@ const ProjectDetails = () => {
               <Typography
                 size="base"
                 weight="normal"
-                className="text-secondary-60">
-                {t("last_updated")}: {projectData&&moment(projectData.updated_at).format("MMMM D, YYYY")}
+                className="text-secondary-60"
+              >
+                {t("last_updated")}:{" "}
+                {projectData &&
+                  moment(projectData.updated_at).format("MMMM D, YYYY")}
               </Typography>
             </div>
             <motion.div
@@ -397,9 +400,15 @@ const ProjectDetails = () => {
                     className="text-secondary-100 break-words"
                     size="sm"
                     element="div"
-                    weight="normal">
-                    {projectData?.description&&<div dangerouslySetInnerHTML=
-                    {{__html:projectData?.description || "-"}}></div>}                    
+                    weight="normal"
+                  >
+                    {projectData?.description && (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: projectData?.description || "-",
+                        }}
+                      ></div>
+                    )}
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:gap-4">
@@ -476,7 +485,7 @@ const ProjectDetails = () => {
                   position: contract.position,
                   amountByContract: Number(contract.amount),
                   dateCreated: moment(contract.created_at).format("YYYY/MM/DD"),
-                  noOfRequest: contract.requests_count,
+                  noOfRequest: contract.requests_data_count,
                   contract_id: contract.id,
                   organization: contract.organization,
                   currency: contract.currency,

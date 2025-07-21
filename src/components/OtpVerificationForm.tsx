@@ -13,12 +13,12 @@ import localStorageService from "../services/local.service";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
-import { useAuth } from "../context/AuthContext";
+// import { useAuth } from "../context/AuthContext";
 
 const OtpVerificationForm = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  // const { login } = useAuth();
 
   const [userData, setUserData] = useState<any | undefined>();
   const path = localStorageService.getPath();
@@ -39,7 +39,7 @@ const OtpVerificationForm = () => {
 
       localStorageService.setUser(JSON.stringify(res.data.data));
       localStorageService.setLogin(JSON.stringify("true"));
-      login("true");
+      // login("true");
       // localStorageService.removePath();
       localStorageService.setAccessToken(JSON.stringify(res.data.data.token));
       navigate("/dashboard");

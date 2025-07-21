@@ -299,7 +299,7 @@ const ContractCreatePage = () => {
                       //   form="project-form"
                       className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
                     >
-                      {t("sunmit")}
+                      {t("submit")}
                       <ArrowRightIconButton
                         width={18}
                         height={18}

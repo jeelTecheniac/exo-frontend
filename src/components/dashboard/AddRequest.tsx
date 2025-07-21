@@ -67,7 +67,9 @@ const AddRequest = () => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [requestLetter, setRequestLetter] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [projectId, setProjectId] = useState<string>("null");
+  const [projectId, setProjectId] = useState<string>(
+    "9f6e1e82-4a59-4a19-8200-dabac1239021"
+  );
   const [totals, setTotals] = useState({
     totalEntity: 0,
     totalAmount: 0,
@@ -137,7 +139,7 @@ const AddRequest = () => {
     const newOrder: Order = {
       id: new Date().getTime(),
       // id: data.length + 1,
-      label: "New Item",
+      label: "",
       quantity: 1,
       unitPrice: 0,
       total: 0,

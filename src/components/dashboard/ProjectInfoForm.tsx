@@ -11,11 +11,14 @@ import UploadFile, { UploadedFile } from "../common/UploadFile";
 import { TrashIcon } from "../../icons";
 import { USFlag, CDFFlag } from "../../icons";
 import { useTranslation } from "react-i18next";
+import { useMutation } from "@tanstack/react-query";
+import projectService from "../../services/project.service";
+import { useAuth } from "../../context/AuthContext";
 
 interface ProjectInfoFormProps {
   initialValues?: ProjectFormValues;
   onSubmit: (values: ProjectFormValues) => void;
-  children?:ReactNode
+  children?: ReactNode;
 }
 
 interface Address {
@@ -49,8 +52,13 @@ export interface UploadArgs {
   onProgress: (percent: number) => void;
 }
 
-const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormProps) => {
+const ProjectInfoForm = ({
+  initialValues,
+  onSubmit,
+  children,
+}: ProjectInfoFormProps) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [editingState, setEditingState] = useState<{
     addressId: number;
     field: string | null;
@@ -123,15 +131,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
         return !isNaN(num) && num > 0;
       }),
     currency: Yup.string().required(t("currency_is_required")),
-    beginDate: Yup.string()
-      .required(t("begin_date_is_required"))
-      .test("is-future-date", t("begin_date_cannot_be_in_past"), (value) => {
-        if (!value) return false;
-        const date = new Date(value.split("-").reverse().join("-")); // Convert DD-MM-YYYY to YYYY-MM-DD
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return date >= today;
-      }),
+    beginDate: Yup.string().required(t("begin_date_is_required")),
     endDate: Yup.string()
       .required(t("end_date_is_required"))
       .test(
@@ -241,6 +241,54 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
     }
   };
 
+  const fileUploadMutation = async ({
+    file,
+    onProgress,
+  }: {
+    file: File;
+    onProgress: (percent: number) => void;
+  }): Promise<{ id: string; url: string }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "document");
+    formData.append("object_type", "request");
+
+    const response = await projectService.uploadFile(formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        VAuthorization: `Bearer ${user?.token}`,
+      },
+      onUploadProgress: (event: ProgressEvent) => {
+        if (event.total) {
+          const percent = Math.round((event.loaded * 100) / event.total);
+          onProgress(percent);
+        }
+      },
+    });
+
+    return {
+      id: response.data.data?.id ?? Date.now().toString(),
+      url: response.data.data?.url ?? "",
+      // file:response.data.data ?? ""
+    };
+  };
+  const uploadMutation = useMutation({
+    mutationFn: fileUploadMutation,
+    onSuccess: (data) => {
+      // toast.success("File uploaded successfully!");
+      console.log("Upload result:", data);
+    },
+    onError: () => {
+      // toast.error("Failed to upload file.");
+    },
+  });
+  const handleUploadFile = async (
+    file: File,
+    onProgress: (percent: number) => void
+  ) => {
+    const response = await uploadMutation.mutateAsync({ file, onProgress });
+    return response;
+  };
   const CustomSelect = ({
     value,
     options,
@@ -321,16 +369,44 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
   //    },
   //  });
   //  const handleUploadFile = async (file: any, onProgress: any) => {
-  //    const response = await uploadMutation.mutateAsync({ file, onProgress });     
+  //    const response = await uploadMutation.mutateAsync({ file, onProgress });
   //    return response;
   //  };
 
-
+  const removeFileMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await projectService.removeFile(id);
+      return { status: true };
+    },
+    onSuccess: () => {
+      // toast.success("File removed successfully!");
+    },
+    onError: () => {
+      // toast.error("Failed to remove file.");
+    },
+  });
+  const handleDeleteFile = async (
+    fileId: string,
+    setFieldValue: FormikHelpers<ProjectFormValues>["setFieldValue"],
+    files: UploadedFile[]
+  ) => {
+    const response = await removeFileMutation.mutateAsync(fileId);
+    if (response.status) {
+      const filteredFiles = files.filter(
+        (file: UploadedFile) => file.id !== fileId
+      );
+      setFieldValue("files", filteredFiles);
+      return { status: true };
+    }
+    return { status: false };
+  };
   return (
     <Formik
       initialValues={initialValues || defaultInitialValues}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}      >
+      onSubmit={handleSubmit}
+      enableReinitialize={true}
+    >
       {({ values, setFieldValue, errors, touched, handleBlur }) => (
         <Form>
           <div>
@@ -338,13 +414,15 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
               <Typography
                 size="lg"
                 weight="semibold"
-                className="text-secondary-100">
+                className="text-secondary-100"
+              >
                 {t("call_for_tenders")}
               </Typography>
               <Typography
                 size="base"
                 weight="normal"
-                className="text-secondary-60">
+                className="text-secondary-60"
+              >
                 {t("enter_key_details_about_your_project_to_continue")}
               </Typography>
             </div>
@@ -463,7 +541,7 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                         ? errors.beginDate
                         : false
                     }
-                  />                  
+                  />
                 </div>
 
                 <div>
@@ -521,7 +599,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                   <button
                     type="button"
                     className="flex items-center gap-1 text-primary-150 text-sm font-medium px-3 py-1 border border-primary-150 rounded-lg hover:bg-blue-50"
-                    onClick={() => addAddress(setFieldValue, values.addresses)}>
+                    onClick={() => addAddress(setFieldValue, values.addresses)}
+                  >
                     <span className="text-base">+</span>
                     {t("add_address")}
                   </button>
@@ -542,7 +621,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                       {values.addresses.map((address, index) => (
                         <tr
                           key={address.id}
-                          className="border-b border-secondary-30 last:border-0">
+                          className="border-b border-secondary-30 last:border-0"
+                        >
                           <td className="p-2">{index + 1}</td>
 
                           {/* Country */}
@@ -570,7 +650,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                                 onClick={() =>
                                   startEditing(address.id, "country")
                                 }
-                                className="cursor-pointer hover:bg-secondary-5 p-1 rounded">
+                                className="cursor-pointer hover:bg-secondary-5 p-1 rounded"
+                              >
                                 {address.country || "—"}
                               </div>
                             )}
@@ -607,7 +688,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                                   address.country
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}>
+                                }`}
+                              >
                                 {address.province || "—"}
                               </div>
                             )}
@@ -644,7 +726,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                                   address.province
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}>
+                                }`}
+                              >
                                 {address.city || "—"}
                               </div>
                             )}
@@ -681,7 +764,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                                   address.city
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}>
+                                }`}
+                              >
                                 {address.municipality || "—"}
                               </div>
                             )}
@@ -698,7 +782,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                                   values.addresses,
                                   address.id
                                 )
-                              }>
+                              }
+                            >
                               <TrashIcon width={20} height={20} />
                             </button>
                           </td>
@@ -708,7 +793,8 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                         <tr>
                           <td
                             colSpan={6}
-                            className="p-4 text-center text-secondary-60">
+                            className="p-4 text-center text-secondary-60"
+                          >
                             {t("no_addresses_added_yet")}
                           </td>
                         </tr>
@@ -727,30 +813,13 @@ const ProjectInfoForm = ({ initialValues, onSubmit,children }: ProjectInfoFormPr
                     setFieldValue("files", files)
                   }
                   files={values.files}
-                  onUploadFile={async (
-                    file: File,
-                    onProgress: (percent: number) => void
-                  ) => {
-                    // Mock upload - just return a mock response
-                    return new Promise<{ id: string; url: string }>(
-                      (resolve) => {
-                        setTimeout(() => {
-                          onProgress(100);
-                          resolve({
-                            id: Date.now().toString(),
-                            url: URL.createObjectURL(file),
-                          });
-                        }, 1000);
-                      }
-                    );
-                  }}
-                  // onUploadFile={handleUploadFile}
+                  onUploadFile={handleUploadFile}
                   onDeleteFile={async (fileId: string) => {
-                    const filteredFiles = values.files.filter(
-                      (file: UploadedFile) => file.id !== fileId
+                    return handleDeleteFile(
+                      fileId,
+                      setFieldValue,
+                      values.files
                     );
-                    setFieldValue("files", filteredFiles);
-                    return { status: true };
                   }}
                 />
               </div>

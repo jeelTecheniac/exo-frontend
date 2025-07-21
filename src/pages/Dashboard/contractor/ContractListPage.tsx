@@ -33,7 +33,7 @@ export interface ContractData {
   organization: string;
   dateOfSigning: string;
   numberOfRequests: number;
-  contractId:string;
+  contractId: string;
 }
 export interface ContractDetails {
   id: string;
@@ -44,14 +44,13 @@ export interface ContractDetails {
   currency: string;
   amount: string;
   organization: string;
-  project_name:string;
+  project_name: string;
   place: string;
-  date_of_signing: string; 
-  status: string; 
+  date_of_signing: string;
+  status: string;
   created_at: string;
   requests_count: number;
 }
-
 
 const ContractListPage = () => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false);
@@ -113,18 +112,23 @@ const ContractListPage = () => {
       const response = await contractService.getAllContractList(payload);
       const contracts: ContractDetails[] = response.data.data;
       console.log(contracts, "contracts");
-      const newContractData:ContractData[] = contracts.map((contract,index:number) => ({
-        id: Number(index+1),
-        projectName: contract.project_name,
-        signedBy: contract.signed_by,
-        position: contract.position,
-        amountOfContract: Number(contract.amount),
-        currency: contract.currency,
-        organization: contract.organization,
-        dateOfSigning: moment(contract.date_of_signing).format("YYYY/MM/DD"),
-        numberOfRequests: contract.requests_count,
-        contractId:contract.id
-      }));
+
+      console.log(contracts, "contracts");
+      const newContractData: ContractData[] = contracts.map(
+        (contract, index: number) => ({
+          id: Number(index + 1),
+          projectName: contract.project_name,
+          projectId: contract.project_id,
+          signedBy: contract.signed_by,
+          position: contract.position,
+          amountOfContract: Number(contract.amount),
+          currency: contract.currency,
+          organization: contract.organization,
+          dateOfSigning: moment(contract.date_of_signing).format("YYYY/MM/DD"),
+          numberOfRequests: contract.requests_count,
+          contractId: contract.id,
+        })
+      );
       setData(newContractData);
       setLoading(false);
     },
@@ -137,9 +141,9 @@ const ContractListPage = () => {
   useEffect(() => {
     setTotal(0);
     contractMutaion.mutate();
-  }, [debouncedSearchTerm,limit,offset,range]);
+  }, [debouncedSearchTerm, limit, offset, range]);
 
-    useEffect(() => {
+  useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 500);
@@ -162,6 +166,7 @@ const ContractListPage = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  console.log(data, "data");
 
   return (
     <AppLayout>
@@ -170,11 +175,13 @@ const ContractListPage = () => {
           className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4 px-4 sm:px-0"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}>
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
           <Typography
             size="xl"
             weight="extrabold"
-            className="text-secondary-100 text-center sm:text-left">
+            className="text-secondary-100 text-center sm:text-left"
+          >
             {t("contracts")}
           </Typography>
 
@@ -182,11 +189,13 @@ const ContractListPage = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="w-full sm:w-auto">
+            className="w-full sm:w-auto"
+          >
             <Button
               variant="primary"
               className="flex items-center justify-center w-full sm:w-fit gap-2 py-2.5 px-4"
-              onClick={() => navigate("/contract-project-list")}>
+              onClick={() => navigate("/contract-project-list")}
+            >
               <WhitePlusIcon
                 width={12}
                 height={12}
@@ -204,12 +213,14 @@ const ContractListPage = () => {
             className="bg-white p-3 sm:p-4 rounded-lg shadow-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}>
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+          >
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center sm:gap-4 mb-4 sm:mb-5">
               <motion.div
                 className="w-full sm:w-1/2"
                 whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.3 }}>
+                transition={{ duration: 0.3 }}
+              >
                 <div className="relative">
                   <div className="absolute inset-y-0 left-2.5 sm:left-3 flex items-center pointer-events-none">
                     <SearchIcon className="h-4 w-4 sm:h-5 sm:w-5 text-secondary-50" />
@@ -227,7 +238,8 @@ const ContractListPage = () => {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2 }}>
+                  transition={{ duration: 0.2 }}
+                >
                   {/* <Button
                     variant="outline"
                     className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[90px] sm:min-w-[120px] h-9 sm:h-10"
@@ -247,17 +259,20 @@ const ContractListPage = () => {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2 }}>
+                  transition={{ duration: 0.2 }}
+                >
                   <Button
                     variant="outline"
                     className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[90px] sm:min-w-[120px] h-9 sm:h-10"
-                    onClick={() => setIsDatePickerOpen(true)}>
+                    onClick={() => setIsDatePickerOpen(true)}
+                  >
                     <FilterIcon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     <Typography
                       className="text-secondary-60"
                       element="span"
                       size="sm"
-                      weight="semibold">
+                      weight="semibold"
+                    >
                       {t("Filter")}
                     </Typography>
                   </Button>
@@ -265,7 +280,8 @@ const ContractListPage = () => {
                 {isDatePickerOpen && (
                   <div
                     ref={datePickerRef}
-                    className="absolute top-[100%] right-0 w-max z-50 mt-2 bg-white border border-secondary-30 rounded-lg shadow-lg p-4">
+                    className="absolute top-[100%] right-0 w-max z-50 mt-2 bg-white border border-secondary-30 rounded-lg shadow-lg p-4"
+                  >
                     <Filter
                       startDate={range.startDate}
                       endDate={range.endDate}
@@ -287,7 +303,8 @@ const ContractListPage = () => {
                 <select
                   value={limit}
                   onChange={(e) => handleLimitChange(Number(e.target.value))}
-                  className="border rounded px-2 py-1 text-sm bg-white">
+                  className="border rounded px-2 py-1 text-sm bg-white"
+                >
                   {[8, 16, 32].map((opt) => (
                     <option key={opt} value={opt}>
                       {opt}
@@ -301,7 +318,7 @@ const ContractListPage = () => {
                   variant="outline"
                   className="px-2 py-1 min-w-[32px] border-0 disabled:text-gray-400"
                   disabled={currentPage === 1}
-                  //   onClick={() => handlePageChange(currentPage - 1)}
+                  // onClick={() => handlePageChange(currentPage - 1)}
                 >
                   {currentPage === 1 ? (
                     <ChevronLeftLightIcon />

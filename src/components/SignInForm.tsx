@@ -28,26 +28,38 @@ const SignInForm = () => {
   >("");
 
   const signInMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: { email: string; password: string }) => {
       const res = await authService.signIn(data);
       return res;
     },
     onSuccess: (res) => {
-      localStorageService.setUser(JSON.stringify(res.data.data));
-      localStorageService.setAccessToken(JSON.stringify(res.data.data.token));
+      const userData = res.data.data;
+      localStorageService.setUser(JSON.stringify(userData));
+      localStorageService.setAccessToken(JSON.stringify(userData.token));
       localStorageService.setLogin(JSON.stringify("true"));
-      login("true");
-      navigate("/dashboard");
-    },
-    onError: (error: any) => {
-      const axiosError:any = error as AxiosError;
-      let message="Something went wrong"
-       message =
-        axiosError?.response?.data?.message || // backend-defined message
-        axiosError?.message ||                 // fallback Axios error message
-        "An unexpected error occurred";        // fallback generic message
+      login("true", userData);
 
-      console.error("Error during sign in:", axiosError?.response?.data?.message);
+      console.log(userData, "user data on sign in");
+
+      // Navigate based on user type
+      if (userData.type === "project_manager") {
+        navigate("/project-dashboard");
+      } else {
+        navigate("/project-dashboard");
+      }
+    },
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      let message = "Something went wrong";
+      message =
+        axiosError?.response?.data?.message || // backend-defined message
+        axiosError?.message || // fallback Axios error message
+        "An unexpected error occurred"; // fallback generic message
+
+      console.error(
+        "Error during sign in:",
+        axiosError?.response?.data?.message
+      );
       toast.error(t(message));
     },
   });
@@ -115,9 +127,9 @@ const SignInForm = () => {
     },
   };
 
-  useEffect(()=>{
-    localStorage.removeItem("userData")
-  },[])
+  useEffect(() => {
+    localStorage.removeItem("userData");
+  }, []);
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible">

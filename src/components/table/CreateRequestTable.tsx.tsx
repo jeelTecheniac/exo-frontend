@@ -96,11 +96,15 @@ const CreateRequestTable = ({
   onDataChange,
   // isEditable=true,
   showActions = true,
+  autoEditId,
+  onEditComplete,
 }: {
   data: Order[];
   onDataChange?: (newData: Order[]) => void;
   isEditable?: boolean;
   showActions?: boolean;
+  autoEditId?: number | null;
+  onEditComplete?: () => void;
 }) => {
   const [tableData, setTableData] = useState<Order[]>(data);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
@@ -129,6 +133,17 @@ const CreateRequestTable = ({
   useEffect(() => {
     setTableData(data);
   }, [data]);
+
+  // Auto-enter edit mode for newly added entity
+  useEffect(() => {
+    if (autoEditId && !editingId) {
+      const newEntity = tableData.find((order) => order.id === autoEditId);
+      if (newEntity) {
+        setEditingId(autoEditId);
+        setEditFormData({ ...newEntity });
+      }
+    }
+  }, [autoEditId, tableData, editingId]);
   const calculateTaxAndVat = (formData: Partial<Order>) => {
     const quantity = formData.quantity || 0;
     const unitPrice = formData.unitPrice || 0;
@@ -253,11 +268,13 @@ const CreateRequestTable = ({
 
     setEditingId(null);
     setEditFormData({});
+    onEditComplete?.();
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditFormData({});
+    onEditComplete?.();
   };
 
   const handleDelete = (orderId: number) => {
@@ -392,10 +409,14 @@ const CreateRequestTable = ({
       content: <div>VAT Included</div>,
       className: "w-28",
     },
-    ...(!showActions?[{
-      content: <div>Financial Authority</div>,
-      className: "min-w-[140px]",
-    }]:[]),
+    ...(!showActions
+      ? [
+          {
+            content: <div>Financial Authority</div>,
+            className: "min-w-[140px]",
+          },
+        ]
+      : []),
     ...(showActions
       ? [
           {
@@ -408,7 +429,7 @@ const CreateRequestTable = ({
 
   return (
     <div className="relative rounded-lg border border-secondary-30 bg-white">
-      <div className="relative overflow-x-auto min-h-[200px]">
+      <div className="relative min-h-[200px]">
         <Table>
           <TableHeader className="border-b border-gray-100 bg-secondary-10 rounded-lg">
             <TableRow>
@@ -468,7 +489,8 @@ const CreateRequestTable = ({
                       <button
                         onClick={() => handleDecrement(order.id)}
                         className="w-8 h-8 flex items-center justify-center bg-white text-secondary-50 border-r border-secondary-30 hover:bg-gray-100 transition-colors focus:outline-none"
-                        aria-label="Decrease quantity">
+                        aria-label="Decrease quantity"
+                      >
                         -
                       </button>
                       <div className="w-12 text-center font-medium bg-secondary-10 px-2 py-1 text-secondary-100 text-sm">
@@ -477,7 +499,8 @@ const CreateRequestTable = ({
                       <button
                         onClick={() => handleIncrement(order.id)}
                         className="w-8 h-8 flex items-center justify-center bg-white text-secondary-50 border-l border-secondary-30 hover:bg-gray-100 transition-colors focus:outline-none"
-                        aria-label="Increase quantity">
+                        aria-label="Increase quantity"
+                      >
                         +
                       </button>
                     </div>
@@ -513,7 +536,8 @@ const CreateRequestTable = ({
                       <Typography
                         size="sm"
                         weight="normal"
-                        className="text-secondary-30">
+                        className="text-secondary-30"
+                      >
                         Not-allowed
                       </Typography>
                     </div>
@@ -549,7 +573,8 @@ const CreateRequestTable = ({
                       <Typography
                         size="sm"
                         weight="normal"
-                        className="text-secondary-30">
+                        className="text-secondary-30"
+                      >
                         Not-allowed
                       </Typography>
                     </div>
@@ -589,7 +614,8 @@ const CreateRequestTable = ({
                             )
                           }
                           className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white"
-                          aria-label="Financial Authority">
+                          aria-label="Financial Authority"
+                        >
                           <option value="DGDA">DGDA</option>
                           <option value="DGI">DGI</option>
                           <option value="DGRAD">DGRAD</option>
@@ -623,7 +649,8 @@ const CreateRequestTable = ({
                     ) : (
                       <div
                         className="relative"
-                        ref={openMenuId === order.id ? menuRef : null}>
+                        ref={openMenuId === order.id ? menuRef : null}
+                      >
                         <button
                           onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                             e.stopPropagation();
@@ -632,18 +659,21 @@ const CreateRequestTable = ({
                           className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                           aria-label="Open actions menu"
                           aria-haspopup="true"
-                          aria-expanded={openMenuId === order.id}>
+                          aria-expanded={openMenuId === order.id}
+                        >
                           <svg
                             className="w-4 h-4"
                             fill="currentColor"
-                            viewBox="0 0 20 20">
+                            viewBox="0 0 20 20"
+                          >
                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                           </svg>
                         </button>
                         {openMenuId === order.id && (
                           <div
                             className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-50"
-                            role="menu">
+                            role="menu"
+                          >
                             <button
                               onClick={(
                                 e: React.MouseEvent<HTMLButtonElement>
@@ -653,7 +683,8 @@ const CreateRequestTable = ({
                               }}
                               className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                               role="menuitem"
-                              aria-label="Edit row">
+                              aria-label="Edit row"
+                            >
                               Edit
                             </button>
                             <button
@@ -665,7 +696,8 @@ const CreateRequestTable = ({
                               }}
                               className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 transition-colors"
                               role="menuitem"
-                              aria-label="Delete row">
+                              aria-label="Delete row"
+                            >
                               Delete
                             </button>
                           </div>

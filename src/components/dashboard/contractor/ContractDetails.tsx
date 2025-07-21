@@ -22,19 +22,32 @@ import { useMutation } from "@tanstack/react-query";
 import contractService from "../../../services/contract.service";
 import moment from "moment";
 import { useLoading } from "../../../context/LoaderProvider";
+import { useAuth } from "../../../context/AuthContext";
 
 interface ContractProps {
   signed_by: string;
   organization: string;
   created_at: string;
-  requests_count: 0;
+  requests_data_count: 0;
   position: string;
   documents: [];
-  requests: [];
+  requests_data: [];
+}
+
+// Define the type for request data from API
+interface RequestApiData {
+  id: string;
+  request_unique_number?: string;
+  total_amount?: string;
+  created_at?: string;
+  status?: string;
+  // add other fields as needed
 }
 
 const ContractDetails = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
   const [contractData, setContractData] = useState<ContractProps>();
@@ -77,6 +90,7 @@ const ContractDetails = () => {
       setLoading(false);
     },
   });
+  console.log(contractData, "contract data");
 
   useEffect(() => {
     if (contractId) {
@@ -194,7 +208,7 @@ const ContractDetails = () => {
                   className="sm:w-11 sm:h-11"
                 />
               }
-              count={10}
+              count={contractData?.requests_data.length || 0}
               title={t("number_of_request")}
             />
           </motion.div>
@@ -309,7 +323,7 @@ const ContractDetails = () => {
                   className="text-gray-900 break-words text-sm sm:text-base"
                   weight="normal"
                 >
-                  {contractData?.requests_count}
+                  {contractData?.requests_data_count}
                 </Typography>
               </div>
             </div>
@@ -413,20 +427,22 @@ const ContractDetails = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-2 sm:gap-3 justify-end relative">
-                <Button
-                  variant="outline"
-                  className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[80px] sm:min-w-[100px] h-9 sm:h-10 text-xs sm:text-sm"
-                >
-                  <ArchiveIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <Typography
-                    className="text-gray-600"
-                    element="span"
-                    size="sm"
-                    weight="semibold"
+                {user?.type === "user" && (
+                  <Button
+                    variant="outline"
+                    className="flex justify-center items-center gap-1.5 sm:gap-2 py-2 px-3 sm:py-2.5 sm:px-4 min-w-[80px] sm:min-w-[100px] h-9 sm:h-10 text-xs sm:text-sm"
                   >
-                    {t("Archive")}
-                  </Typography>
-                </Button>
+                    <ArchiveIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <Typography
+                      className="text-gray-600"
+                      element="span"
+                      size="sm"
+                      weight="semibold"
+                    >
+                      {t("Archive")}
+                    </Typography>
+                  </Button>
+                )}
 
                 <Button
                   variant="outline"
@@ -461,18 +477,30 @@ const ContractDetails = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
+            <div>
               <RequestTable
-                data={[
-                  {
-                    amount: 23,
-                    createdDate: "24-10-2001",
-                    id: 1,
-                    request_id: "1",
-                    requestNo: 23,
-                    status: "pending",
-                  },
-                ]}
+                data={
+                  Array.isArray(contractData?.requests_data)
+                    ? (contractData.requests_data as RequestApiData[]).map(
+                        (req, idx) => ({
+                          id: idx + 1,
+                          requestNo:
+                            req.request_unique_number &&
+                            !isNaN(Number(req.request_unique_number))
+                              ? Number(req.request_unique_number)
+                              : idx + 1,
+                          amount: req.total_amount
+                            ? parseFloat(req.total_amount)
+                            : 0,
+                          createdDate: req.created_at
+                            ? moment(req.created_at).format("YYYY-MM-DD")
+                            : "",
+                          status: req.status || "",
+                          request_id: req.id || "",
+                        })
+                      )
+                    : []
+                }
               />
             </div>
           </motion.div>

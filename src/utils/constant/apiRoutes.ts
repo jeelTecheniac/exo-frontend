@@ -9,20 +9,20 @@ export const ApiRoutes = {
   EDIT_PROFILE: "/profile",
   CHANGE_EMAIL: "/change-email",
   LOGOUT_USER: "/logout",
-  CHANGE_PASSWORD:"/change-password",
+  CHANGE_PASSWORD: "/change-password",
   // project routes
   CREATE_PROJECT: "/project/create",
-  UPLOAD_FILE: "/project/upload-file",
-  REMOVE_FILE: "/project/delete-file",
-  REQUEST_DETAILS: "/project/view-request",
+  UPLOAD_FILE: "/upload-file",
+  REMOVE_FILE: "/delete-file",
+  REQUEST_DETAILS: "/request/view",
   DELETE_REQUEST: "/project/delete-request",
   DELETE_PROJECT: "/project/delete",
   ADDRESS_LIST: "project/list-address",
   // contract routes
   LIST_ALL_PPROJECT: "/project/get-list-all",
-  CONTRACT_DETAILS:"/contract/view",
-  CREATE_CONTRACT:"/contract/create",
-  ALL_CONTRACT_LIST:"/contract/list"
+  CONTRACT_DETAILS: "/contract/view",
+  CREATE_CONTRACT: "/contract/create",
+  ALL_CONTRACT_LIST: "/contract/list",
 };
 
 export const mobileCountryCode = [
