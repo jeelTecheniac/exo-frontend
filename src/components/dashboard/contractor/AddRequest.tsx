@@ -163,7 +163,7 @@ const AddRequest = () => {
     if (projectId && projectId !== "") {
       fetchProjectAddresses(projectId);
     }
-  }, [currentProjectId,projectId]);
+  }, [currentProjectId, projectId]);
 
   const recalculateTableData = (tableData: Order[]): Order[] => {
     return tableData.map((row) => {
@@ -233,13 +233,7 @@ const AddRequest = () => {
       toast.success(t("request_submitted_successfully"));
       navigate(getRoute("dashboard"));
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error && typeof error === "object" && "error" in error
-          ? (error as { error: { message: string } }).error.message
-          : "Failed to upload file.";
-      // toast.error(errorMessage);
-    },
+    onError: () => {},
   });
 
   const handleSubmit = () => {
