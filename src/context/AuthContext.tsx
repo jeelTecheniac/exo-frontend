@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import localStorageService from "../services/local.service";
 
-interface User {
+export interface User {
   id?: string;
   email?: string;
   first_name?: string;

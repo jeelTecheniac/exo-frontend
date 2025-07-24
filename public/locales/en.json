@@ -242,5 +242,7 @@
   "contract_info_description": "Fill in the details to complete the contract information form.",
   "contract_submitted":"Contract submitted for verification",
   "contract_update_message":"You will receive further updates regarding your contract via email at your registered email address.",
-  "failed_to_create_project": "Failed to create project."
+  "failed_to_create_project": "Failed to create project.",
+  "request_submitted_successfully" : "Request Submitted Successfully.",
+  "request_updated_successfully" : "Request Updated Successfully."
 }

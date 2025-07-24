@@ -19,7 +19,9 @@ import DashBoardCard from "../../../lib/components/molecules/DashBoardCard.tsx";
 import UploadFile, { UploadedFile } from "../../common/UploadFile.tsx";
 import axios from "axios";
 import localStorageService from "../../../services/local.service.ts";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { useRoleRoute } from "../../../hooks/useRoleRoute.ts";
+import { toast } from "react-toastify";
 
 interface AddressData {
   id: string;
@@ -49,8 +51,8 @@ const AddRequest = () => {
   const { t } = useTranslation();
   const { contractId } = useParams();
   const { projectId } = useParams();
-  console.log(contractId, "contractId");
-  console.log(projectId, "projectId");
+  const navigate = useNavigate();
+  const { getRoute } = useRoleRoute();
 
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [requestLetter, setRequestLetter] = useState("");
@@ -175,11 +177,11 @@ const AddRequest = () => {
       );
     },
     onSuccess: () => {
-      //   toast.success(t("request_created"));
-      //   navigate("/dashboard");
+        toast.success(t("request_submitted_successfully"));
+        navigate("/contract-project-list");
     },
-    onError: () => {
-      // toast.error("Failed to upload file.");
+    onError: (error:any) => {
+      toast.error(error?.error.message||"Failed to upload file.");
     },
   });
   const handleSubmit = () => {
@@ -284,7 +286,7 @@ const AddRequest = () => {
     <div>
       <div
         className="flex items-center gap-2 cursor-pointer mb-2"
-        onClick={() => window.history.back()}
+        onClick={() => navigate(getRoute("dashboard"))}
       >
         <ArrowLeftIcon width={16} height={16} className="text-primary-150" />
         <Typography size="base" weight="semibold" className="text-primary-150">

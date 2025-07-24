@@ -92,6 +92,7 @@ import { ReactComponent as CdfGreenIcon } from "./cdf-green.svg?react";
 import { ReactComponent as GreenRightIcon } from "./green-right.svg?react";
 import { ReactComponent as BlueNoteIcon } from "./blue-note.svg?react";
 import { ReactComponent as PluseDarkIcon } from "./plus.svg?react";
+import { ReactComponent as RightGrayIcon } from "./right-icon.svg?react";
 
 import USFlag from "./USFlag";
 import CDFFlag from "./CDFFlag";
@@ -189,5 +190,6 @@ export {
   ChevronLeftLightIcon,
   ChevronRightIcon,
   ChevronRightLightIcon,
-  PluseDarkIcon
+  PluseDarkIcon,
+  RightGrayIcon
 };

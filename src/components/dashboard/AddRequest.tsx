@@ -22,6 +22,8 @@ import axios from "axios";
 import projectService from "../../services/project.service.ts";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../common/Loader.tsx";
+import { toast } from "react-toastify";
+import { useRoleRoute } from "../../hooks/useRoleRoute.ts";
 
 // Type for address data structure
 interface AddressData {
@@ -76,6 +78,7 @@ const AddRequest = () => {
     totalTaxAmount: 0,
     totalAmountWithTax: 0,
   });
+  const { getRoute } = useRoleRoute();
   const [financialAuthority, setFinancialAuthority] = useState<string>("DGI");
   useEffect(() => {
     const user = localStorageService.getUser() || "";
@@ -202,11 +205,11 @@ const AddRequest = () => {
       );
     },
     onSuccess: () => {
-      // toast.success(t("request_created"));
-      navigate("/dashboard");
+      toast.success(t("request_updated_successfully"));
+      navigate("/contract-project-list");
     },
-    onError: () => {
-      // toast.error("Failed to upload file.");
+    onError: (error:any) => {
+      toast.error(error?.error?.message||"Failed to upload file.");
     },
   });
 
@@ -401,7 +404,7 @@ const AddRequest = () => {
       <div className="px-4 md:px-0">
         <div
           className="flex items-center gap-2 cursor-pointer mb-2"
-          onClick={() => window.history.back()}
+          onClick={() => navigate(getRoute("dashboard"))}
         >
           <ArrowLeftIcon width={16} height={16} className="text-primary-150" />
           <Typography

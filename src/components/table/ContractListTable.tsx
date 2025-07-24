@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import moment from "moment";
-import { ArchiveIconDark, EyeDarkIcon, PencilIcon } from "../../icons";
+import { ArchiveIconDark, EyeDarkIcon, PencilIcon, PlusIcon } from "../../icons";
 import { useNavigate } from "react-router";
 
 export interface TableHeader {
@@ -339,7 +339,7 @@ const ContractListTable = ({
                               role="menuitem"
                               aria-label="Edit"
                             >
-                              <PencilIcon />
+                              <PlusIcon />
                               Add Request
                             </button>
 

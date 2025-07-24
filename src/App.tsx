@@ -123,7 +123,7 @@ export default function App() {
             <Route
               path="/project-details/:projectId"
               element={
-                <RoleBasedRoute allowedRoles={["project_manager"]}>
+                <RoleBasedRoute allowedRoles={["project_manager","user"]}>
                   <ProjectDetailsPage />
                 </RoleBasedRoute>
               }

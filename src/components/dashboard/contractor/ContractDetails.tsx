@@ -17,13 +17,14 @@ import Input from "../../../lib/components/atoms/Input";
 import Button from "../../../lib/components/atoms/Button";
 import { useEffect, useRef, useState } from "react";
 import Filter from "../../../lib/components/molecules/Filter";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import contractService from "../../../services/contract.service";
 import moment from "moment";
 import { useLoading } from "../../../context/LoaderProvider";
 import { useAuth } from "../../../context/AuthContext";
 import requestService from "../../../services/request.service";
+import { useRoleRoute } from "../../../hooks/useRoleRoute";
 
 interface ContractProps {
   id: string;
@@ -124,6 +125,8 @@ const ContractDetails = () => {
   });
   const { contractId } = useParams();
   const { setLoading } = useLoading();
+  const navigate = useNavigate();
+  const { getRoute } = useRoleRoute();
 
   const handleApplyDateFilter = (newRange: {
     startDate: Date | null;
@@ -276,7 +279,7 @@ const ContractDetails = () => {
         >
           <motion.div
             className="flex items-center gap-2 cursor-pointer mb-2"
-            onClick={() => window.history.back()}
+            onClick={() => navigate(getRoute("dashboard"))}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             transition={{ type: "spring", stiffness: 300 }}

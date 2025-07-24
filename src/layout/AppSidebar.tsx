@@ -3,26 +3,30 @@ import { Link, useLocation } from "react-router";
 
 import { useSidebar } from "../context/SidebarContext";
 import { Logo } from "../icons";
+import { useRoleRoute } from "../hooks/useRoleRoute";
 
 type NavItem = {
   name: string;
   path?: string;
 };
 
-const navItems: NavItem[] = [
-  {
-    name: "Dashboard",
-    path: "/test",
-  },
-  {
-    name: "Help",
-    path: "/test",
-  },
-];
+
 
 const AppSidebar: React.FC = () => {
   const { isMobileOpen } = useSidebar();
   const location = useLocation();
+  const { getRoute } = useRoleRoute();
+
+  const navItems: NavItem[] = [
+  {
+    name: "Dashboard",
+    path: getRoute("dashboard"),
+  },
+  {
+    name: "Help",
+    path: getRoute("help"),
+  },
+];
 
   const isActive = useCallback(
     (path: string) => location.pathname === path,

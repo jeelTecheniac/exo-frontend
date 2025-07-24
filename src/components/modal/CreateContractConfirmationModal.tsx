@@ -4,6 +4,7 @@ import Modal from '../../lib/components/atoms/Modal';
 import Typography from '../../lib/components/atoms/Typography';
 import Button from '../../lib/components/atoms/Button';
 import { CongratulationIcon } from '../../icons';
+import { useRoleRoute } from '../../hooks/useRoleRoute';
 
 interface ChangeEmailModalProps {
   isOpen: boolean;
@@ -13,9 +14,11 @@ interface ChangeEmailModalProps {
 const CreateContractConfirmationModal = ({
   isOpen,
   onClose,
+  projectId
 }: ChangeEmailModalProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { getRoute } = useRoleRoute();
   return (
     <div className="flex w-full">
       <Modal
@@ -23,7 +26,7 @@ const CreateContractConfirmationModal = ({
         isOpen={isOpen}
         onClose={() => {
           onClose();
-          navigate("/contract");
+          navigate(getRoute("dashboard"));
         }}
         isFullscreen={false}
         showCloseButton={false}
@@ -61,7 +64,7 @@ const CreateContractConfirmationModal = ({
               variant="outline"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
               onClick={() => {
-                navigate("/contract");
+                navigate(getRoute("dashboard"));
                 onClose();
               }}
             >
@@ -70,7 +73,7 @@ const CreateContractConfirmationModal = ({
             <Button
               variant="primary"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
-              onClick={() => navigate("create-request")}
+              onClick={() => navigate("/add-request/"+projectId)}
             >
               {t("create_request")}
             </Button>
