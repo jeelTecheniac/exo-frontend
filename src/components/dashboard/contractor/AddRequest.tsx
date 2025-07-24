@@ -22,6 +22,7 @@ import localStorageService from "../../../services/local.service.ts";
 import { useNavigate, useParams } from "react-router";
 import { useRoleRoute } from "../../../hooks/useRoleRoute.ts";
 import { toast } from "react-toastify";
+import Loader from "../../common/Loader.tsx";
 
 interface AddressData {
   id: string;
@@ -33,6 +34,30 @@ interface AddressData {
   user_id: number;
 }
 
+interface Entity {
+  financial_authority: string;
+  label: string;
+  quantity: number;
+  status: string;
+  tax_amount: number;
+  tax_rate: number;
+  total: number;
+  unit_price: number;
+  vat_included: number;
+}
+
+interface ApiFile {
+  id: string;
+  object_id: string;
+  extension: string;
+  file: string;
+  object_type: string;
+  order_by: number;
+  original_name: string;
+  size: number;
+  type: string;
+}
+
 interface CreateRequestPayload {
   project_id: string;
   contract_id: string;
@@ -42,11 +67,13 @@ interface CreateRequestPayload {
   request_entity: string; // must be stringified JSON
   request_id?: string;
 }
+
 const financialAuthorityList: { name: string; value: string }[] = [
   { name: "DGI: Invoice Files", value: "DGI" },
   { name: "DGDA: DGDA Files", value: "DGDA" },
   { name: "DGRAD: DGRAD Files", value: "DGRAD" },
 ];
+
 const AddRequest = () => {
   const { t } = useTranslation();
   const { contractId } = useParams();
@@ -58,22 +85,26 @@ const AddRequest = () => {
   const [requestLetter, setRequestLetter] = useState("");
   const [data, setData] = useState<Order[]>([]);
   const [autoEditId, setAutoEditId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const handleAddressChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedAddress(event.target.value);
   };
 
+  const [currentProjectId, setCurrentProjectId] = useState<string>("");
+
   const {
     mutate: fetchProjectAddresses,
+    mutateAsync: fetchProjectAddressesAsync,
     data: addressData,
     isPending: isLoadingAddresses,
   } = useMutation({
-    mutationFn: async () => {
-      const res = await projectService.getAddressList(projectId || " ");
-
+    mutationFn: async (projectId: string) => {
+      const res = await projectService.getAddressList(projectId);
       return res.data;
     },
   });
+
   const [financialAuthority, setFinancialAuthority] = useState<string>("DGI");
   const [totals, setTotals] = useState({
     totalEntity: 0,
@@ -84,10 +115,12 @@ const AddRequest = () => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
   const [userData, setUserData] = useState<{ token: string } | undefined>();
+
   useEffect(() => {
     const user = localStorageService.getUser() || "";
     setUserData(JSON.parse(user));
   }, []);
+
   useEffect(() => {
     if (!data || data.length === 0) {
       setTotals({
@@ -101,12 +134,10 @@ const AddRequest = () => {
 
     const totalEntity = data.length;
     const totalAmount = data.reduce((sum, row) => sum + (row.total || 0), 0);
-
     const totalTaxAmount = data.reduce(
       (sum, row) => sum + (row.taxAmount || 0),
       0
     );
-
     const totalAmountWithTax = data.reduce(
       (sum, row) => sum + (row.vatIncluded || 0),
       0
@@ -125,9 +156,12 @@ const AddRequest = () => {
   ) => {
     setFinancialAuthority(event.target.value);
   };
+
   useEffect(() => {
-    fetchProjectAddresses();
-  }, []);
+    if (currentProjectId && currentProjectId !== "") {
+      fetchProjectAddresses(currentProjectId);
+    }
+  }, [currentProjectId]);
 
   const recalculateTableData = (tableData: Order[]): Order[] => {
     return tableData.map((row) => {
@@ -146,7 +180,6 @@ const AddRequest = () => {
   const handleAddEntity = () => {
     const newOrder: Order = {
       id: new Date().getTime(),
-      // id: data.length + 1,
       label: "",
       quantity: 1,
       unitPrice: 0,
@@ -158,6 +191,24 @@ const AddRequest = () => {
     };
     setData(recalculateTableData([...data, newOrder]));
     setAutoEditId(newOrder.id);
+  };
+
+  const updateEntitys = (entitys: Entity[]) => {
+    const newOrder: Order[] = entitys.map((entity: Entity, index: number) => ({
+      id: new Date().getTime() + index + 1,
+      label: entity.label,
+      quantity: entity.quantity,
+      unitPrice: entity.unit_price,
+      total: entity.total,
+      taxRate: entity.tax_rate,
+      taxAmount: entity.tax_amount,
+      vatIncluded: entity.vat_included,
+      financialAuthority: entity.financial_authority,
+    }));
+    setFinancialAuthority(
+      entitys.length !== 0 ? entitys[0]?.financial_authority : "DGI"
+    );
+    setData(recalculateTableData(newOrder));
   };
 
   const handleTableDataChange = (newData: Order[]) => {
@@ -177,16 +228,17 @@ const AddRequest = () => {
       );
     },
     onSuccess: () => {
-        toast.success(t("request_submitted_successfully"));
-        navigate("/contract-project-list");
+      toast.success(t("request_submitted_successfully"));
+      navigate("/contract-project-list");
     },
-    onError: (error:any) => {
-      toast.error(error?.error.message||"Failed to upload file.");
+    onError: (error: any) => {
+      toast.error(error?.error.message || "Failed to upload file.");
     },
   });
+
   const handleSubmit = () => {
     const apiData: CreateRequestPayload = {
-      project_id: projectId || "",
+      project_id: requestId ? currentProjectId : projectId || "",
       contract_id: contractId || "",
       address_id: selectedAddress,
       request_letter: requestLetter,
@@ -206,12 +258,75 @@ const AddRequest = () => {
           financial_authority: financialAuthority,
         }))
       ),
+      ...(requestId && { request_id: requestId }),
     };
+
     createRequestMutation.mutate(apiData);
   };
+
+  const requestDetailsMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      const res = await projectService.requestDetails({
+        request_id: requestId,
+      });
+      setIsLoading(false);
+      return res.data;
+    },
+    onSuccess: () => {
+      setIsLoading(false);
+    },
+    onError: (error) => {
+      setIsLoading(false);
+      console.error(error);
+    },
+  });
+
+  const getRequestData = async (requestId: string) => {
+    const response = await requestDetailsMutation.mutateAsync(requestId);
+    if (response.status === 200) {
+      const { project_id, request_letter, entities, address, files } =
+        response.data;
+
+      console.log(files, "files");
+
+      updateEntitys(entities);
+      setRequestLetter(request_letter);
+      setCurrentProjectId(project_id);
+
+      // Set uploaded files from API response
+      if (files && files.length > 0) {
+        const existingFiles: UploadedFile[] = files.map((file: ApiFile) => ({
+          id: file.id,
+          original_name: file.original_name,
+          url: file.file,
+          size: file.size,
+          type: file.type,
+          extension: file.extension,
+        }));
+        setUploadedFiles(existingFiles);
+      }
+
+      const res = await fetchProjectAddressesAsync(project_id);
+      if (res.status === 200) {
+        setSelectedAddress(address.id);
+      }
+    }
+  };
+
+  console.log(uploadedFiles, "uploaded files");
+
+  useEffect(() => {
+    if (requestId && requestId !== "") {
+      getRequestData(requestId);
+    } else {
+      setIsLoading(false);
+    }
+  }, [requestId]);
+
   const handleFilesSelect = (files: UploadedFile[]) => {
     setUploadedFiles(files);
   };
+
   const fileUploadMutation = async ({
     file,
     onProgress,
@@ -240,9 +355,9 @@ const AddRequest = () => {
     return {
       id: response.data.data?.id ?? Date.now().toString(),
       url: response.data.data?.url ?? "",
-      // file:response.data.data ?? ""
     };
   };
+
   const uploadMutation = useMutation({
     mutationFn: fileUploadMutation,
     onSuccess: (data) => {
@@ -253,6 +368,7 @@ const AddRequest = () => {
       // toast.error("Failed to upload file.");
     },
   });
+
   const handleUploadFile = async (
     file: File,
     onProgress: (percent: number) => void
@@ -260,6 +376,7 @@ const AddRequest = () => {
     const response = await uploadMutation.mutateAsync({ file, onProgress });
     return response;
   };
+
   const removeFileMutation = useMutation({
     mutationFn: async (id: string) => {
       await projectService.removeFile(id);
@@ -272,6 +389,7 @@ const AddRequest = () => {
       // toast.error("Failed to remove file.");
     },
   });
+
   const handleDeleteFile = async (fileId: string) => {
     const response = await removeFileMutation.mutateAsync(fileId);
     if (response.status) {
@@ -282,6 +400,9 @@ const AddRequest = () => {
       return { status: true };
     }
   };
+
+  if (isLoading) return <Loader />;
+
   return (
     <div>
       <div
@@ -298,7 +419,7 @@ const AddRequest = () => {
         weight="extrabold"
         className="text-secondary-100 text-2xl md:text-3xl"
       >
-        {t("create_request")}
+        {requestId ? t("edit_request") : t("create_request")}
       </Typography>
 
       <div className="mt-4 md:mt-6">
@@ -425,7 +546,7 @@ const AddRequest = () => {
           variant="primary"
           className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center"
         >
-          {t("submit_request")}
+          {requestId ? t("update_request") : t("submit_request")}
         </Button>
       </div>
     </div>

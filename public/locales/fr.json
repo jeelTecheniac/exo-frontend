@@ -230,7 +230,7 @@
   "number_of_request": "Number of Request",
   "sum_of_request": "Sum of Request",
   "accepted_requests": "Accepted Requests",
-  "requests": "Requests",  
+  "requests": "Requests",
   "create_contract": "Créer un contrat",
   "contracts": "Contrats",
   "select_project_to_continue": "Sélectionnez un projet pour continuer",
@@ -238,8 +238,10 @@
   "view_project": "Voir le projet",
   "contract_info_description": "Remplissez les informations pour compléter le formulaire de contrat.",
   "contract_submitted": "Contrat soumis pour vérification",
-  "contract_update_message" :"Vous recevrez d'autres mises à jour concernant votre contrat par e-mail à votre adresse e-mail enregistrée.",
+  "contract_update_message": "Vous recevrez d'autres mises à jour concernant votre contrat par e-mail à votre adresse e-mail enregistrée.",
   "failed_to_create_project": "Échec de la création du projet.",
-  "request_submitted_successfully" : "Demande soumise avec succès.",
-  "request_updated_successfully" : "Demande mise à jour avec succès."
+  "request_submitted_successfully": "Demande soumise avec succès.",
+  "request_updated_successfully": "Demande mise à jour avec succès.",
+  "edit_request": "Edit Request",
+  "update_request": "Update Request"
 }

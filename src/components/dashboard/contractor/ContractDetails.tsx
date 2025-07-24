@@ -48,49 +48,6 @@ interface RequestApiData {
   // add other fields as needed
 }
 
-interface Address {
-  id: string;
-  project_id: string;
-  user_id: string;
-  country: string;
-  providence: string;
-  city?: string;
-  street?: string;
-  [key: string]: any;
-}
-
-interface Entity {
-  [key: string]: any;
-}
-
-interface RequestData {
-  id: string;
-  project_id: string;
-  contract_id: string;
-  user_id: string;
-  address_id: string;
-  address: Address;
-  request_letter: string;
-  request_unique_number: string;
-  unique_id: string | null;
-  status: string;
-  current_status: string;
-  entities: Entity[];
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  amount: string;
-}
-
-interface RequestTableData {
-  id: number;
-  amount: string;
-  createdDate: string;
-  request_id: string;
-  status: string;
-  requestNo: string;
-}
-
 interface CardDateProps {
   approved_requests: number;
   pending_requests: number;
@@ -106,7 +63,8 @@ const ContractDetails = () => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
   const [contractData, setContractData] = useState<ContractProps>();
-  const [requestData, setRequestData] = useState<RequestTableData[]>([]);
+  console.log(contractData, "contractData");
+
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [cardData, setCardData] = useState<CardDateProps>({
@@ -163,6 +121,7 @@ const ContractDetails = () => {
       }
       const response = await contractService.getContractDetails(formData);
       const contract: ContractProps = response.data.data;
+
       const card = response.data.summary;
 
       setCardData(card);
@@ -193,19 +152,7 @@ const ContractDetails = () => {
         search: debouncedSearchTerm,
       };
       const response = await requestService.getAllRequestList(payload);
-      const requests: RequestData[] = response.data.data;
 
-      const newRequests: RequestTableData[] = requests.map(
-        (request, index: number) => ({
-          amount: Number(request.amount)?.toFixed(0),
-          createdDate: moment(request.created_at).format("YYYY/MM/DD"),
-          id: index + 1,
-          request_id: request.id,
-          requestNo: request.request_unique_number,
-          status: request.status,
-        })
-      );
-      setRequestData(newRequests);
       console.log(response, "response");
     },
     onError: async (error) => {
@@ -605,19 +552,18 @@ const ContractDetails = () => {
                     ? (contractData.requests_data as RequestApiData[]).map(
                         (req, idx) => ({
                           id: idx + 1,
-                          requestNo:
-                            req.request_unique_number &&
-                            !isNaN(Number(req.request_unique_number))
-                              ? Number(req.request_unique_number)
-                              : idx + 1,
+                          requestNo: req.request_unique_number
+                            ? String(req.request_unique_number)
+                            : String(idx + 1),
                           amount: req.total_amount
-                            ? parseFloat(req.total_amount)
-                            : 0,
+                            ? String(req.total_amount)
+                            : "0",
                           createdDate: req.created_at
                             ? moment(req.created_at).format("YYYY-MM-DD")
                             : "",
                           status: req.status || "",
                           request_id: req.id || "",
+                          contract_id: contractData.id,
                         })
                       )
                     : []

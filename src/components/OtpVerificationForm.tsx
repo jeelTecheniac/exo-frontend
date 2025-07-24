@@ -42,7 +42,7 @@ const OtpVerificationForm = () => {
       // login("true");
       // localStorageService.removePath();
       localStorageService.setAccessToken(JSON.stringify(res.data.data.token));
-      navigate("/dashboard");
+      navigate("/project-dashboard");
     },
     onError: (error) => {
       console.error("Error during sign up:", error);

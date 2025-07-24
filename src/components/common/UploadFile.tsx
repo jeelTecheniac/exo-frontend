@@ -13,7 +13,7 @@ interface FileUploadProps {
     file: File,
     onProgress: (percent: number) => void
   ) => Promise<{ id: string; url: string }>;
-  onDeleteFile?: (fileId: string) => Promise<any>;
+  onDeleteFile?: (fileId: string) => Promise<{ status: boolean }>;
   maxSize?: number; // in MB
   acceptedFormats?: string[];
   maxFiles?: number;
@@ -39,9 +39,14 @@ const UploadFile: React.FC<FileUploadProps> = ({
   const [removingFile, setRemovingFile] = useState<boolean>(false);
 
   useEffect(() => {
-    if (files) setSelectedFiles(files);
-  }, [files]);
+    if (files) {
+      setSelectedFiles(files);
+      // Notify parent component about the initial files
+      onFilesSelect?.(files);
+    }
+  }, [files, onFilesSelect]);
   const inputRef = useRef<HTMLInputElement>(null);
+  console.log(selectedFiles, "selectedFiles");
 
   const validateFile = (file: File): boolean => {
     if (file.size > maxSize * 1024 * 1024) {
@@ -120,10 +125,10 @@ const UploadFile: React.FC<FileUploadProps> = ({
     inputRef.current?.click();
   };
 
-  const removeFile = async (data: any) => {
+  const removeFile = async (data: UploadedFile) => {
     setRemovingFile(true);
     const response = await onDeleteFile?.(data.id);
-    if (response.status) {
+    if (response?.status) {
       setRemovingFile(false);
     }
   };
@@ -212,7 +217,13 @@ const UploadFile: React.FC<FileUploadProps> = ({
       {selectedFiles.length > 0 && (
         <div className="mt-4 space-y-2">
           {selectedFiles
-            .filter((file) => file.file && !uploadingFiles.has(file.file.name))
+            .filter((file) => {
+              // Show files that either have a file object (new uploads) or are existing files (no file object)
+              return (
+                (file.file && !uploadingFiles.has(file.file.name)) ||
+                (!file.file && file.id)
+              );
+            })
             .map((file, index) => (
               <div
                 key={index}

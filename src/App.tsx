@@ -147,10 +147,10 @@ export default function App() {
               }
             />
             <Route
-              path="/edit-request/:requestId"
+              path="/edit-request/:contractId/:requestId"
               element={
                 <RoleBasedRoute allowedRoles={["user"]}>
-                  <AddRequest />
+                  <AddRequestPage />
                 </RoleBasedRoute>
               }
             />

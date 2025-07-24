@@ -49,7 +49,7 @@ export interface ContractDetails {
   date_of_signing: string;
   status: string;
   created_at: string;
-  requests_count: number;
+  requests_data_count: number;
 }
 
 const ContractListPage = () => {
@@ -125,7 +125,7 @@ const ContractListPage = () => {
           currency: contract.currency,
           organization: contract.organization,
           dateOfSigning: moment(contract.date_of_signing).format("YYYY/MM/DD"),
-          numberOfRequests: contract.requests_count,
+          numberOfRequests: contract.requests_data_count,
           contractId: contract.id,
         })
       );

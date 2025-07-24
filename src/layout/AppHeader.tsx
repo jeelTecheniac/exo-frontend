@@ -54,7 +54,7 @@ const AppHeader: React.FC = () => {
             <Button
               variant="outline"
               className={`border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 ${
-                pathname === "/dashboard"
+                pathname === "/project-dashboard"
                   ? "hover:bg-primary-10"
                   : "hover:text-primary-150"
               } hover:bg-primary-10 rounded-lg`}

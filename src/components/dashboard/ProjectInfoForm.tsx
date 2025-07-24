@@ -52,6 +52,15 @@ export interface UploadArgs {
   onProgress: (percent: number) => void;
 }
 
+export interface Data {
+  id: number;
+  requestNo: string;
+  amount: string;
+  createdDate: string;
+  status: string;
+  request_id: string;
+}
+
 const ProjectInfoForm = ({
   initialValues,
   onSubmit,

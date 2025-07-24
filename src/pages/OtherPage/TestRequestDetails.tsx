@@ -224,12 +224,13 @@ const TestRequestDetails = () => {
           <div className="px-4 md:px-8 py-6">
             <div className="mb-6">
               <div className="cursor-pointer mb-4">
-                <Breadcrumbs crumbs={crumbs}/>                
+                <Breadcrumbs crumbs={crumbs} />
               </div>
               <Typography
                 size="xl_2"
                 weight="extrabold"
-                className="text-secondary-100">
+                className="text-secondary-100"
+              >
                 {t("request_details")} #{" "}
                 {requestData ? requestData.unique_number : ""}
               </Typography>
@@ -245,13 +246,15 @@ const TestRequestDetails = () => {
                       <Typography
                         size="base"
                         weight="bold"
-                        className="text-secondary-100">
+                        className="text-secondary-100"
+                      >
                         {t("request_details")}
                       </Typography>
                       <Button
                         variant="outline"
                         className="px-4 py-2 w-fit"
-                        onClick={openRequestDetails}>
+                        onClick={openRequestDetails}
+                      >
                         {t("view_more")}
                       </Button>
                     </div>
@@ -303,7 +306,8 @@ const TestRequestDetails = () => {
                       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
                         <Typography
                           className="text-secondary-60 min-w-[100px]"
-                          size="sm">
+                          size="sm"
+                        >
                           {t("amount")}
                         </Typography>
                         <Typography className="text-secondary-100" size="sm">
@@ -316,7 +320,8 @@ const TestRequestDetails = () => {
                       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
                         <Typography
                           className="text-secondary-60 min-w-[100px]"
-                          size="sm">
+                          size="sm"
+                        >
                           {t("address")}
                         </Typography>
                         <Typography className="text-secondary-100" size="sm">
@@ -336,7 +341,8 @@ const TestRequestDetails = () => {
                       <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
                         <Typography
                           className="text-secondary-60 min-w-[100px]"
-                          size="sm">
+                          size="sm"
+                        >
                           {t("invoice_files")}
                         </Typography>
                         <div className="flex flex-wrap gap-2">
@@ -348,7 +354,8 @@ const TestRequestDetails = () => {
                                   <Typography
                                     size="xs"
                                     weight="semibold"
-                                    className="text-secondary-100 whitespace-nowrap">
+                                    className="text-secondary-100 whitespace-nowrap"
+                                  >
                                     {f.original_name}
                                     <span className="text-secondary-60 ml-1">
                                       {(f.size / (1024 * 1024)).toFixed(2)}MB

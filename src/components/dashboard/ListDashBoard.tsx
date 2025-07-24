@@ -107,12 +107,12 @@ const ListDashBoard = () => {
         setTotalAmountRequest(res.total_amount_request || 0);
 
         if (res.total_project <= 0) {
-          navigate("/");
+          navigate("/project-dashboard");
         }
       } catch (e) {
         console.log(e, "error");
         setData([]);
-        navigate("/");
+        navigate("/project-dashboard");
       } finally {
         setLoading(false);
       }

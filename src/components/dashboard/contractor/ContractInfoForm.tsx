@@ -18,7 +18,7 @@ interface ContractFormValues {
   amount: string;
   currency: string;
   dateOfSigning: string;
-  place:string;
+  place: string;
   contractFiles: UploadedFile[];
 }
 
@@ -39,7 +39,7 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
     currency: "USD",
     dateOfSigning: "",
     contractFiles: [],
-    place:""
+    place: "",
   };
 
   const currencyOptions = [
@@ -69,20 +69,23 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
     <Formik
       initialValues={initialValues || defaultValues}
       validationSchema={validationSchema}
-      onSubmit={onSubmit}>
+      onSubmit={onSubmit}
+    >
       {({ values, setFieldValue, touched, errors }) => (
         <Form className="space-y-5">
           <div className="mb-6">
             <Typography
               size="lg"
               weight="semibold"
-              className="text-secondary-100">
+              className="text-secondary-100"
+            >
               {t("contract_info")}
             </Typography>
             <Typography
               size="base"
               weight="normal"
-              className="text-secondary-60">
+              className="text-secondary-60"
+            >
               {t("contract_info_description")}
             </Typography>
           </div>
@@ -179,12 +182,7 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
             <Label htmlFor="place">
               Place <span className="text-red-500">*</span>
             </Label>
-            <Field
-              as={Input}
-              name="place"
-              id="place"
-              placeholder="Frace"
-            />
+            <Field as={Input} name="place" id="place" placeholder="Frace" />
             <ErrorMessage
               name="place"
               component="div"
@@ -243,7 +241,9 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
                 });
               }}
               onDeleteFile={async (id) => {
-                const updated = values.contractFiles.filter((file) => file.id !== id);
+                const updated = values.contractFiles.filter(
+                  (file) => file.id !== id
+                );
                 setFieldValue("files", updated);
                 return { status: true };
               }}
@@ -257,7 +257,8 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
               variant="primary"
               type="submit"
               //   form="project-form"
-              className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto">
+              className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
+            >
               {t("next")}
               <ArrowRightIconButton
                 width={18}

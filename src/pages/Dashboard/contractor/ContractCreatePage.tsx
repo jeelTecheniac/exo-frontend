@@ -125,7 +125,7 @@ const ContractCreatePage = () => {
 
   const contractCreateMutation = useMutation({
     mutationFn: async (data: any) => {
-      let payload = new FormData();
+      const payload = new FormData();
       payload.append("signed_by", data.signedBy);
       payload.append("position", data.position);
       payload.append("currency", data.currency);
