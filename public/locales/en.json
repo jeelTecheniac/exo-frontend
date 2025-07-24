@@ -246,5 +246,9 @@
   "request_submitted_successfully": "Request Submitted Successfully.",
   "request_updated_successfully": "Request Updated Successfully.",
   "edit_request": "Edit Request",
-  "update_request": "Update Request"
+  "update_request": "Update Request",
+  "no_data_found": "No Data Found",
+  "no_projects_match_your_search_criteria": "No projects match your search criteria.",
+  "clear_filters": "Clear Filters",
+  "create_new_project": "Create New Project"
 }

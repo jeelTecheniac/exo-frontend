@@ -50,6 +50,7 @@ const ListDashBoard = () => {
     startDate: null,
     endDate: null,
   });
+  const [hasInitialData, setHasInitialData] = useState(false);
 
   const datePickerRef = useRef<HTMLDivElement>(null);
 
@@ -85,19 +86,35 @@ const ListDashBoard = () => {
           formateDate(range.startDate),
           formateDate(range.endDate)
         );
-        const dataArray = (res.data || []).map((item: any, idx: number) => ({
-          id: idx + 1 + offset,
-          projectId: item.reference || "-",
-          projectName: item.name,
-          currency: item.currency,
-          amount: Number(item.amount),
-          createdDate: item.created_at,
-          noOfRequest: item.requests_count || 0,
-          projectUuid: item.id,
-          status: item.status,
-          endDate: item.end_date,
-          fundedBy: item.funded_by,
-        }));
+        const dataArray = (res.data || []).map(
+          (
+            item: {
+              reference: string;
+              name: string;
+              currency: string;
+              amount: string | number;
+              created_at: string;
+              requests_count: number;
+              id: string;
+              status: string;
+              end_date: string;
+              funded_by: string;
+            },
+            idx: number
+          ) => ({
+            id: idx + 1 + offset,
+            projectId: item.reference || "-",
+            projectName: item.name,
+            currency: item.currency,
+            amount: Number(item.amount),
+            createdDate: item.created_at,
+            noOfRequest: item.requests_count || 0,
+            projectUuid: item.id,
+            status: item.status,
+            endDate: item.end_date,
+            fundedBy: item.funded_by,
+          })
+        );
 
         setData(dataArray);
         setTotal(res.total_project || 0);
@@ -106,13 +123,26 @@ const ListDashBoard = () => {
         // setTotalRequest(res.total_request || 0);
         setTotalAmountRequest(res.total_amount_request || 0);
 
-        if (res.total_project <= 0) {
+        // Set hasInitialData to true if we have data or if this is the first load
+        if (
+          !hasInitialData &&
+          (res.total_project > 0 ||
+            debouncedSearchTerm ||
+            range.startDate ||
+            range.endDate)
+        ) {
+          setHasInitialData(true);
+        }
+
+        if (res.total_project <= 0 && !hasInitialData) {
           navigate("/project-dashboard");
         }
       } catch (e) {
         console.log(e, "error");
         setData([]);
-        navigate("/project-dashboard");
+        if (!hasInitialData) {
+          navigate("/project-dashboard");
+        }
       } finally {
         setLoading(false);
       }
@@ -156,12 +186,66 @@ const ListDashBoard = () => {
     };
   }, []);
 
+  // Check if we have any active filters or search
+  const hasActiveFilters =
+    debouncedSearchTerm || range.startDate || range.endDate;
+
   return (
     <AppLayout>
-      {data.length <= 0 ? (
+      {data.length <= 0 && !hasActiveFilters && !hasInitialData ? (
         <CreateProject />
+      ) : data.length <= 0 && hasActiveFilters ? (
+        <div className="flex flex-col items-center justify-center min-h-[400px] px-4">
+          <div className="text-center">
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"
+                />
+              </svg>
+            </div>
+            <Typography
+              size="lg"
+              weight="semibold"
+              className="text-secondary-100 mb-2"
+            >
+              {t("no_data_found")}
+            </Typography>
+            <Typography size="base" className="text-secondary-60 mb-6">
+              {t("no_projects_match_your_search_criteria")}
+            </Typography>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm("");
+                  setRange({ startDate: null, endDate: null });
+                }}
+                className="px-4 py-2"
+              >
+                {t("clear_filters")}
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => navigate("/create-project")}
+                className="px-4 py-2"
+              >
+                {t("create_new_project")}
+              </Button>
+            </div>
+          </div>
+        </div>
       ) : (
-        <div className={"relative"}>
+        <div className="relative">
           <motion.div
             className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4 px-4 sm:px-0"
             initial={{ opacity: 0, y: 20 }}
