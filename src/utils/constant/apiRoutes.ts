@@ -15,7 +15,7 @@ export const ApiRoutes = {
   UPLOAD_FILE: "/upload-file",
   REMOVE_FILE: "/delete-file",
   REQUEST_DETAILS: "/request/view",
-  DELETE_REQUEST: "/project/delete-request",
+  DELETE_REQUEST: "/request/delete",
   DELETE_PROJECT: "/project/delete",
   ADDRESS_LIST: "project/list-address",
   // contract routes

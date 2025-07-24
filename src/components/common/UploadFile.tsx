@@ -44,9 +44,8 @@ const UploadFile: React.FC<FileUploadProps> = ({
       // Notify parent component about the initial files
       onFilesSelect?.(files);
     }
-  }, [files, onFilesSelect]);
+  }, [files]);
   const inputRef = useRef<HTMLInputElement>(null);
-  console.log(selectedFiles, "selectedFiles");
 
   const validateFile = (file: File): boolean => {
     if (file.size > maxSize * 1024 * 1024) {
@@ -105,9 +104,9 @@ const UploadFile: React.FC<FileUploadProps> = ({
       const uploadedFile = { file, id: uploaded.id, url: uploaded.url };
       setSelectedFiles((prev) => {
         const updated = [...prev, uploadedFile];
+        onFilesSelect?.(updated);
         return updated;
       });
-      onFilesSelect?.([...selectedFiles, uploadedFile]);
     } catch (err) {
       console.log(err, "er");
 
@@ -127,8 +126,18 @@ const UploadFile: React.FC<FileUploadProps> = ({
 
   const removeFile = async (data: UploadedFile) => {
     setRemovingFile(true);
-    const response = await onDeleteFile?.(data.id);
-    if (response?.status) {
+    try {
+      const response = await onDeleteFile?.(data.id);
+      if (response?.status) {
+        setSelectedFiles((prev) => {
+          const updated = prev.filter((file) => file.id !== data.id);
+          onFilesSelect?.(updated);
+          return updated;
+        });
+      }
+    } catch (error) {
+      console.error("Error removing file:", error);
+    } finally {
       setRemovingFile(false);
     }
   };
@@ -389,4 +398,4 @@ const UploadFile: React.FC<FileUploadProps> = ({
   );
 };
 
-export default UploadFile;
+export default UploadFile;
