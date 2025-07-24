@@ -8,11 +8,13 @@ import Button from "../lib/components/atoms/Button";
 import UserDropdown from "../components/header/UserDropdown";
 import LanguageSwitchLayout from "../pages/Auth/LanguageSwitchLayout";
 import { useTranslation } from "react-i18next";
+import { useRoleRoute } from "../hooks/useRoleRoute";
 
 const AppHeader: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { getRoute } = useRoleRoute();
 
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
@@ -56,14 +58,14 @@ const AppHeader: React.FC = () => {
                   ? "hover:bg-primary-10"
                   : "hover:text-primary-150"
               } hover:bg-primary-10 rounded-lg`}
-              onClick={() => navigate("/project-dashboard")}
+              onClick={() => navigate(getRoute("dashboard"))}
             >
               {t("dashboard")}
             </Button>
             <Button
               variant="outline"
               className={`border-none text-secondary-60 px-3 py-3 hover:border-none hover:shadow-none mt-2 hover:text-primary-150 hover:bg-primary-10 rounded-lg`}
-              onClick={() => navigate("/help")}
+              onClick={() => navigate(getRoute("help"))}
             >
               {t("help")}
             </Button>

@@ -16,8 +16,9 @@ import ContractTable from "../../table/ContractTable";
 import { useLoading } from "../../../context/LoaderProvider";
 import projectService from "../../../services/project.service";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import moment from "moment";
+import { useRoleRoute } from "../../../hooks/useRoleRoute";
 
 export interface ProjectProps {
   id: string;
@@ -95,6 +96,8 @@ const ProjectDetails = () => {
   });
 
   const { setLoading } = useLoading();
+  const {getRoute}=useRoleRoute()
+  const navigate=useNavigate()
 
   const fetchProject = async (projectId: string) => {
     try {
@@ -178,7 +181,7 @@ const ProjectDetails = () => {
             <div className="flex-1 min-w-0">
               <motion.div
                 className="flex items-center gap-2 cursor-pointer mb-2"
-                onClick={() => window.history.back()}
+                onClick={() => navigate(getRoute("dashboard")) }
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >

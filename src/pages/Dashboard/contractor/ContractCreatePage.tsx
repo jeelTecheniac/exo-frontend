@@ -103,6 +103,7 @@ const ContractCreatePage = () => {
   const [editProjectId, setEditProjectId] = useState("");
 
   const { projectId, contractId } = useParams();
+  const [newContractId, setNewContractId] = useState();
   const { loading, setLoading } = useLoading();
 
   const steps = [
@@ -143,7 +144,8 @@ const ContractCreatePage = () => {
         payload.append("project_id", editProjectId);
         payload.append("contract_id", contractId);
       }
-      const response = await contractService.creteContract(payload);
+      const response = await contractService.creteContract(payload);      
+      setNewContractId(response.data.data.id);
       return response.data;
     },
     onSuccess: async () => {
@@ -295,6 +297,7 @@ const ContractCreatePage = () => {
                     <Button
                       variant="primary"
                       type="submit"
+                      loading={contractCreateMutation.isPending}
                       onClick={handleFinalSubmit}
                       //   form="project-form"
                       className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
@@ -315,7 +318,7 @@ const ContractCreatePage = () => {
         <CreateContractConfirmationModal
           isOpen={isOpen}
           onClose={closeModal}
-          projectId=""
+          projectId={`${projectId||editProjectId}/${newContractId}`}
         />
       </div>
     </AppLayout>

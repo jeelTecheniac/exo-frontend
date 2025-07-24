@@ -4,6 +4,7 @@ import Button from "../../lib/components/atoms/Button";
 import Modal from "../../lib/components/atoms/Modal";
 import Typography from "../../lib/components/atoms/Typography";
 import { useNavigate } from "react-router";
+import { useRoleRoute } from "../../hooks/useRoleRoute";
 
 interface ChangeEmailModalProps {
   isOpen: boolean;
@@ -16,13 +17,15 @@ const CreateProjectConfirmationModal = ({
 }: ChangeEmailModalProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { getRoute } = useRoleRoute();
+
   return (
     <div className="flex w-full">
       <Modal
         className="w-[90%] md:max-w-[600px] mx-auto p-4 md:p-6 max-h-[90vh] md:max-h-[900px] flex justify-center items-center"
         isOpen={isOpen}
         onClose={() => {
-          navigate("/project-dashboard");
+          navigate(getRoute("dashboard"));
           onClose();
         }}
         isFullscreen={false}
@@ -60,10 +63,9 @@ const CreateProjectConfirmationModal = ({
             <Button
               variant="outline"
               className="w-full md:w-fit py-2.5 md:py-3 px-4 md:px-[35px]"
-              onClick={() => {
-                console.log("in navigate");
+              onClick={() => {                
                 onClose();
-                navigate("/project-dashboard");
+                navigate(getRoute("dashboard"));
               }}
             >
               {t("go_to_dashboard")}

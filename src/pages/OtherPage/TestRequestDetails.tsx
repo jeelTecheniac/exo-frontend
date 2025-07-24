@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import {
   BlueCopyIcon,
+  RightGrayIcon,
   MenuListIcon,
   MenuListIconFrench,
   PdfIcon,
@@ -25,6 +26,8 @@ import RequestDetailModal from "../../components/modal/RequestDetailModal";
 import History from "../../components/dashboard/History";
 import moment from "moment";
 import { useLoading } from "../../context/LoaderProvider";
+import { useRoleRoute } from "../../hooks/useRoleRoute";
+import Breadcrumbs from "../../components/common/Breadcrumbs";
 interface UserData {
   id: number;
   first_name: string;
@@ -142,6 +145,7 @@ const TestRequestDetails = () => {
   const { t, i18n } = useTranslation();
   const { requestId } = useParams();
   const [history, setHistory] = useState([]);
+  const { getRoute } = useRoleRoute();
 
   const { data: _requestDetails, isLoading: _requestLoading } = useQuery<any>({
     queryKey: [`project-${requestId}-address`],
@@ -202,6 +206,17 @@ const TestRequestDetails = () => {
     setUserData(JSON.parse(user));
   }, []);
 
+  const crumbs = [
+    { label: "dashboard", path: getRoute("dashboard") },
+    {
+      label: "project_details",
+      path: requestData
+        ? `/project-details/${requestData && requestData.project_id}`
+        : "",
+    },
+    { label: "request_details", path: "" }, // current page, no link
+  ];
+
   return (
     <div>
       {requestData && (
@@ -209,25 +224,12 @@ const TestRequestDetails = () => {
           <div className="px-4 md:px-8 py-6">
             <div className="mb-6">
               <div className="cursor-pointer mb-4">
-                {i18n.language === "en" ? (
-                  <MenuListIcon
-                    width="100%"
-                    height={30}
-                    className="max-w-[700px]"
-                  />
-                ) : (
-                  <MenuListIconFrench
-                    width="100%"
-                    height={30}
-                    className="max-w-[700px]"
-                  />
-                )}
+                <Breadcrumbs crumbs={crumbs}/>                
               </div>
               <Typography
                 size="xl_2"
                 weight="extrabold"
-                className="text-secondary-100"
-              >
+                className="text-secondary-100">
                 {t("request_details")} #{" "}
                 {requestData ? requestData.unique_number : ""}
               </Typography>
@@ -243,15 +245,13 @@ const TestRequestDetails = () => {
                       <Typography
                         size="base"
                         weight="bold"
-                        className="text-secondary-100"
-                      >
+                        className="text-secondary-100">
                         {t("request_details")}
                       </Typography>
                       <Button
                         variant="outline"
                         className="px-4 py-2 w-fit"
-                        onClick={openRequestDetails}
-                      >
+                        onClick={openRequestDetails}>
                         {t("view_more")}
                       </Button>
                     </div>
@@ -303,8 +303,7 @@ const TestRequestDetails = () => {
                       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
                         <Typography
                           className="text-secondary-60 min-w-[100px]"
-                          size="sm"
-                        >
+                          size="sm">
                           {t("amount")}
                         </Typography>
                         <Typography className="text-secondary-100" size="sm">
@@ -317,8 +316,7 @@ const TestRequestDetails = () => {
                       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
                         <Typography
                           className="text-secondary-60 min-w-[100px]"
-                          size="sm"
-                        >
+                          size="sm">
                           {t("address")}
                         </Typography>
                         <Typography className="text-secondary-100" size="sm">
@@ -338,8 +336,7 @@ const TestRequestDetails = () => {
                       <div className="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
                         <Typography
                           className="text-secondary-60 min-w-[100px]"
-                          size="sm"
-                        >
+                          size="sm">
                           {t("invoice_files")}
                         </Typography>
                         <div className="flex flex-wrap gap-2">
@@ -351,8 +348,7 @@ const TestRequestDetails = () => {
                                   <Typography
                                     size="xs"
                                     weight="semibold"
-                                    className="text-secondary-100 whitespace-nowrap"
-                                  >
+                                    className="text-secondary-100 whitespace-nowrap">
                                     {f.original_name}
                                     <span className="text-secondary-60 ml-1">
                                       {(f.size / (1024 * 1024)).toFixed(2)}MB
