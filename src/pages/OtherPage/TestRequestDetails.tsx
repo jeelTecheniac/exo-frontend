@@ -1,9 +1,6 @@
 import { useTranslation } from "react-i18next";
 import {
   BlueCopyIcon,
-  RightGrayIcon,
-  MenuListIcon,
-  MenuListIconFrench,
   PdfIcon,
   // PdfIcon,
   UsdGreenIcon,
@@ -142,7 +139,7 @@ const TestRequestDetails = () => {
     openModal: openRequestDetails,
   } = useModal();
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { requestId } = useParams();
   const [history, setHistory] = useState([]);
   const { getRoute } = useRoleRoute();

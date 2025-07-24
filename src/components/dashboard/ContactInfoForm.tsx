@@ -237,7 +237,6 @@ const ContactInfoForm = ({
       // toast.error("Failed to remove file.");
     },
   });
-  console.log(projectData);
   const handleDeleteFile = async (fileId: string) => {
     const response = await removeFileMutation.mutateAsync(fileId);
     if (response.status) {
@@ -245,7 +244,9 @@ const ContactInfoForm = ({
         (file: any) => file.id !== fileId
       );
       updateProjectData({ contractFiles: filteredFiles });
+      return { status: true };
     }
+    return { status: false };
   };
 
   return (

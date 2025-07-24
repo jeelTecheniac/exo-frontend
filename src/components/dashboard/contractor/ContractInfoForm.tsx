@@ -244,7 +244,7 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
                 const updated = values.contractFiles.filter(
                   (file) => file.id !== id
                 );
-                setFieldValue("files", updated);
+                setFieldValue("contractFiles", updated);
                 return { status: true };
               }}
               maxSize={5}

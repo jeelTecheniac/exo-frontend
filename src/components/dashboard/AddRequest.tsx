@@ -64,7 +64,7 @@ const AddRequest = () => {
   const { requestId, projectId: newProjectId } = useParams();
 
   const [data, setData] = useState<Order[]>([]);
-  const [userData, setUserData] = useState<any | undefined>();
+  const [userData, setUserData] = useState<{ token: string } | undefined>();
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [requestLetter, setRequestLetter] = useState("");
@@ -208,8 +208,12 @@ const AddRequest = () => {
       toast.success(t("request_updated_successfully"));
       navigate("/contract-project-list");
     },
-    onError: (error:any) => {
-      toast.error(error?.error?.message||"Failed to upload file.");
+    onError: (error: unknown) => {
+      const errorMessage =
+        error && typeof error === "object" && "error" in error
+          ? (error as { error: { message: string } }).error.message
+          : "Failed to upload file.";
+      toast.error(errorMessage);
     },
   });
 
@@ -241,7 +245,10 @@ const AddRequest = () => {
   const fileUploadMutation = async ({
     file,
     onProgress,
-  }: any): Promise<any> => {
+  }: {
+    file: File;
+    onProgress: (percent: number) => void;
+  }): Promise<{ id: string; url: string }> => {
     console.log("Inside mutation file:", file);
     const formData = new FormData();
     formData.append("file", file);
@@ -277,13 +284,16 @@ const AddRequest = () => {
       // toast.error("Failed to upload file.");
     },
   });
-  const handleUploadFile = async (file: any, onProgress: any) => {
+  const handleUploadFile = async (
+    file: File,
+    onProgress: (percent: number) => void
+  ) => {
     const response = await uploadMutation.mutateAsync({ file, onProgress });
     return response;
   };
 
   const removeFileMutation = useMutation({
-    mutationFn: async (id: any) => {
+    mutationFn: async (id: string) => {
       await projectService.removeFile(id);
       return { status: true };
     },
@@ -298,11 +308,12 @@ const AddRequest = () => {
     const response = await removeFileMutation.mutateAsync(fileId);
     if (response.status) {
       const filteredFiles = uploadedFiles.filter(
-        (file: any) => file.id !== fileId
+        (file: UploadedFile) => file.id !== fileId
       );
       setUploadedFiles(filteredFiles);
       return { status: true };
     }
+    return { status: false };
   };
 
   const requestMutaion = useMutation({
@@ -420,7 +431,7 @@ const AddRequest = () => {
           weight="extrabold"
           className="text-secondary-100 text-2xl md:text-3xl"
         >
-          {t("create_request")}
+          {requestId ? t("edit_request") : t("create_request")}
         </Typography>
 
         {/* Form Fields */}
@@ -551,7 +562,7 @@ const AddRequest = () => {
             variant="primary"
             className="flex items-center w-full md:w-fit gap-1 py-2 mt-4 justify-center"
           >
-            {t("submit_request")}
+            {requestId ? t("update_request") : t("submit_request")}
           </Button>
         </div>
       </div>

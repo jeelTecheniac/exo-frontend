@@ -15,7 +15,6 @@ import EditProfile from "./pages/user/EditProfile";
 import Help from "./pages/OtherPage/Help";
 import TestRequestDetails from "./pages/OtherPage/TestRequestDetails";
 import TestFilterData from "./pages/OtherPage/TestFilterData";
-import AddRequest from "./components/dashboard/AddRequest";
 import ListDashBoard from "./components/dashboard/ListDashBoard";
 import PublicRoute from "./utils/PublicRoute";
 import ProtectedRoute from "./utils/constant/ProtectedRoute";
@@ -123,7 +122,7 @@ export default function App() {
             <Route
               path="/project-details/:projectId"
               element={
-                <RoleBasedRoute allowedRoles={["project_manager","user"]}>
+                <RoleBasedRoute allowedRoles={["project_manager", "user"]}>
                   <ProjectDetailsPage />
                 </RoleBasedRoute>
               }

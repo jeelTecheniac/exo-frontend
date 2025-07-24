@@ -76,8 +76,7 @@ const financialAuthorityList: { name: string; value: string }[] = [
 
 const AddRequest = () => {
   const { t } = useTranslation();
-  const { contractId } = useParams();
-  const { projectId } = useParams();
+  const { contractId, projectId, requestId } = useParams();
   const navigate = useNavigate();
   const { getRoute } = useRoleRoute();
 
@@ -231,8 +230,12 @@ const AddRequest = () => {
       toast.success(t("request_submitted_successfully"));
       navigate("/contract-project-list");
     },
-    onError: (error: any) => {
-      toast.error(error?.error.message || "Failed to upload file.");
+    onError: (error: unknown) => {
+      const errorMessage =
+        error && typeof error === "object" && "error" in error
+          ? (error as { error: { message: string } }).error.message
+          : "Failed to upload file.";
+      toast.error(errorMessage);
     },
   });
 
@@ -399,6 +402,7 @@ const AddRequest = () => {
       setUploadedFiles(filteredFiles);
       return { status: true };
     }
+    return { status: false };
   };
 
   if (isLoading) return <Loader />;
