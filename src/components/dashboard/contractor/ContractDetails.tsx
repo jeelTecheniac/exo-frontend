@@ -110,7 +110,7 @@ const ContractDetails = () => {
         projectId: contractData.project_id,
       });
     }
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm,range]);
 
   const contractMutation = useMutation({
     mutationFn: async () => {
@@ -150,6 +150,8 @@ const ContractDetails = () => {
         contract_id: data.contractId,
         project_id: data.projectId,
         search: debouncedSearchTerm,
+        ...(range.startDate && { start_date: range.startDate }),
+        ...(range.endDate && { end_date: range.endDate }),
       };
       const response = await requestService.getAllRequestList(payload);
 
@@ -165,6 +167,21 @@ const ContractDetails = () => {
       contractMutation.mutate();
     }
   }, [contractId]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        datePickerRef.current &&
+        !datePickerRef.current.contains(event.target as Node)
+      ) {
+        setIsDatePickerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
