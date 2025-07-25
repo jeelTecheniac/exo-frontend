@@ -22,23 +22,31 @@ class AuthService extends ApiBaseService {
   async resetPassword(data: any) {
     return await this.guestRequest.post(ApiRoutes.RESET_PASSWORD, data);
   }
-  async getProfile(){
-    return await this.authorizedRequest.get(ApiRoutes.USER_PROFILE)
+  async getProfile() {
+    return await this.authorizedRequest.get(ApiRoutes.USER_PROFILE);
   }
-  async editProfile(data:any){
-    return await this.authorizedRequest.put(ApiRoutes.EDIT_PROFILE,data)
-  }
-
-  async changeEmail(data:any){
-    return await this.authorizedRequest.put(ApiRoutes.CHANGE_EMAIL,data)
+  async editProfile(data: any) {
+    return await this.authorizedRequest.put(ApiRoutes.EDIT_PROFILE, data);
   }
 
-  async logOutUser(){
-    return await this.authorizedRequest.get(ApiRoutes.LOGOUT_USER)
+  async changeEmail(data: any) {
+    return await this.authorizedRequest.put(ApiRoutes.CHANGE_EMAIL, data);
   }
 
-  async changePassword(data:any){
-    return await this.authorizedRequest.put(ApiRoutes.CHANGE_PASSWORD,data)
+  async logOutUser() {
+    return await this.authorizedRequest.get(ApiRoutes.LOGOUT_USER);
+  }
+
+  async changePassword(data: any) {
+    return await this.authorizedRequest.put(ApiRoutes.CHANGE_PASSWORD, data);
+  }
+
+  async uploadProfilePicture(data: FormData) {
+    return await this.authorizedRequest.post(ApiRoutes.UPLOAD_FILE, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   }
   // async getProfile() {
   //   return await this.guestRequest.post(ApiRoutes.RESET_PASSWORD, data);
