@@ -8,17 +8,19 @@ import CurrencyInput from "../../lib/components/atoms/CurrencyInput";
 import Typography from "../../lib/components/atoms/Typography";
 import TextEditor from "../../lib/components/atoms/TextEditor";
 import UploadFile, { UploadedFile } from "../common/UploadFile";
-import { TrashIcon } from "../../icons";
+import { ArrowRightIconButton, SaveDraftIcon, TrashIcon } from "../../icons";
 import { USFlag, CDFFlag } from "../../icons";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
 import projectService from "../../services/project.service";
 import { useAuth } from "../../context/AuthContext";
+import Button from "../../lib/components/atoms/Button";
 
 interface ProjectInfoFormProps {
   initialValues?: ProjectFormValues;
-  onSubmit: (values: ProjectFormValues) => void;
+  onSubmit: (values: ProjectFormValues,resetForm?: () => void) => void;
   children?: ReactNode;
+  loading?:boolean
 }
 
 interface Address {
@@ -40,6 +42,7 @@ interface ProjectFormValues {
   description: string;
   addresses: Address[];
   files: UploadedFile[];
+  status: "publish" | "draft";
 }
 
 export interface UploadResponse {
@@ -64,7 +67,8 @@ export interface Data {
 const ProjectInfoForm = ({
   initialValues,
   onSubmit,
-  children,
+  loading
+  // children,
 }: ProjectInfoFormProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -75,6 +79,7 @@ const ProjectInfoForm = ({
     addressId: 0,
     field: null,
   });
+  const [formResetKey, setFormResetKey] = useState(Date.now().toString());
 
   const locationData = {
     countries: [{ value: "RD Congo", label: "RD Congo" }],
@@ -121,6 +126,7 @@ const ProjectInfoForm = ({
     description: "",
     addresses: [],
     files: [],
+    status:"draft"
   };
 
   // Validation schema
@@ -165,9 +171,12 @@ const ProjectInfoForm = ({
     ),
   });
 
-  const handleSubmit = (values: ProjectFormValues) => {
+  const handleSubmit = (values: ProjectFormValues,{ resetForm }: FormikHelpers<ProjectFormValues>) => {
     console.log("Form submitted with values:", values);
-    onSubmit(values);
+    onSubmit(values, () => {
+      resetForm();
+      setFormResetKey(Date.now().toString());
+    });
   };
 
   // Address management functions
@@ -414,24 +423,29 @@ const ProjectInfoForm = ({
       initialValues={initialValues || defaultInitialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
-      enableReinitialize={true}
-    >
-      {({ values, setFieldValue, errors, touched, handleBlur }) => (
+      enableReinitialize={true}>
+      {({
+        values,
+        setFieldValue,
+        errors,
+        touched,
+        handleBlur,
+        submitForm,
+        resetForm,
+      }) => (
         <Form>
           <div>
             <div className="mb-6">
               <Typography
                 size="lg"
                 weight="semibold"
-                className="text-secondary-100"
-              >
+                className="text-secondary-100">
                 {t("call_for_tenders")}
               </Typography>
               <Typography
                 size="base"
                 weight="normal"
-                className="text-secondary-60"
-              >
+                className="text-secondary-60">
                 {t("enter_key_details_about_your_project_to_continue")}
               </Typography>
             </div>
@@ -526,6 +540,7 @@ const ProjectInfoForm = ({
                     <span className="text-red-500">*</span>
                   </Label>
                   <DatePicker
+                    key={`beginDate-${formResetKey}`}
                     id="beginDate"
                     defaultDate={
                       values.beginDate ? new Date(values.beginDate) : undefined
@@ -559,6 +574,7 @@ const ProjectInfoForm = ({
                     <span className="text-red-500">*</span>
                   </Label>
                   <DatePicker
+                    key={`beginDate-${formResetKey}`}
                     id="endDate"
                     defaultDate={
                       values.endDate ? new Date(values.endDate) : undefined
@@ -588,6 +604,7 @@ const ProjectInfoForm = ({
               <div>
                 <Label htmlFor="description">{t("description")}</Label>
                 <TextEditor
+                  key={`description-${formResetKey}`}
                   placeholder={t("write_here")}
                   maxLength={100}
                   initialValue={values.description || ""}
@@ -608,8 +625,7 @@ const ProjectInfoForm = ({
                   <button
                     type="button"
                     className="flex items-center gap-1 text-primary-150 text-sm font-medium px-3 py-1 border border-primary-150 rounded-lg hover:bg-blue-50"
-                    onClick={() => addAddress(setFieldValue, values.addresses)}
-                  >
+                    onClick={() => addAddress(setFieldValue, values.addresses)}>
                     <span className="text-base">+</span>
                     {t("add_address")}
                   </button>
@@ -630,8 +646,7 @@ const ProjectInfoForm = ({
                       {values.addresses.map((address, index) => (
                         <tr
                           key={address.id}
-                          className="border-b border-secondary-30 last:border-0"
-                        >
+                          className="border-b border-secondary-30 last:border-0">
                           <td className="p-2">{index + 1}</td>
 
                           {/* Country */}
@@ -659,8 +674,7 @@ const ProjectInfoForm = ({
                                 onClick={() =>
                                   startEditing(address.id, "country")
                                 }
-                                className="cursor-pointer hover:bg-secondary-5 p-1 rounded"
-                              >
+                                className="cursor-pointer hover:bg-secondary-5 p-1 rounded">
                                 {address.country || "—"}
                               </div>
                             )}
@@ -697,8 +711,7 @@ const ProjectInfoForm = ({
                                   address.country
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}
-                              >
+                                }`}>
                                 {address.province || "—"}
                               </div>
                             )}
@@ -735,8 +748,7 @@ const ProjectInfoForm = ({
                                   address.province
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}
-                              >
+                                }`}>
                                 {address.city || "—"}
                               </div>
                             )}
@@ -773,8 +785,7 @@ const ProjectInfoForm = ({
                                   address.city
                                     ? "cursor-pointer hover:bg-secondary-5"
                                     : "cursor-not-allowed text-gray-400"
-                                }`}
-                              >
+                                }`}>
                                 {address.municipality || "—"}
                               </div>
                             )}
@@ -791,8 +802,7 @@ const ProjectInfoForm = ({
                                   values.addresses,
                                   address.id
                                 )
-                              }
-                            >
+                              }>
                               <TrashIcon width={20} height={20} />
                             </button>
                           </td>
@@ -802,8 +812,7 @@ const ProjectInfoForm = ({
                         <tr>
                           <td
                             colSpan={6}
-                            className="p-4 text-center text-secondary-60"
-                          >
+                            className="p-4 text-center text-secondary-60">
                             {t("no_addresses_added_yet")}
                           </td>
                         </tr>
@@ -834,7 +843,42 @@ const ProjectInfoForm = ({
               </div>
             </div>
           </div>
-          {children && <>{children}</>}
+          <div className="flex flex-col-reverse md:flex-row justify-end gap-4 mt-8">
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => {
+                setFieldValue("status", "draft");
+                submitForm();
+              }}
+              loading={loading && values.status === "draft"}
+              className="px-6 py-3 bg-white rounded-lg text-primary-150 font-medium flex items-center justify-center gap-2 shadow-md hover:bg-gray-50 w-full md:w-auto">
+              <SaveDraftIcon
+                width={20}
+                height={20}
+                className="text-primary-150"
+              />
+              {t("save_as_draft")}
+            </Button>
+
+            <Button
+              variant="primary"
+              type="button"
+              onClick={() => {
+                setFieldValue("status", "publish");
+                submitForm();
+              }}
+              loading={loading && values.status === "publish"}
+              className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto">
+              {t("submit")}
+              <ArrowRightIconButton
+                width={18}
+                height={18}
+                className="text-white"
+              />
+            </Button>
+          </div>
+          {/* {children && <>{children}</>} */}
         </Form>
       )}
     </Formik>
