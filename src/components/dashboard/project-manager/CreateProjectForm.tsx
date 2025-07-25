@@ -35,6 +35,7 @@ interface ProjectFormValues {
     municipality: string;
   }>;
   files: UploadedFile[];
+  status: "publish" | "draft";
 }
 
 const initialValues: ProjectFormValues = {
@@ -48,6 +49,7 @@ const initialValues: ProjectFormValues = {
   description: "",
   addresses: [],
   files: [],
+  status: "draft",
 };
 
 const CreateProjectForm = () => {
@@ -72,7 +74,7 @@ const CreateProjectForm = () => {
     },
   });
 
-  const createProject = (values: ProjectFormValues, status: string) => {
+  const createProject = (values: ProjectFormValues,resetForm?: () => void) => {
     const payload = {
       name: values.projectName,
       funded_by: values.fundedBy,
@@ -91,23 +93,28 @@ const CreateProjectForm = () => {
         }))
       ),
       document_ids: values.files.map((file) => file.id).join(","),
-      status,
+      status:values.status,
       ...(projectId && { project_id: projectId }),
-    };
-    createProjectMutation.mutate(payload);
+    };    
+    createProjectMutation.mutate(payload, {
+      onSuccess: () => {
+        if (resetForm) {
+          resetForm();
+          setFormValue(initialValues)
+        }
+      },
+    });
   };
 
-  const handleSubmit = (values: ProjectFormValues) => {
-    createProject(values, "publish");
+  const handleSubmit = (values: ProjectFormValues,resetForm?: () => void) => {
+    createProject(values, resetForm);
   };
 
   const handelCloseModal = () => {
     closeModal();
     navigate("/create-project");
   };
-  const handleSaveDraft = () => {
-    createProject(formValue, "draft");
-  };
+
 
   const fetchProject = async (projectId: string) => {
     try {
@@ -137,6 +144,7 @@ const CreateProjectForm = () => {
               )
             : [],
         files: [],
+        status:projectData.status
       };
       setFormValue(newData);
     } catch (err: any) {
@@ -160,8 +168,7 @@ const CreateProjectForm = () => {
           <div className="p-4 md:p-6">
             <div
               className="flex items-center gap-2 cursor-pointer mb-2"
-              onClick={() => navigate("/project-dashboard")}
-            >
+              onClick={() => navigate("/project-dashboard")}>
               <ArrowLeftIcon
                 width={16}
                 height={16}
@@ -170,8 +177,7 @@ const CreateProjectForm = () => {
               <Typography
                 size="base"
                 weight="semibold"
-                className="text-primary-150"
-              >
+                className="text-primary-150">
                 {t("back_to_dashboard")}
               </Typography>
             </div>
@@ -187,36 +193,8 @@ const CreateProjectForm = () => {
               <ProjectInfoForm
                 initialValues={formValue}
                 onSubmit={handleSubmit}
-              >
-                <div className="flex flex-col-reverse md:flex-row justify-end gap-4 mt-8">
-                  <Button
-                    variant="secondary"
-                    onClick={handleSaveDraft}
-                    className="px-6 py-3 bg-white rounded-lg text-primary-150 font-medium flex items-center justify-center gap-2 shadow-md hover:bg-gray-50 w-full md:w-auto"
-                  >
-                    <SaveDraftIcon
-                      width={20}
-                      height={20}
-                      className="text-primary-150"
-                    />
-                    {t("save_as_draft")}
-                  </Button>
-
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    loading={createProjectMutation.isPending}
-                    className="px-6 py-3 bg-primary-150 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-primary-200 w-full md:w-auto"
-                  >
-                    {t("submit")}
-                    <ArrowRightIconButton
-                      width={18}
-                      height={18}
-                      className="text-white"
-                    />
-                  </Button>
-                </div>
-              </ProjectInfoForm>
+                loading={createProjectMutation.isPending}
+              />
             )}
           </div>
         </div>
