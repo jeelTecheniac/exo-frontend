@@ -1,13 +1,8 @@
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import Typography from "../../../lib/components/atoms/Typography";
-import Button from "../../../lib/components/atoms/Button";
 import ProjectInfoForm from "../ProjectInfoForm";
-import {
-  ArrowLeftIcon,
-  ArrowRightIconButton,
-  SaveDraftIcon,
-} from "../../../icons";
+import { ArrowLeftIcon } from "../../../icons";
 import { useModal } from "../../../hooks/useModal";
 import CreateProjectConfirmationModal from "../../modal/CreateProjectConfirmationModal";
 import { UploadedFile } from "../../common/UploadFile";
@@ -74,7 +69,7 @@ const CreateProjectForm = () => {
     },
   });
 
-  const createProject = (values: ProjectFormValues,resetForm?: () => void) => {
+  const createProject = (values: ProjectFormValues, resetForm?: () => void) => {
     const payload = {
       name: values.projectName,
       funded_by: values.fundedBy,
@@ -93,20 +88,20 @@ const CreateProjectForm = () => {
         }))
       ),
       document_ids: values.files.map((file) => file.id).join(","),
-      status:values.status,
+      status: values.status,
       ...(projectId && { project_id: projectId }),
-    };    
+    };
     createProjectMutation.mutate(payload, {
       onSuccess: () => {
         if (resetForm) {
           resetForm();
-          setFormValue(initialValues)
+          setFormValue(initialValues);
         }
       },
     });
   };
 
-  const handleSubmit = (values: ProjectFormValues,resetForm?: () => void) => {
+  const handleSubmit = (values: ProjectFormValues, resetForm?: () => void) => {
     createProject(values, resetForm);
   };
 
@@ -114,7 +109,6 @@ const CreateProjectForm = () => {
     closeModal();
     navigate("/create-project");
   };
-
 
   const fetchProject = async (projectId: string) => {
     try {
@@ -144,7 +138,7 @@ const CreateProjectForm = () => {
               )
             : [],
         files: [],
-        status:projectData.status
+        status: projectData.status,
       };
       setFormValue(newData);
     } catch (err: any) {
@@ -168,7 +162,8 @@ const CreateProjectForm = () => {
           <div className="p-4 md:p-6">
             <div
               className="flex items-center gap-2 cursor-pointer mb-2"
-              onClick={() => navigate("/project-dashboard")}>
+              onClick={() => navigate("/project-dashboard")}
+            >
               <ArrowLeftIcon
                 width={16}
                 height={16}
@@ -177,7 +172,8 @@ const CreateProjectForm = () => {
               <Typography
                 size="base"
                 weight="semibold"
-                className="text-primary-150">
+                className="text-primary-150"
+              >
                 {t("back_to_dashboard")}
               </Typography>
             </div>
