@@ -51,13 +51,9 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
 
   const renderFileList = (files: any[] | undefined) => {
     if (!files || files.length === 0) return "-";
-  const filesData = Array.isArray(files)
-    ? files
-    : files
-    ? [files]
-    : [];
-    console.log(filesData,"filesData");
-    
+    const filesData = Array.isArray(files) ? files : files ? [files] : [];
+    console.log(filesData, "filesData");
+
     return (
       <div className="flex flex-wrap gap-2">
         {filesData.map((file, index) => (
@@ -81,7 +77,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 </svg>
               </div>
               <span className="text-xs text-secondary-100">
-                {file.file.name||file.original_name}
+                {file.file.name || file.original_name}
               </span>
             </div>
           </div>
@@ -139,7 +135,9 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("amount")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                <span className="text-gray-400">{projectData?.currency || "USD"}{" "}</span>
+                <span className="text-gray-400">
+                  {projectData?.currency || "USD"}{" "}
+                </span>
                 {formatAmount(projectData?.projectAmount)}
               </div>
             </div>
@@ -148,7 +146,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("project_begin_date")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {formatDate(projectData?.beginDate)||"-"}
+                {formatDate(projectData?.beginDate) || "-"}
               </div>
             </div>
             <div className="flex">
@@ -156,7 +154,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("project_end_date")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {formatDate(projectData?.endDate)||"-"}
+                {formatDate(projectData?.endDate) || "-"}
               </div>
             </div>
             <div className="flex">
@@ -198,13 +196,12 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                   </div>
 
                   {projectData.address && projectData.address.length > 0 ? (
-                    projectData.address.map(
-                      (address: Address, index: number) => (
-                        <div
-                          key={address.id}
-                          className="grid grid-cols-5 py-3 px-4 border-b border-secondary-30 last:border-0"
-                        >
-                          {/* <div className="flex items-center">
+                    projectData.address.map((address: Address) => (
+                      <div
+                        key={address.id}
+                        className="grid grid-cols-5 py-3 px-4 border-b border-secondary-30 last:border-0"
+                      >
+                        {/* <div className="flex items-center">
                             <input
                               type="checkbox"
                               className="w-5 h-5 mr-4 border border-gray-300 rounded"
@@ -212,13 +209,12 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                             />
                             <span>{index + 1}</span>
                           </div> */}
-                          <div>{address.country || "-"}</div>
-                          <div>{address.providence || "-"}</div>
-                          <div>{address.city || "-"}</div>
-                          <div>{address.municipality || "-"}</div>
-                        </div>
-                      )
-                    )
+                        <div>{address.country || "-"}</div>
+                        <div>{address.providence || "-"}</div>
+                        <div>{address.city || "-"}</div>
+                        <div>{address.municipality || "-"}</div>
+                      </div>
+                    ))
                   ) : (
                     <div className="p-4 text-center text-secondary-60">
                       {t("no_addresses_added")}
@@ -263,7 +259,9 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("amount")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                <span className="text-gray-400">{projectData.currency || "USD"}{" "}</span>
+                <span className="text-gray-400">
+                  {projectData.currency || "USD"}{" "}
+                </span>
                 {formatAmount(projectData.amount) || "-"}
               </div>
             </div>
@@ -282,7 +280,7 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                 <Label>{t("place")}</Label>
               </div>
               <div className="w-2/3 text-secondary-100">
-                {projectData.place||"-"}
+                {projectData.place || "-"}
               </div>
             </div>
 
@@ -307,6 +305,6 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
       </div>
     </div>
   );
-}
+};
 
-export default ContractReviewForm
+export default ContractReviewForm;

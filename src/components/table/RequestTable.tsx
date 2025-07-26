@@ -34,7 +34,6 @@ const RequestTable = ({
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Data>>({});
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
@@ -111,7 +110,6 @@ const RequestTable = ({
       const response = await deleteRequestMutation.mutateAsync(request_id);
       if (response.data.status === 200) {
         setTableData((prev) => prev.filter((order) => order.id !== orderId));
-        setSelectedRows((prev) => prev.filter((id) => id !== orderId));
       }
     }
     setOpenMenuId(null);
@@ -133,24 +131,6 @@ const RequestTable = ({
         [field]: value,
       }));
     }
-  };
-
-  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelectedRows(tableData.map((order) => order.id));
-    } else {
-      setSelectedRows([]);
-    }
-  };
-
-  const handleSelectRow = (orderId: number) => {
-    setSelectedRows((prev) => {
-      if (prev.includes(orderId)) {
-        return prev.filter((id) => id !== orderId);
-      } else {
-        return [...prev, orderId];
-      }
-    });
   };
 
   const tableHeader: TableHeader[] = [

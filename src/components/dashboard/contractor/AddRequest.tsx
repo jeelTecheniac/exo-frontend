@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  ArrowLeftIcon,
   FileVioletIcon,
   PlusBlueIcon,
   UsdGreenIcon,
@@ -80,7 +79,7 @@ const AddRequest = () => {
   const { contractId, projectId, requestId } = useParams();
   const navigate = useNavigate();
   const { getRoute } = useRoleRoute();
-  const {pathname}=useLocation();
+  const { pathname } = useLocation();
 
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [requestLetter, setRequestLetter] = useState("");
@@ -117,12 +116,15 @@ const AddRequest = () => {
 
   const [userData, setUserData] = useState<{ token: string } | undefined>();
 
-  const pathName:string=pathname.split("/")[1]
+  const pathName: string = pathname.split("/")[1];
 
   const crumbs = [
     { label: "dashboard", path: getRoute("dashboard") },
-    { label: "contract_details", path: `${getRoute("contractDetails")}/${contractId}` },
-    { label: pathName==="add-request"?"create_request":"edit_request" },
+    {
+      label: "contract_details",
+      path: `${getRoute("contractDetails")}/${contractId}`,
+    },
+    { label: pathName === "add-request" ? "create_request" : "edit_request" },
   ];
 
   useEffect(() => {

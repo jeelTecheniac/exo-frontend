@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   ArchiveIcon,
-  ArrowLeftIcon,
   BlueNoteIcon,
   FilterIcon,
   GreenRightIcon,
@@ -17,7 +16,7 @@ import Input from "../../../lib/components/atoms/Input";
 import Button from "../../../lib/components/atoms/Button";
 import { useEffect, useRef, useState } from "react";
 import Filter from "../../../lib/components/molecules/Filter";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import contractService from "../../../services/contract.service";
 import moment from "moment";
@@ -83,7 +82,6 @@ const ContractDetails = () => {
   });
   const { contractId } = useParams();
   const { setLoading } = useLoading();
-  const navigate = useNavigate();
   const { getRoute } = useRoleRoute();
 
   const handleApplyDateFilter = (newRange: {
@@ -110,7 +108,7 @@ const ContractDetails = () => {
         projectId: contractData.project_id,
       });
     }
-  }, [debouncedSearchTerm,range]);
+  }, [debouncedSearchTerm, range]);
 
   const contractMutation = useMutation({
     mutationFn: async () => {
@@ -153,13 +151,12 @@ const ContractDetails = () => {
         ...(range.endDate && { end_date: range.endDate }),
       };
       const response = await requestService.getAllRequestList(payload);
-      return response.data      
+      return response.data;
     },
     onError: async (error) => {
       console.log(error);
     },
   });
-
 
   const documents = Array.isArray(contractData?.documents)
     ? contractData.documents
@@ -190,7 +187,10 @@ const ContractDetails = () => {
 
   const crumbs = [
     { label: "dashboard", path: getRoute("dashboard") },
-    { label: "project_details", path: `${getRoute("projectDetails")}/${contractData?.project_id}` },
+    {
+      label: "project_details",
+      path: `${getRoute("projectDetails")}/${contractData?.project_id}`,
+    },
     { label: "contract_details" },
   ];
 
@@ -443,19 +443,20 @@ const ContractDetails = () => {
                   Uploaded Files :
                 </Typography>
                 <div className="flex-1">
-                  {documents.length?documents.map((doc:any)=>
-                    <a
-                      key={1}
-                      href={doc.file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-blue-600 hover:underline break-all text-sm sm:text-base">
-                      <PdfIcon width={16} height={16} />
-                      {doc?.original_name}
-                    </a>                    
-                  ) : (
-                    "-"
-                  )}
+                  {documents.length
+                    ? documents.map((doc: any) => (
+                        <a
+                          key={1}
+                          href={doc.file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-blue-600 hover:underline break-all text-sm sm:text-base"
+                        >
+                          <PdfIcon width={16} height={16} />
+                          {doc?.original_name}
+                        </a>
+                      ))
+                    : "-"}
                 </div>
               </div>
             </div>

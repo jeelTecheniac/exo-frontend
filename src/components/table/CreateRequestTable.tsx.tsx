@@ -111,7 +111,6 @@ const CreateRequestTable = ({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Order>>({});
   const [sortOrder, setSortOrder] = useState<SortOrder>(null);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   // Ref for the dropdown menu container
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -281,7 +280,6 @@ const CreateRequestTable = ({
     if (window.confirm("Are you sure you want to delete this record?")) {
       setTableData((prev) => prev.filter((order) => order.id !== orderId));
       onDataChange?.(tableData.filter((order) => order.id !== orderId));
-      setSelectedRows((prev) => prev.filter((id) => id !== orderId));
     }
     setOpenMenuId(null);
   };
@@ -338,24 +336,6 @@ const CreateRequestTable = ({
       return "↓";
     }
     return "↕️";
-  };
-
-  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelectedRows(tableData.map((order) => order.id));
-    } else {
-      setSelectedRows([]);
-    }
-  };
-
-  const handleSelectRow = (orderId: number) => {
-    setSelectedRows((prev) => {
-      if (prev.includes(orderId)) {
-        return prev.filter((id) => id !== orderId);
-      } else {
-        return [...prev, orderId];
-      }
-    });
   };
 
   const tableHeader: TableHeader[] = [

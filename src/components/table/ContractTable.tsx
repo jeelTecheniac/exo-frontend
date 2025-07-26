@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -17,37 +17,18 @@ export interface ContractData {
   dateCreated: string;
   noOfRequest: number;
   contract_id: string;
-  currency:string
+  currency: string;
 }
 
 const ContractTable = ({ data }: { data: ContractData[] | [] }) => {
   const [tableData, setTableData] = useState<ContractData[]>(data);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     setTableData(data);
   }, [data]);
 
-  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelectedRows(tableData.map((contract) => contract.id));
-    } else {
-      setSelectedRows([]);
-    }
-  };
-
-  const handleSelectRow = (contractId: number) => {
-    setSelectedRows((prev) => {
-      if (prev.includes(contractId)) {
-        return prev.filter((id) => id !== contractId);
-      } else {
-        return [...prev, contractId];
-      }
-    });
-  };
-
-  const handleViewContract = (contractId: string) => {    
+  const handleViewContract = (contractId: string) => {
     navigate(`/contract-details/${contractId}`);
   };
 
