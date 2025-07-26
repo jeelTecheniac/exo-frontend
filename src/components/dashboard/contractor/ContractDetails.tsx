@@ -25,6 +25,7 @@ import { useLoading } from "../../../context/LoaderProvider";
 import { useAuth } from "../../../context/AuthContext";
 import requestService from "../../../services/request.service";
 import { useRoleRoute } from "../../../hooks/useRoleRoute";
+import Breadcrumbs from "../../common/Breadcrumbs";
 
 interface ContractProps {
   id: string;
@@ -187,6 +188,12 @@ const ContractDetails = () => {
     };
   }, []);
 
+  const crumbs = [
+    { label: "dashboard", path: getRoute("dashboard") },
+    { label: "project_details", path: `${getRoute("projectDetails")}/${contractData?.project_id}` },
+    { label: "contract_details" },
+  ];
+
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -245,26 +252,7 @@ const ContractDetails = () => {
           initial="hidden"
           animate="visible"
         >
-          <motion.div
-            className="flex items-center gap-2 cursor-pointer mb-2"
-            onClick={() => navigate(getRoute("dashboard"))}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <ArrowLeftIcon
-              width={16}
-              height={16}
-              className="text-primary-150 flex-shrink-0"
-            />
-            <Typography
-              size="sm"
-              weight="semibold"
-              className="text-primary-150 truncate"
-            >
-              {t("back_to_dashboard")}
-            </Typography>
-          </motion.div>
+          <Breadcrumbs crumbs={crumbs} />
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

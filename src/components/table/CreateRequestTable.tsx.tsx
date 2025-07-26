@@ -359,18 +359,18 @@ const CreateRequestTable = ({
   };
 
   const tableHeader: TableHeader[] = [
-    {
-      content: (
-        <input
-          type="checkbox"
-          checked={selectedRows.length === tableData.length}
-          onChange={handleSelectAll}
-          className="w-4 h-4 rounded border-secondary-30 text-blue-600 focus:ring-blue-500"
-          aria-label="Select all rows"
-        />
-      ),
-      className: "w-10", // Fixed width for checkbox
-    },
+    // {
+    //   content: (
+    //     <input
+    //       type="checkbox"
+    //       checked={selectedRows.length === tableData.length}
+    //       onChange={handleSelectAll}
+    //       className="w-4 h-4 rounded border-secondary-30 text-blue-600 focus:ring-blue-500"
+    //       aria-label="Select all rows"
+    //     />
+    //   ),
+    //   className: "w-10", // Fixed width for checkbox
+    // },
     {
       content: <div>Sr No</div>,
       className: "w-16",
@@ -451,7 +451,7 @@ const CreateRequestTable = ({
           <TableBody className="divide-y divide-gray-100">
             {tableData.map((order, index) => (
               <TableRow key={order.id}>
-                <TableCell className="px-5 py-4 w-10">
+                {/* <TableCell className="px-5 py-4 w-10">
                   <input
                     type="checkbox"
                     checked={selectedRows.includes(order.id)}
@@ -459,7 +459,7 @@ const CreateRequestTable = ({
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     aria-label={`Select row ${order.id}`}
                   />
-                </TableCell>
+                </TableCell> */}
                 <TableCell className="px-5 py-4 text-gray-500 text-sm">
                   {index + 1}
                 </TableCell>

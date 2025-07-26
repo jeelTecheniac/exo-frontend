@@ -183,14 +183,14 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
               <div className="overflow-x-auto rounded-lg">
                 <div className="min-w-[600px] border border-secondary-30 rounded-lg">
                   <div className="grid grid-cols-5 bg-gray-50 py-3 px-4 text-sm text-secondary-60 border-b border-secondary-30">
-                    <div className="flex items-center">
+                    {/* <div className="flex items-center">
                       <input
                         type="checkbox"
                         className="w-5 h-5 mr-4 border border-gray-300 rounded"
                         disabled
                       />
                       <span>{t("sr_no")}</span>
-                    </div>
+                    </div> */}
                     <div>{t("country")}</div>
                     <div>{t("Province")}</div>
                     <div>{t("city")}</div>
@@ -204,14 +204,14 @@ const ContractReviewForm = ({ projectData }: ReviewFormProps) => {
                           key={address.id}
                           className="grid grid-cols-5 py-3 px-4 border-b border-secondary-30 last:border-0"
                         >
-                          <div className="flex items-center">
+                          {/* <div className="flex items-center">
                             <input
                               type="checkbox"
                               className="w-5 h-5 mr-4 border border-gray-300 rounded"
                               disabled
                             />
                             <span>{index + 1}</span>
-                          </div>
+                          </div> */}
                           <div>{address.country || "-"}</div>
                           <div>{address.providence || "-"}</div>
                           <div>{address.city || "-"}</div>
