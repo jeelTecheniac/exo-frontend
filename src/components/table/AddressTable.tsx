@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -22,29 +22,10 @@ const AddressTable = ({
   onDataChange?: (newData: Data[]) => void;
 }) => {
   const [tableData, setTableData] = useState<Data[]>(data);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   useEffect(() => {
     setTableData(data);
   }, [data]);
-
-  const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelectedRows(tableData.map((order) => order.id));
-    } else {
-      setSelectedRows([]);
-    }
-  };
-
-  const handleSelectRow = (orderId: number) => {
-    setSelectedRows((prev) => {
-      if (prev.includes(orderId)) {
-        return prev.filter((id) => id !== orderId);
-      } else {
-        return [...prev, orderId];
-      }
-    });
-  };
 
   const tableHeader: TableHeader[] = [
     // {
