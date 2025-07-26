@@ -1,7 +1,7 @@
 import { User } from "../context/AuthContext";
 
 type UserRole = "project_manager" | "user";
-export type RouteKey = "dashboard" | "projectList" | "profile" | "help";
+export type RouteKey = "dashboard" | "projectList" | "profile" | "help" | "projectDetails" | "contractDetails";
 
 type RoleBasedPathMap = Partial<Record<UserRole, string>> & {
   default: string;
@@ -18,6 +18,16 @@ const roleBasedRoutes: Record<RouteKey, RoleBasedPathMap> = {
     user: "/contract-project-list",
     default: "/sign-in",
   },
+  projectDetails: {
+    project_manager: "/project-details",
+    user: "/project-details",
+    default: "/sign-in",
+  },
+  contractDetails: {
+    project_manager: "/contract-details",
+    user: "/contract-details",
+    default: "/sign-in",
+  },  
   profile: {
     project_manager: "/edit-profile",
     user: "/edit-profile",

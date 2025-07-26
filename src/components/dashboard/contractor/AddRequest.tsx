@@ -19,10 +19,11 @@ import DashBoardCard from "../../../lib/components/molecules/DashBoardCard.tsx";
 import UploadFile, { UploadedFile } from "../../common/UploadFile.tsx";
 import axios from "axios";
 import localStorageService from "../../../services/local.service.ts";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useRoleRoute } from "../../../hooks/useRoleRoute.ts";
 import { toast } from "react-toastify";
 import Loader from "../../common/Loader.tsx";
+import Breadcrumbs from "../../common/Breadcrumbs.tsx";
 
 interface AddressData {
   id: string;
@@ -79,6 +80,7 @@ const AddRequest = () => {
   const { contractId, projectId, requestId } = useParams();
   const navigate = useNavigate();
   const { getRoute } = useRoleRoute();
+  const {pathname}=useLocation();
 
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [requestLetter, setRequestLetter] = useState("");
@@ -114,6 +116,14 @@ const AddRequest = () => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
   const [userData, setUserData] = useState<{ token: string } | undefined>();
+
+  const pathName:string=pathname.split("/")[1]
+
+  const crumbs = [
+    { label: "dashboard", path: getRoute("dashboard") },
+    { label: "contract_details", path: `${getRoute("contractDetails")}/${contractId}` },
+    { label: pathName==="add-request"?"create_request":"edit_request" },
+  ];
 
   useEffect(() => {
     const user = localStorageService.getUser() || "";
@@ -406,15 +416,7 @@ const AddRequest = () => {
 
   return (
     <div>
-      <div
-        className="flex items-center gap-2 cursor-pointer mb-2"
-        onClick={() => navigate(getRoute("dashboard"))}
-      >
-        <ArrowLeftIcon width={16} height={16} className="text-primary-150" />
-        <Typography size="base" weight="semibold" className="text-primary-150">
-          {t("back_to_dashboard")}
-        </Typography>
-      </div>
+      <Breadcrumbs crumbs={crumbs} />
       <Typography
         size="xl_2"
         weight="extrabold"

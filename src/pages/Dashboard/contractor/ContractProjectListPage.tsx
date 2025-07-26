@@ -126,6 +126,7 @@ const ContractProjectListPage = () => {
         })
       );
       setData(newProjectData);
+      setTotal(res.data.total);
       setLoading(false);
       return res;
     },
@@ -139,7 +140,6 @@ const ContractProjectListPage = () => {
   });
 
   useEffect(() => {
-    setTotal(0);
     contractMutation.mutate();
   }, [limit, offset, navigate, debouncedSearchTerm, range]);
 

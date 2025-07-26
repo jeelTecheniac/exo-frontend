@@ -130,6 +130,7 @@ const ContractListPage = () => {
         })
       );
       setData(newContractData);
+      setTotal(response.data.total);
       setLoading(false);
     },
     onError: async (error) => {
@@ -138,8 +139,7 @@ const ContractListPage = () => {
     },
   });
 
-  useEffect(() => {
-    setTotal(0);
+  useEffect(() => {    
     contractMutaion.mutate();
   }, [debouncedSearchTerm, limit, offset, range]);
 
@@ -151,6 +151,11 @@ const ContractListPage = () => {
       clearTimeout(handler);
     };
   }, [searchTerm]);
+  
+  const handlePageChange = (newPage: number) => {
+    const newOffset = (newPage - 1) * limit;
+    setOffset(newOffset);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -318,7 +323,7 @@ const ContractListPage = () => {
                   variant="outline"
                   className="px-2 py-1 min-w-[32px] border-0 disabled:text-gray-400"
                   disabled={currentPage === 1}
-                  // onClick={() => handlePageChange(currentPage - 1)}
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
                   {currentPage === 1 ? (
                     <ChevronLeftLightIcon />
@@ -335,7 +340,7 @@ const ContractListPage = () => {
                   variant="outline"
                   className="px-2 py-1 min-w-[32px] border-0"
                   disabled={currentPage === totalPages}
-                  //   onClick={() => handlePageChange(currentPage + 1)}
+                    onClick={() => handlePageChange(currentPage + 1)}
                 >
                   {currentPage === totalPages ? (
                     <ChevronRightLightIcon />
