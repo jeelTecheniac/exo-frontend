@@ -174,6 +174,7 @@ const ContractCreatePage = () => {
         projectAmount: project.amount,
         projectName: project.name,
         currency: project.currency,
+        projectCurrency: project.currency,
         beginDate: project.begin_date,
         endDate: project.end_date,
         description: project.description,
@@ -186,6 +187,12 @@ const ContractCreatePage = () => {
           municipality: address.municipality,
           country: address.country,
         })),
+      }));
+      
+      // Set the project currency in formData to fix the currency selection
+      setFormData((prev) => ({
+        ...prev,
+        currency: project.currency,
       }));
       return project;
     } catch (err: any) {
@@ -294,6 +301,7 @@ const ContractCreatePage = () => {
                 <ContractInfoForm
                   initialValues={formData}
                   onSubmit={handleFormSubmit}
+                  isProjectSelected={!!projectId || !!editProjectId}
                 />
               )}
 

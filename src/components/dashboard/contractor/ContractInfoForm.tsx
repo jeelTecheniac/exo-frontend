@@ -28,9 +28,10 @@ interface ContractFormValues {
 interface StepProps {
   initialValues?: ContractFormValues;
   onSubmit: (values: ContractFormValues) => void;
+  isProjectSelected?: boolean;
 }
 
-const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
+const ContractInfoForm = ({ initialValues, onSubmit, isProjectSelected = false }: StepProps) => {
   const { t } = useTranslation();
 
   const defaultValues: ContractFormValues = {
@@ -213,11 +214,22 @@ const ContractInfoForm = ({ initialValues, onSubmit }: StepProps) => {
                 options={currencyOptions}
                 value={values.amount}
                 currency={values.currency}
+                currencyDisabled={isProjectSelected}
                 onChange={(amount: string, currency: string) => {
                   setFieldValue("amount", amount);
-                  setFieldValue("currency", currency);
+                  if (!isProjectSelected) {
+                    setFieldValue("currency", currency);
+                  }
                 }}
               />
+              {isProjectSelected && (
+                <Typography
+                  size="sm"
+                  className="text-secondary-60 mt-1"
+                >
+                  Currency is fixed based on the selected project
+                </Typography>
+              )}
               <ErrorMessage
                 name="amount"
                 component="div"
