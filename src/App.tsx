@@ -190,7 +190,7 @@ export default function App() {
             <Route
               path="/"
               element={
-                <RoleBasedRoute allowedRoles={["user"]}>
+                <RoleBasedRoute allowedRoles={["project_manager"]}>
                   <Home />
                 </RoleBasedRoute>
               }

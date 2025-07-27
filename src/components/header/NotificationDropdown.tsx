@@ -1,46 +1,60 @@
 import { useState } from "react";
+import moment from "moment";
 
 import { Dropdown } from "../../lib/components/atoms/Dropdown";
 import { NotificationIcon } from "../../icons";
 import Typography from "../../lib/components/atoms/Typography";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import authService from "../../services/auth.service";
+
+interface NotificationData {
+  id: string;
+  user_id: string;
+  from_user_id: string;
+  push_type: number;
+  title: string;
+  message: string;
+  read: number;
+  extra: string;
+  created_at: string;
+  updated_at: string;
+  object_id: string;
+  object_type: string;
+}
+
+interface FormattedNotification {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  isRead: boolean;
+}
 
 export default function NotificationDropdown() {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      heading: "Renovation Project request is approved.",
-      time: "Today at 1:30 PM",
-      isRead: false,
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["notification"],
+    queryFn: () => {
+      return authService.notificationList();
     },
-    {
-      heading: "Reminder: Task ‘Submit proposal’ is due tomorrow.",
-      time: "Today at 1:30 PM",
-      isRead: true,
-    },
-    {
-      heading: "Rapid Return System project request is sent for approval.",
-      time: "Today at 1:30 PM",
-      isRead: true,
-    },
-    {
-      heading:
-        "Upcoming deadline: Request Vertex Compliance Hub is due for submission in 3 days",
-      time: "Today at 1:30 PM",
-      isRead: true,
-    },
-    {
-      heading: "Renovation Project request is approved.",
-      time: "Today at 1:30 PM",
-      isRead: true,
-    },
-  ]);
+  });
+
+  // Format notifications from API response
+  const formattedNotifications: FormattedNotification[] = (
+    data?.data?.data || []
+  ).map((notification: NotificationData) => ({
+    id: notification.id,
+    title: notification.title,
+    description: notification.message,
+    createdAt: moment(notification.created_at).fromNow(),
+    isRead: notification.read === 1,
+  }));
 
   function toggleDropdown() {
-    setIsOpen(true);
-    // Mark all as read when dropdown is opened
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setIsOpen(!isOpen);
   }
 
   function closeDropdown() {
@@ -52,8 +66,8 @@ export default function NotificationDropdown() {
   };
 
   // Separate unread and read notifications
-  const unread = notifications.filter((n) => !n.isRead);
-  const read = notifications.filter((n) => n.isRead);
+  const unread = formattedNotifications.filter((n) => !n.isRead);
+  const read = formattedNotifications.filter((n) => n.isRead);
 
   return (
     <div className="relative">
@@ -101,68 +115,101 @@ export default function NotificationDropdown() {
           </button>
         </div>
         <Typography size="xs" weight="semibold" className="text-secondary-50">
-          {t("today")}
+          {t("notifications")}
         </Typography>
-        <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar mt-2 gap-3">
-          {unread.length > 0 && (
-            <>
-              <li className="text-xs font-bold text-blue-600 mb-1">
-                {t("Unread")}
-              </li>
-              {unread.map((l, index) => (
-                <div
-                  key={"unread-" + index}
-                  className="notification-unread flex flex-col gap-1 rounded p-2"
-                >
-                  <Typography
-                    size="xs"
-                    weight="semibold"
-                    className="text-secondary-100"
-                  >
-                    {l.heading}
-                  </Typography>
-                  <Typography
-                    size="xs"
-                    weight="semibold"
-                    className="text-secondary-50"
-                  >
-                    {l.time}
-                  </Typography>
-                </div>
-              ))}
-            </>
-          )}
-          {read.length > 0 && (
-            <>
-              {unread.length > 0 && (
-                <li className="text-xs font-bold text-gray-400 mt-2 mb-1">
-                  {t("Read")}
+
+        {isLoading ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          </div>
+        ) : error ? (
+          <div className="py-4 text-center">
+            <Typography size="xs" className="text-red-500">
+              {t("failed_to_load_notifications")}
+            </Typography>
+          </div>
+        ) : formattedNotifications.length === 0 ? (
+          <div className="py-4 text-center">
+            <Typography size="xs" className="text-secondary-50">
+              {t("no_notifications")}
+            </Typography>
+          </div>
+        ) : (
+          <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar mt-2 gap-3">
+            {unread.length > 0 && (
+              <>
+                <li className="text-xs font-bold text-blue-600 mb-1">
+                  {t("Unread")}
                 </li>
-              )}
-              {read.map((l, index) => (
-                <div
-                  key={"read-" + index}
-                  className="notification-read flex flex-col gap-1 rounded p-2"
-                >
-                  <Typography
-                    size="xs"
-                    weight="semibold"
-                    className="text-secondary-100"
+                {unread.map((l, index) => (
+                  <div
+                    key={"unread-" + index}
+                    className="notification-unread flex flex-col gap-1 rounded p-2"
                   >
-                    {l.heading}
-                  </Typography>
-                  <Typography
-                    size="xs"
-                    weight="semibold"
-                    className="text-secondary-50"
+                    <Typography
+                      size="xs"
+                      weight="semibold"
+                      className="text-secondary-100"
+                    >
+                      {l.title}
+                    </Typography>
+                    <Typography
+                      size="xs"
+                      weight="normal"
+                      className="text-secondary-80"
+                    >
+                      {l.description}
+                    </Typography>
+                    <Typography
+                      size="xs"
+                      weight="semibold"
+                      className="text-secondary-50"
+                    >
+                      {l.createdAt}
+                    </Typography>
+                  </div>
+                ))}
+              </>
+            )}
+            {read.length > 0 && (
+              <>
+                {unread.length > 0 && (
+                  <li className="text-xs font-bold text-gray-400 mt-2 mb-1">
+                    {t("Read")}
+                  </li>
+                )}
+                {read.map((l, index) => (
+                  <div
+                    key={"read-" + index}
+                    className="notification-read flex flex-col gap-1 rounded p-2"
                   >
-                    {l.time}
-                  </Typography>
-                </div>
-              ))}
-            </>
-          )}
-        </ul>
+                    <Typography
+                      size="xs"
+                      weight="semibold"
+                      className="text-secondary-100"
+                    >
+                      {l.title}
+                    </Typography>
+                    <Typography
+                      size="xs"
+                      weight="normal"
+                      className="text-secondary-80"
+                    >
+                      {l.description}
+                    </Typography>
+                    <Typography
+                      size="xs"
+                      weight="semibold"
+                      className="text-secondary-50"
+                    >
+                      {l.createdAt}
+                    </Typography>
+                  </div>
+                ))}
+              </>
+            )}
+          </ul>
+        )}
         {/* <Link
           to="/"
           className="block px-4 py-2 mt-3 text-sm font-medium text-center text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
