@@ -22,7 +22,7 @@ interface PolicyData {
   sections: PolicySection[];
 }
 
-const TermsConditionModal = ({
+const PrivacyModal = ({
   isOpen,
   onClose,
   onAccept,
@@ -32,26 +32,22 @@ const TermsConditionModal = ({
 
   // Fetch terms data from API
   const { data, isLoading, error } = useQuery({
-    queryKey: ["terms", i18n.language],
+    queryKey: ["privacy", i18n.language],
     queryFn: () => {
-      return termsService.getTerms(i18n.language);
+      return termsService.getPrivacy(i18n.language);
     },
-    enabled: isOpen, // Only fetch when modal is open
+    enabled: isOpen,
   });
 
   // Update policy data when API data is received
   useEffect(() => {
     if (data) {
-      console.log(data, "API data received");
-
-      // Transform API data to match your PolicyData interface
-      // Adjust this based on your actual API response structure
       const transformedData: PolicyData = {
         lastUpdated: data.lastUpdated || "May 10, 2025",
         sections: data.sections ||
           data.content || [
             {
-              title: "Terms and Conditions",
+              title: "Privacy Policy",
               content: typeof data === "string" ? data : JSON.stringify(data),
             },
           ],
@@ -72,7 +68,7 @@ const TermsConditionModal = ({
         {/* Header */}
         <div className="py-4">
           <Typography size="xl" weight="bold" className="text-secondary-100">
-            Terms and Condition
+            Privacy
           </Typography>
           <Typography size="sm" weight="normal" className="text-secondary-60">
             <span>Last Updated: </span>
@@ -85,13 +81,13 @@ const TermsConditionModal = ({
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <Typography size="base" className="text-secondary-60">
-                Loading terms and conditions...
+                Loading privacy...
               </Typography>
             </div>
           ) : error ? (
             <div className="flex items-center justify-center h-full">
               <Typography size="base" className="text-red-600">
-                Failed to load terms and conditions. Showing default content.
+                Failed to load privacy. Showing default content.
               </Typography>
             </div>
           ) : (
@@ -145,4 +141,4 @@ const TermsConditionModal = ({
   );
 };
 
-export default TermsConditionModal;
+export default PrivacyModal;

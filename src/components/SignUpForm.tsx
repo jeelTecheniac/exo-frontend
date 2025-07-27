@@ -19,12 +19,35 @@ import { mobileCountryCode } from "../utils/constant/apiRoutes";
 import { useMutation } from "@tanstack/react-query";
 import authService from "../services/auth.service";
 import { toast } from "react-toastify";
+import PrivacyModal from "./modal/PrivacyModal";
 
 const SignUpForm = () => {
   const [remember, setRemember] = useState(false);
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isOpen, openModal, closeModal } = useModal();
+  const {
+    isOpen: isTermModel,
+    openModal: openTermModel,
+    closeModal: closeTermModel,
+  } = useModal();
+
+  const {
+    isOpen: isPrivacyModel,
+    openModal: openPrivacyModel,
+    closeModal: closePrivacyModel,
+  } = useModal();
+
+  const handleTermsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openTermModel();
+  };
+
+  const handlePrivacyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openPrivacyModel();
+  };
 
   const [passwordStrength, setPasswordStrength] = useState<
     "week" | "acceptable" | "strong" | ""
@@ -64,8 +87,9 @@ const SignUpForm = () => {
       toast.success(t("otp_sent_successfully"));
       navigate("/otp-verification");
     },
-    onError: (error: any) => {
-      if (error.status === 412) {
+    onError: (error: unknown) => {
+      const errorObj = error as { status?: number };
+      if (errorObj.status === 412) {
         return toast.error(t("email_is_already_registered"));
       }
       return toast.error(t("otp_send_error"));
@@ -319,15 +343,15 @@ const SignUpForm = () => {
           <Typography className="text-secondary-60 text-base font-normal">
             {t("i_agree_to_the")}
             <span
-              className="text-primary-150 text-base font-normal mx-1 cursor-pointer"
-              onClick={openModal}
+              className="text-primary-150 text-base font-normal mx-1 cursor-pointer hover:underline"
+              onClick={handleTermsClick}
             >
               {t("terms_conditions")}
             </span>
             {t("and")}
             <span
-              className="text-primary-150 text-base font-normal mx-1 cursor-pointer"
-              onClick={openModal}
+              className="text-primary-150 text-base font-normal mx-1 cursor-pointer hover:underline"
+              onClick={handlePrivacyClick}
             >
               {t("privacy_policy")}
             </span>
@@ -346,7 +370,9 @@ const SignUpForm = () => {
           </Button>
         </motion.div>
       </motion.form>
-      <TermsConditionModal isOpen={isOpen} onClose={closeModal} />
+
+      <TermsConditionModal isOpen={isTermModel} onClose={closeTermModel} />
+      <PrivacyModal isOpen={isPrivacyModel} onClose={closePrivacyModel} />
     </motion.div>
   );
 };

@@ -6,10 +6,34 @@ import Typography from "../../lib/components/atoms/Typography";
 import { useTranslation } from "react-i18next";
 import TermsConditionModal from "../../components/modal/TermsConditionModal";
 import { useModal } from "../../hooks/useModal";
+import PrivacyModal from "../../components/modal/PrivacyModal";
 
 const SignIn = () => {
   const { t } = useTranslation();
-  const { isOpen, openModal, closeModal } = useModal();
+
+  const {
+    isOpen: isTermModel,
+    openModal: openTermModel,
+    closeModal: closeTermModel,
+  } = useModal();
+
+  const {
+    isOpen: isPrivacyModel,
+    openModal: openPrivacyModel,
+    closeModal: closePrivacyModel,
+  } = useModal();
+
+  const handleTermsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openTermModel();
+  };
+
+  const handlePrivacyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openPrivacyModel();
+  };
   return (
     <AuthLayout>
       <div className="flex">
@@ -19,7 +43,7 @@ const SignIn = () => {
             <div>
               <SignInForm />
             </div>
-            <div className="text-center mb-2 lg:mb-0" onClick={openModal}>
+            <div className="text-center mb-2 lg:mb-0">
               <Typography
                 className="text-secondary-60"
                 size="base"
@@ -27,16 +51,29 @@ const SignIn = () => {
               >
                 {t("by_signing_up_to_create_an_account_i_accept_company")}
               </Typography>
-              <span className="text-primary-150 text-base font-semibold cursor-pointer">
-                {t("terms_of_use_privacy_policy")}.
-              </span>
+              <Typography className="text-secondary-60 text-base font-normal">
+                <span
+                  className="text-primary-150 text-base font-normal mx-1 cursor-pointer hover:underline"
+                  onClick={handleTermsClick}
+                >
+                  {t("terms_conditions")}
+                </span>
+                {t("and")}
+                <span
+                  className="text-primary-150 text-base font-normal mx-1 cursor-pointer hover:underline"
+                  onClick={handlePrivacyClick}
+                >
+                  {t("privacy_policy")}
+                </span>
+              </Typography>
             </div>
           </div>
         </div>
         <div className="w-full hidden lg:block">
           <Features />
         </div>
-        <TermsConditionModal isOpen={isOpen} onClose={closeModal} />
+        <TermsConditionModal isOpen={isTermModel} onClose={closeTermModel} />
+        <PrivacyModal isOpen={isPrivacyModel} onClose={closePrivacyModel} />
       </div>
     </AuthLayout>
   );
