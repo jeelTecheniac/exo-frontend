@@ -48,6 +48,9 @@ class AuthService extends ApiBaseService {
       },
     });
   }
+  async notificationList() {
+    return await this.authorizedRequest.post(ApiRoutes.NOTIFICATION_LIST);
+  }
   // async getProfile() {
   //   return await this.guestRequest.post(ApiRoutes.RESET_PASSWORD, data);
   // }

@@ -27,8 +27,6 @@ const RoleBasedRoute: React.FC<RoleBasedRouteProps> = ({
   // Check if user has the required role
   const hasRequiredRole = user.type && allowedRoles.includes(user.type);
 
-  console.log(hasRequiredRole, "has required role");
-
   if (!hasRequiredRole) {
     // Redirect to appropriate dashboard based on user type
     let redirectPath = fallbackPath;

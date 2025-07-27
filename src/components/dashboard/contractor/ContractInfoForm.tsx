@@ -31,7 +31,11 @@ interface StepProps {
   isProjectSelected?: boolean;
 }
 
-const ContractInfoForm = ({ initialValues, onSubmit, isProjectSelected = false }: StepProps) => {
+const ContractInfoForm = ({
+  initialValues,
+  onSubmit,
+  isProjectSelected = false,
+}: StepProps) => {
   const { t } = useTranslation();
 
   const defaultValues: ContractFormValues = {
@@ -69,56 +73,56 @@ const ContractInfoForm = ({ initialValues, onSubmit, isProjectSelected = false }
     dateOfSigning: Yup.string().required(t("date_required")),
   });
 
-    const fileUploadMutation = async ({
-      file,
-      onProgress,
-    }: {
-      file: File;
-      onProgress: (percent: number) => void;
-    }): Promise<{ id: string; url: string }> => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("type", "document");
-      formData.append("object_type", "contract");
+  const fileUploadMutation = async ({
+    file,
+    onProgress,
+  }: {
+    file: File;
+    onProgress: (percent: number) => void;
+  }): Promise<{ id: string; url: string }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "document");
+    formData.append("object_type", "contract");
 
-      const response = await projectService.uploadFile(formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          // VAuthorization: `Bearer ${user?.token}`,
-        },
-        onUploadProgress: (event: ProgressEvent) => {
-          if (event.total) {
-            const percent = Math.round((event.loaded * 100) / event.total);
-            onProgress(percent);
-          }
-        },
-      });
-
-      return {
-        id: response.data.data?.id ?? Date.now().toString(),
-        url: response.data.data?.url ?? "",
-        // file:response.data.data ?? ""
-      };
-    };
-    const uploadMutation = useMutation({
-      mutationFn: fileUploadMutation,
-      onSuccess: (data) => {
-        // toast.success("File uploaded successfully!");
-        console.log("Upload result:", data);
+    const response = await projectService.uploadFile(formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        // VAuthorization: `Bearer ${user?.token}`,
       },
-      onError: () => {
-        // toast.error("Failed to upload file.");
+      onUploadProgress: (event: ProgressEvent) => {
+        if (event.total) {
+          const percent = Math.round((event.loaded * 100) / event.total);
+          onProgress(percent);
+        }
       },
     });
-    const handleUploadFile = async (
-      file: File,
-      onProgress: (percent: number) => void
-    ) => {
-      const response = await uploadMutation.mutateAsync({ file, onProgress });
-      return response;
-    };
 
-    const removeFileMutation = useMutation({
+    return {
+      id: response.data.data?.id ?? Date.now().toString(),
+      url: response.data.data?.url ?? "",
+      // file:response.data.data ?? ""
+    };
+  };
+  const uploadMutation = useMutation({
+    mutationFn: fileUploadMutation,
+    onSuccess: (data) => {
+      // toast.success("File uploaded successfully!");
+      console.log("Upload result:", data);
+    },
+    onError: () => {
+      // toast.error("Failed to upload file.");
+    },
+  });
+  const handleUploadFile = async (
+    file: File,
+    onProgress: (percent: number) => void
+  ) => {
+    const response = await uploadMutation.mutateAsync({ file, onProgress });
+    return response;
+  };
+
+  const removeFileMutation = useMutation({
     mutationFn: async (id: string) => {
       await projectService.removeFile(id);
       return { status: true };
@@ -131,21 +135,22 @@ const ContractInfoForm = ({ initialValues, onSubmit, isProjectSelected = false }
     },
   });
 
-    const handleDeleteFile = async (
-        fileId: string,
-        setFieldValue: FormikHelpers<ContractFormValues>["setFieldValue"],
-        files: UploadedFile[]
-      ) => {
-        const response = await removeFileMutation.mutateAsync(fileId);
-        if (response.status) {
-          const filteredFiles = files.filter(
-            (file: UploadedFile) => file.id !== fileId
-          );
-          setFieldValue("files", filteredFiles);
-          return { status: true };
-        }
-        return { status: false };
-      };
+  const handleDeleteFile = async (
+    fileId: string,
+    setFieldValue: FormikHelpers<ContractFormValues>["setFieldValue"],
+    files: UploadedFile[]
+  ) => {
+    const response = await removeFileMutation.mutateAsync(fileId);
+    if (response.status) {
+      const filteredFiles = files.filter(
+        (file: UploadedFile) => file.id !== fileId
+      );
+      setFieldValue("files", filteredFiles);
+      return { status: true };
+    }
+    return { status: false };
+  };
+  console.log("Initial values:", initialValues);
 
   return (
     <Formik
@@ -173,7 +178,8 @@ const ContractInfoForm = ({ initialValues, onSubmit, isProjectSelected = false }
           </div>
           <div>
             <Label htmlFor="signedBy">
-              {t("signed_by")}<span className="text-red-500">*</span>
+              {t("signed_by")}
+              <span className="text-red-500">*</span>
             </Label>
             <Field
               id="signedBy"
@@ -223,10 +229,7 @@ const ContractInfoForm = ({ initialValues, onSubmit, isProjectSelected = false }
                 }}
               />
               {isProjectSelected && (
-                <Typography
-                  size="sm"
-                  className="text-secondary-60 mt-1"
-                >
+                <Typography size="sm" className="text-secondary-60 mt-1">
                   Currency is fixed based on the selected project
                 </Typography>
               )}
@@ -335,12 +338,12 @@ const ContractInfoForm = ({ initialValues, onSubmit, isProjectSelected = false }
               //   });
               // }}
               onDeleteFile={async (fileId: string) => {
-                    return handleDeleteFile(
-                      fileId,
-                      setFieldValue,
-                      values.contractFiles
-                    );
-                  }}
+                return handleDeleteFile(
+                  fileId,
+                  setFieldValue,
+                  values.contractFiles
+                );
+              }}
               // onDeleteFile={async (id) => {
               //   const updated = values.contractFiles.filter(
               //     (file) => file.id !== id

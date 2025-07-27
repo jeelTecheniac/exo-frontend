@@ -7,6 +7,7 @@ import Label from "../../lib/components/atoms/Label";
 import PhoneInput from "../../lib/components/atoms/PhoneInput";
 import Typography from "../../lib/components/atoms/Typography";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 import authService from "../../services/auth.service";
 
@@ -31,6 +32,7 @@ interface FormValues {
 
 interface UserInformationProps {
   userData: UserData;
+  onProfileUpdate?: () => void;
 }
 
 // 📌 Fixed Validation Schema - field names now match form fields
@@ -44,31 +46,27 @@ const validationSchema = Yup.object().shape({
     .matches(/^\d{10}$/, "Enter a valid 10-digit mobile number"),
 });
 
-const UserInformation = ({ userData }: UserInformationProps) => {
+const UserInformation = ({ userData, onProfileUpdate }: UserInformationProps) => {
   const { t } = useTranslation();
 
   // 🔥 HOOK MUST BE CALLED BEFORE ANY EARLY RETURNS
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: FormValues) => {
-      const formData = new FormData();
-
-      // Append form data
-      Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
-
-      const res = await authService.editProfile(data);
+    mutationFn: async (formData: FormData) => {
+      const res = await authService.editProfile(formData);
       return res.data;
     },
     onSuccess: (res) => {
       console.log("Profile updated successfully:", res);
-      // Add success notification here
-      // toast.success(t("profile_updated_successfully"));
+      toast.success(t("profile_updated_successfully"));
+      
+      // Trigger profile refresh
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
     },
     onError: (error) => {
       console.error("Error during profile update:", error);
-      // Add error notification here
-      // toast.error(t("profile_update_error"));
+      toast.error(t("profile_update_error"));
     },
   });
 
@@ -97,17 +95,23 @@ const UserInformation = ({ userData }: UserInformationProps) => {
     mobile: userData.mobile || "",
   };
 
-  const handleSubmit = async (
+const handleSubmit = async (
     values: FormValues,
     { setSubmitting }: FormikHelpers<FormValues>
   ) => {
     try {
-      const payload = {
-        ...values,
-      };
+      const formData = new FormData();
 
-      await updateProfileMutation.mutateAsync(payload);
-      console.log("Payload submitted:", payload);
+      // Append form data
+      Object.entries(values).forEach(([key, value]) => {
+        if (key !== 'profile_image' && value !== undefined && value !== null) {
+          formData.append(key, value as string);
+        }
+      });
+      
+
+      await updateProfileMutation.mutateAsync(formData);
+      console.log("FormData submitted:", formData);
     } catch (err) {
       console.error("Update failed:", err);
     } finally {
@@ -189,6 +193,7 @@ const UserInformation = ({ userData }: UserInformationProps) => {
                 className="text-red-500 text-sm"
               />
             </div>
+
 
             {/* Mobile Number with Country Code */}
             <div className="mt-6">

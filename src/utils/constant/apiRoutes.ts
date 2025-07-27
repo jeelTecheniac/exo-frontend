@@ -25,6 +25,7 @@ export const ApiRoutes = {
   ALL_CONTRACT_LIST: "/contract/list",
   // Request routes
   GET_ALL_REQUEST: "/request/list",
+  NOTIFICATION_LIST: "/notifications",
 };
 
 export const mobileCountryCode = [

@@ -139,7 +139,10 @@ const ContractCreatePage = () => {
         "date_of_signing",
         moment(data.dateOfSigning, "DD-MM-YYYY").format("YYYY-MM-DD")
       );
-      payload.append("document_ids",filesData.map((file:any) => file.id).join(","));
+      payload.append(
+        "document_ids",
+        filesData.map((file: any) => file.id).join(",")
+      );
       if (projectId) {
         payload.append("project_id", projectId);
       }
@@ -147,7 +150,7 @@ const ContractCreatePage = () => {
         payload.append("project_id", editProjectId);
         payload.append("contract_id", contractId);
       }
-      const response = await contractService.creteContract(payload);      
+      const response = await contractService.creteContract(payload);
       setNewContractId(response.data.data.id);
       return response.data;
     },
@@ -188,7 +191,7 @@ const ContractCreatePage = () => {
           country: address.country,
         })),
       }));
-      
+
       // Set the project currency in formData to fix the currency selection
       setFormData((prev) => ({
         ...prev,
@@ -226,10 +229,12 @@ const ContractCreatePage = () => {
         } = response.data.data;
         setEditProjectId(contractData.project_id);
         fetchProject(contractData.project_id);
-        
-      const files = response.data.data.documents;
-      const filesData = Array.isArray(files) ? files : files ? [files] : [];
-      
+
+        console.log(contractData, "contract data");
+
+        const files = response.data.data.documents;
+        const filesData = Array.isArray(files) ? files : files ? [files] : [];
+
         setFormData((prev: FormDataProps) => ({
           ...prev,
           amount: parseFloat(contractData.amount).toString(),
@@ -242,7 +247,6 @@ const ContractCreatePage = () => {
           position: contractData.position,
         }));
       }
-      console.log(response.data.data, "contract Data");
     },
     onError: async (error) => {
       setLoading(true);
@@ -333,7 +337,7 @@ const ContractCreatePage = () => {
         <CreateContractConfirmationModal
           isOpen={isOpen}
           onClose={closeModal}
-          projectId={`${projectId||editProjectId}/${newContractId}`}
+          projectId={`${projectId || editProjectId}/${newContractId}`}
         />
       </div>
     </AppLayout>
