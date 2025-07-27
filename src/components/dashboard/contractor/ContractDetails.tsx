@@ -7,7 +7,6 @@ import {
   GreenRightIcon,
   PdfIcon,
   SearchIcon,
-  UsdVioletIcon,
 } from "../../../icons";
 import Typography from "../../../lib/components/atoms/Typography";
 import DashBoardCard from "../../../lib/components/molecules/DashBoardCard";
@@ -37,7 +36,7 @@ interface ContractProps {
   position: string;
   documents: [];
   requests_data: [];
-  currency: "USD" | "CDF"
+  currency: "USD" | "CDF";
 }
 
 // Define the type for request data from API

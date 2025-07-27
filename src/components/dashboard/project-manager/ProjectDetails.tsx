@@ -1,13 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import {
-  ArrowLeftIcon,
-  CdfCreamIcon,
-  CdfGreenIcon,
-  CdfPurpleIcon,
-  CommentIcon,
-  PdfIcon,
-} from "../../../icons";
+import { ArrowLeftIcon, CommentIcon, PdfIcon } from "../../../icons";
 import Typography from "../../../lib/components/atoms/Typography";
 import Button from "../../../lib/components/atoms/Button";
 import DashBoardCard from "../../../lib/components/molecules/DashBoardCard";
@@ -97,8 +90,8 @@ const ProjectDetails = () => {
   });
 
   const { setLoading } = useLoading();
-  const {getRoute}=useRoleRoute()
-  const navigate=useNavigate()
+  const { getRoute } = useRoleRoute();
+  const navigate = useNavigate();
 
   const fetchProject = async (projectId: string) => {
     try {
@@ -182,7 +175,7 @@ const ProjectDetails = () => {
             <div className="flex-1 min-w-0">
               <motion.div
                 className="flex items-center gap-2 cursor-pointer mb-2"
-                onClick={() => navigate(getRoute("dashboard")) }
+                onClick={() => navigate(getRoute("dashboard"))}
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
@@ -459,7 +452,8 @@ const ProjectDetails = () => {
                           href={doc.file}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-blue-600 hover:underline break-all">
+                          className="flex items-center gap-1 text-blue-600 hover:underline break-all"
+                        >
                           <PdfIcon width={16} height={16} />
                           {doc.original_name}
                         </a>
