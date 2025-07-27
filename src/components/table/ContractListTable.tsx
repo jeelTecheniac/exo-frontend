@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import moment from "moment";
 import { ArchiveIconDark, EyeDarkIcon, PencilIcon, PlusIcon } from "../../icons";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 export interface TableHeader {
   content: React.ReactNode;
@@ -102,6 +103,8 @@ const ContractListTable = ({
 
   const navigate = useNavigate();
 
+  const { t } = useTranslation()
+
   // const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
   //   if (event.target.checked) {
   //     setSelectedRows(tableData.map((order) => order.id));
@@ -147,39 +150,39 @@ const ContractListTable = ({
 
   const tableHeader: TableHeader[] = [
     {
-      content: <div className="text-nowrap">Sr No</div>,
+      content: <div className="text-nowrap">{t("sr_no")}</div>,
       className: "w-16",
     },
     {
-      content: <div className="text-nowrap">Project Name</div>,
+      content: <div className="text-nowrap">{t("project_name")}</div>,
       className: "min-w-[120px]",
     },
     {
-      content: <div className="text-nowrap">Signed By</div>,
+      content: <div className="text-nowrap">{t("signed_by")}</div>,
       className: "min-w-[120px]",
     },
     {
-      content: <div className="text-nowrap">Position</div>,
+      content: <div className="text-nowrap">{t("position")}</div>,
       className: "w-24",
     },
     {
-      content: <div className="text-nowrap">Amount of Contract</div>,
+      content: <div className="text-nowrap">{t("amount_of_contract")}</div>,
       className: "min-w-[120px]",
     },
     {
-      content: <div className="text-nowrap">Organization</div>,
+      content: <div className="text-nowrap">{t("organization")}</div>,
       className: "w-24",
     },
     {
-      content: <div className="text-nowrap">Date of Signing</div>,
+      content: <div className="text-nowrap">{t("date_of_signing")}</div>,
       className: "w-24",
     },
     {
-      content: <div className="text-nowrap">Number of Requests</div>,
+      content: <div className="text-nowrap">{t("number_of_equests")}</div>,
       className: "w-24",
     },
     {
-      content: <div>Actions</div>,
+      content: <div>{t("actions")}</div>,
       className: "w-20",
     },
   ];

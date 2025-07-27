@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "./CreateRequestTable.tsx";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 export interface ContractData {
   id: number;
@@ -23,6 +24,7 @@ export interface ContractData {
 const ContractTable = ({ data }: { data: ContractData[] | [] }) => {
   const [tableData, setTableData] = useState<ContractData[]>(data);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     setTableData(data);
@@ -46,31 +48,31 @@ const ContractTable = ({ data }: { data: ContractData[] | [] }) => {
     //   className: "w-10", // Fixed width for checkbox
     // },
     {
-      content: <div>Sr No</div>,
+      content: <div>{t("sr_no")}</div>,
       className: "w-16",
     },
     {
-      content: <div>Signed By</div>,
+      content: <div>{t("signed_by")}</div>,
       className: "min-w-[120px]",
     },
     {
-      content: <div>Position</div>,
+      content: <div>{t("position")}</div>,
       className: "min-w-[120px]",
     },
     {
-      content: <div>Amount by Contract</div>,
+      content: <div>{t("amount_by_contract")}</div>,
       className: "min-w-[140px]",
     },
     {
-      content: <div>Organization</div>,
+      content: <div>{t("organization")}</div>,
       className: "min-w-[140px]",
     },
     {
-      content: <div>Date Created</div>,
+      content: <div>{t("date_created")}</div>,
       className: "w-28",
     },
     {
-      content: <div>No of Request</div>,
+      content: <div>{t("no_of_request")}</div>,
       className: "w-24",
     },
     {

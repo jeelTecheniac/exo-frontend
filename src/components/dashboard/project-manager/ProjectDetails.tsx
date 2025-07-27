@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import moment from "moment";
 import { useRoleRoute } from "../../../hooks/useRoleRoute";
+import CurrencyBadge from "../../common/CurrencyBadge";
 
 export interface ProjectProps {
   id: string;
@@ -26,7 +27,7 @@ export interface ProjectProps {
   name: string;
   funded_by: string;
   reference: string;
-  currency: string;
+  currency: "USD" | "CDF";
   amount: string;
   begin_date: string;
   end_date: string;
@@ -245,28 +246,56 @@ const ProjectDetails = () => {
           >
             <motion.div variants={cardVariants}>
               <DashBoardCard
-                icon={<CdfCreamIcon width={44} height={44} />}
+                icon={
+                  <CurrencyBadge
+                    currency={projectData?.currency || "CDF"}
+                    variant="orange"
+                    width={44}
+                    height={44}
+                  />
+                }
                 count={Number(cardData?.project_amount) || 0}
                 title={t("project_amount")}
               />
             </motion.div>
             <motion.div variants={cardVariants}>
               <DashBoardCard
-                icon={<CdfPurpleIcon width={44} height={44} />}
+                icon={
+                  <CurrencyBadge
+                    currency={projectData?.currency || "CDF"}
+                    variant="violet"
+                    width={44}
+                    height={44}
+                  />
+                }
                 count={Number(cardData.contracts_total)}
                 title={t("sum_of_contracts_amount")}
               />
             </motion.div>
             <motion.div variants={cardVariants}>
               <DashBoardCard
-                icon={<CdfCreamIcon width={44} height={44} />}
+                icon={
+                  <CurrencyBadge
+                    currency={projectData?.currency || "CDF"}
+                    variant="orange"
+                    width={44}
+                    height={44}
+                  />
+                }
                 count={Number(cardData.requests_total)}
                 title={t("sum_of_requests_amount")}
               />
             </motion.div>
             <motion.div variants={cardVariants}>
               <DashBoardCard
-                icon={<CdfGreenIcon width={44} height={44} />}
+                icon={
+                  <CurrencyBadge
+                    currency={projectData?.currency || "CDF"}
+                    variant="green"
+                    width={44}
+                    height={44}
+                  />
+                }
                 count={0}
                 title={t("sum_of_approved_amount")}
               />

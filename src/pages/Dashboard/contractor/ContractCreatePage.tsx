@@ -137,7 +137,7 @@ const ContractCreatePage = () => {
       payload.append("place", data.place);
       payload.append(
         "date_of_signing",
-        moment(data.dateOfSigning, "DD-MM-YYYY").format("YYYY-MM-DD")
+        moment(data.dateOfSigning, ["DD-MM-YYYY", "YYYY-MM-DD"], true).format("YYYY-MM-DD")
       );
       payload.append("document_ids",filesData.map((file:any) => file.id).join(","));
       if (projectId) {
@@ -302,6 +302,7 @@ const ContractCreatePage = () => {
                   initialValues={formData}
                   onSubmit={handleFormSubmit}
                   isProjectSelected={!!projectId || !!editProjectId}
+                  projectAmount={contractReview.projectAmount}
                 />
               )}
 
