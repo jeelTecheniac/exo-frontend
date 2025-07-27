@@ -346,7 +346,7 @@ const TestRequestDetails = () => {
                           {requestData &&
                             requestData?.files?.map((f) => {
                               return (
-                                <div className="inline-flex items-center gap-2 border border-secondary-60 rounded-full px-3 py-1.5 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
+                                <div key={f.id} className="inline-flex items-center gap-2 border border-secondary-60 rounded-full px-3 py-1.5 bg-white hover:bg-gray-50 cursor-pointer transition-colors">
                                   <PdfIcon width={12} height={12} />
                                   <Typography
                                     size="xs"

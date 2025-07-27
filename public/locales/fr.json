@@ -201,7 +201,7 @@
   "email_updated_successfully": "E-mail mis à jour avec succès",
   "email_update_error": "Erreur lors de la mise à jour de l'e-mail",
   "select_address": "Select Address",
-  "loading": "loading....",
+  "loading": "chargement....",
   "file_uploaded_successfully": "File uploaded successfully!",
   "request_created": "Request Created",
   "details": "détails",
@@ -270,5 +270,12 @@
   "amount_required": "Le champ 'Montant' est requis",
   "organization_required": "Le champ 'Organisation' est requis",
   "place_required": "Le champ 'Lieu' est requis",
-  "date_required": "La date est requise"
+  "date_required": "La date est requise",
+  "contract_amount_exceeds_project": "Le montant du contrat ne peut pas dépasser le montant du projet.",
+  "amount_by_contract": "Montant par contrat",
+  "date_created": "Date de création",
+  "no_of_request": "Nombre de demandes",
+  "amount_of_contract": "Montant du contrat",
+  "number_of_equests": "Nombre de demandes",
+  "actions": "Actions"
 }

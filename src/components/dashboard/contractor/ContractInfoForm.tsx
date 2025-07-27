@@ -29,12 +29,14 @@ interface StepProps {
   initialValues?: ContractFormValues;
   onSubmit: (values: ContractFormValues) => void;
   isProjectSelected?: boolean;
+  projectAmount?: string;
 }
 
 const ContractInfoForm = ({
   initialValues,
   onSubmit,
   isProjectSelected = false,
+  projectAmount,
 }: StepProps) => {
   const { t } = useTranslation();
 
@@ -67,8 +69,23 @@ const ContractInfoForm = ({
     signedBy: Yup.string().required(t("signed_by_required")),
     position: Yup.string().required(t("position_required")),
     // projectManager: Yup.string().required("Project Manager is required"),
-    organization: Yup.string().required(t("amount_required")),
-    amount: Yup.string().required(t("organization_required")),
+    organization: Yup.string().required(t("organization_required")),
+    amount: Yup.string()
+      .required(t("amount_required"))
+      .test(
+        "amount-less-than-project",
+        t("contract_amount_exceeds_project"),
+        (value) => {
+          if (!projectAmount || !value) return true;
+          const contractAmount = parseFloat(value);
+          const projAmount = parseFloat(projectAmount);
+          return (
+            !isNaN(contractAmount) &&
+            !isNaN(projAmount) &&
+            contractAmount <= projAmount
+          );
+        }
+      ),
     place: Yup.string().required(t("place_required")),
     dateOfSigning: Yup.string().required(t("date_required")),
   });
@@ -158,7 +175,7 @@ const ContractInfoForm = ({
       validationSchema={validationSchema}
       onSubmit={onSubmit}
     >
-      {({ values, setFieldValue, touched, errors }) => (
+      {({ values, setFieldValue, touched, errors, validateField }) => (
         <Form className="space-y-5">
           <div className="mb-6">
             <Typography
@@ -226,6 +243,7 @@ const ContractInfoForm = ({
                   if (!isProjectSelected) {
                     setFieldValue("currency", currency);
                   }
+                  validateField("amount");
                 }}
               />
               {isProjectSelected && (
@@ -294,7 +312,11 @@ const ContractInfoForm = ({
               id="dateOfSigning"
               defaultDate={
                 values.dateOfSigning
-                  ? moment(values.dateOfSigning, "DD-MM-YYYY").toDate()
+                  ? moment(
+                      values.dateOfSigning,
+                      ["DD-MM-YYYY", "YYYY-MM-DD"],
+                      true
+                    ).toDate()
                   : undefined
               }
               onChange={(selectedDates: Date[]) => {

@@ -25,6 +25,7 @@ import { useAuth } from "../../../context/AuthContext";
 import requestService from "../../../services/request.service";
 import { useRoleRoute } from "../../../hooks/useRoleRoute";
 import Breadcrumbs from "../../common/Breadcrumbs";
+import CurrencyBadge from "../../common/CurrencyBadge";
 
 interface ContractProps {
   id: string;
@@ -36,6 +37,7 @@ interface ContractProps {
   position: string;
   documents: [];
   requests_data: [];
+  currency: "USD" | "CDF"
 }
 
 // Define the type for request data from API
@@ -292,7 +294,9 @@ const ContractDetails = () => {
           <motion.div variants={cardVariants}>
             <DashBoardCard
               icon={
-                <UsdVioletIcon
+                <CurrencyBadge
+                  currency={contractData?.currency || "CDF"}
+                  variant="violet"
                   width={32}
                   height={32}
                   className="sm:w-11 sm:h-11"

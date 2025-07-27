@@ -63,7 +63,7 @@ const CreateProjectForm = () => {
       openModal();
       setFormValue(initialValues); // Clear the form after successful creation
     },
-    onError: async (error:any) => {
+    onError: async (error: any) => {
       let errorMessage = "Failed to create project.";
 
       if (error?.response?.data?.message) {
@@ -93,8 +93,8 @@ const CreateProjectForm = () => {
       reference: values.projectReference,
       currency: values.currency,
       amount: values.amount,
-      begin_date: moment(values.beginDate, "DD-MM-YYYY").format("YYYY-MM-DD"),
-      end_date: moment(values.endDate, "DD-MM-YYYY").format("YYYY-MM-DD"),
+      begin_date: moment(values.beginDate, ["DD-MM-YYYY", "YYYY-MM-DD"], true).format("YYYY-MM-DD"),
+      end_date: moment(values.endDate, ["DD-MM-YYYY", "YYYY-MM-DD"], true).format("YYYY-MM-DD"),
       description: values.description,
       address: JSON.stringify(
         values.addresses.map((address) => ({
