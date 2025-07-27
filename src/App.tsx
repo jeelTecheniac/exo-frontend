@@ -32,7 +32,7 @@ export default function App() {
   const queryClient = new QueryClient();
   return (
     <>
-      <BrowserRouter basename="/web">
+      <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <ToastContainer className="z-100" />
           <Routes>

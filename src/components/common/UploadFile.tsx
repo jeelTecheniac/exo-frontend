@@ -69,8 +69,39 @@ const UploadFile: React.FC<FileUploadProps> = ({
       setError(`Maximum ${maxFiles} files allowed`);
       return;
     }
-    const newFiles = Array.from(files).filter(validateFile);
-    newFiles.forEach(uploadFile);
+    
+    const newFiles = Array.from(files).filter((file) => {
+      // Check if file is valid
+      if (!validateFile(file)) {
+        return false;
+      }
+      
+      // Check if file with same name is currently being uploaded
+      const fileBeingUploaded = uploadingFiles.has(file.name);
+      
+      if (fileBeingUploaded) {
+        setError(`File "${file.name}" is currently being uploaded`);
+        return false;
+      }
+      
+      // Check if file with same name already exists in selected files
+      const fileExists = selectedFiles.some(
+        (existingFile) => 
+          (existingFile.file?.name === file.name) || 
+          (existingFile.original_name === file.name)
+      );
+      
+      if (fileExists) {
+        setError(`File "${file.name}" has already been uploaded. Please remove it first to upload again.`);
+        return false;
+      }
+      
+      return true;
+    });
+    
+    if (newFiles.length > 0) {
+      newFiles.forEach(uploadFile);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -86,6 +117,8 @@ const UploadFile: React.FC<FileUploadProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       handleFiles(e.target.files);
+      // Reset the input value to allow selecting the same file again
+      e.target.value = '';
     }
   };
   const uploadFile = async (file: File) => {
@@ -134,9 +167,12 @@ const UploadFile: React.FC<FileUploadProps> = ({
           onFilesSelect?.(updated);
           return updated;
         });
+        // Clear any error messages when file is successfully removed
+        setError("");
       }
     } catch (error) {
       console.error("Error removing file:", error);
+      setError("Failed to remove file. Please try again.");
     } finally {
       setRemovingFile(false);
     }

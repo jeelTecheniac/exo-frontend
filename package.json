@@ -1,6 +1,5 @@
 {
   "name": "tailadmin-react",
-  "homepage": "/web",
   "private": true,
   "version": "2.0.2",
   "type": "module",
