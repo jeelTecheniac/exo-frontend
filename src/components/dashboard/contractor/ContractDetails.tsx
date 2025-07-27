@@ -44,7 +44,7 @@ interface RequestApiData {
   request_unique_number?: string;
   total_amount?: string;
   created_at?: string;
-  status?: string;
+  current_status?: string;
   // add other fields as needed
 }
 
@@ -574,7 +574,7 @@ const ContractDetails = () => {
                           createdDate: req.created_at
                             ? moment(req.created_at).format("YYYY-MM-DD")
                             : "",
-                          status: req.status || "",
+                          status: req.current_status || "",
                           request_id: req.id || "",
                           contract_id: contractData.id,
                         })
