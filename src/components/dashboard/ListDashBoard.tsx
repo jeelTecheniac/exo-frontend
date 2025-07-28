@@ -15,7 +15,7 @@ import {
   // FilterIcon,
   SearchIcon,
   UsdGreenIcon,
-  UsdOrangeIcon,
+  CdfCreamIcon,
   WhitePlusIcon,
 } from "../../icons";
 import Typography from "../../lib/components/atoms/Typography.tsx";
@@ -39,9 +39,9 @@ const ListDashBoard = () => {
   const [offset, setOffset] = useState(0);
   // Dashboard card state
   const [totalProject, setTotalProject] = useState(0);
-  const [totalAmountProject, setTotalAmountProject] = useState(0);
+  const [totalAmountProjectUSD, setTotalAmountProjectUSD] = useState(0);
   // const [setTotalRequest] = useState(0);
-  const [totalAmountRequest, setTotalAmountRequest] = useState(0);
+  const [totalAmountProjectCDF, setTotalAmountProjectCDF] = useState(0);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [range, setRange] = useState<{
     startDate: Date | null;
@@ -119,9 +119,9 @@ const ListDashBoard = () => {
         setData(dataArray);
         setTotal(res.total_project || 0);
         setTotalProject(res.total_project || 0);
-        setTotalAmountProject(res.total_amount_project || 0);
+        setTotalAmountProjectUSD(res.total_usd_amount_project || 0);
         // setTotalRequest(res.total_request || 0);
-        setTotalAmountRequest(res.total_amount_request || 0);
+        setTotalAmountProjectCDF(res.total_cdf_amount_project || 0);
 
         // Set hasInitialData to true if we have data or if this is the first load
         if (
@@ -309,7 +309,7 @@ const ListDashBoard = () => {
                       className="sm:w-11 sm:h-11"
                     />
                   ),
-                  count: totalAmountProject,
+                  count: totalAmountProjectUSD,
                   title: t("total_amount_of_project"),
                 },
                 // {
@@ -325,13 +325,13 @@ const ListDashBoard = () => {
                 // },
                 {
                   icon: (
-                    <UsdOrangeIcon
+                    <CdfCreamIcon
                       width={36}
                       height={36}
                       className="sm:w-11 sm:h-11"
                     />
                   ),
-                  count: totalAmountRequest,
+                  count: totalAmountProjectCDF,
                   title: t("total_amount_requested"),
                 },
               ].map((card, index) => (

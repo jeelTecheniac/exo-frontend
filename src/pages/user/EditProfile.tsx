@@ -84,6 +84,7 @@ const EditProfile = () => {
           last_name: res.data.data.last_name,
           company_name: res.data.data.company_name,
           profile_picture: res.data.data.profile_picture,
+          mobile:res.data.data.mobile
         };
       });
       return res.data as ProfileData;

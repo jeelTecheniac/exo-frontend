@@ -34,7 +34,8 @@ const TermsConditionModal = ({
   const { data, isLoading, error } = useQuery({
     queryKey: ["terms", i18n.language],
     queryFn: () => {
-      return termsService.getTerms(i18n.language);
+      const lang=i18n.language ==="en-US" ||  i18n.language ==="en"? "en" :"fr"
+      return termsService.getTerms(lang);
     },
     enabled: isOpen, // Only fetch when modal is open
   });

@@ -30,7 +30,7 @@ const DashBoardCard: FC<DashBoardCardProps> = ({
             weight="extrabold"
             className="text-secondary-100"
           >
-            {count}
+            {count?.toLocaleString()}
           </Typography>
 
           <Typography size="sm" weight="normal" className="text-secondary-60">
