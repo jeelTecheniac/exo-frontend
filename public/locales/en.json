@@ -278,5 +278,6 @@
   "no_of_request":"No of Request",
   "amount_of_contract":"Amount of Contract",
   "number_of_equests":"Number of Requests",
-  "actions":"Actions"
+  "actions":"Actions",
+  "profile_updated_successfully":"profile_updated_successfully"
 }

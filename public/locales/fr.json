@@ -261,10 +261,10 @@
   "request_updated_successfully": "Demande mise à jour avec succès.",
   "edit_request": "Edit Request",
   "update_request": "Update Request",
-  "no_data_found": "No Data Found",
-  "no_projects_match_your_search_criteria": "No projects match your search criteria.",
-  "clear_filters": "Clear Filters",
-  "create_new_project": "Create New Project",
+  "no_data_found": "Aucune donnée trouvée",
+  "no_projects_match_your_search_criteria": "Aucun projet ne correspond à vos critères de recherche.",
+  "clear_filters": "Réinitialiser les filtres",
+  "create_new_project": "Créer un nouveau projet",
   "signed_by_required": "Le champ 'Signé par' est requis",
   "position_required": "Le champ 'Poste' est requis",
   "amount_required": "Le champ 'Montant' est requis",
@@ -277,5 +277,6 @@
   "no_of_request": "Nombre de demandes",
   "amount_of_contract": "Montant du contrat",
   "number_of_equests": "Nombre de demandes",
-  "actions": "Actions"
+  "actions": "Actions",
+  "profile_updated_successfully":"Profil mis à jour avec succès"
 }

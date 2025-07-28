@@ -80,7 +80,8 @@ const Help = () => {
       setLoading(true);
       setError(null);
       try {
-        const faqs = await faqService.getFaqs(i18n.language);
+        const lang=i18n.language ==="en-US" ||  i18n.language ==="en"? "en" :"fr"
+        const faqs = await faqService.getFaqs(lang);
         setFaqItems(
           faqs.map((item: { title: string; description: string }) => ({
             question: item.title,

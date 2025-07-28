@@ -34,7 +34,8 @@ const PrivacyModal = ({
   const { data, isLoading, error } = useQuery({
     queryKey: ["privacy", i18n.language],
     queryFn: () => {
-      return termsService.getPrivacy(i18n.language);
+      const lang=i18n.language ==="en-US" ||  i18n.language ==="en"? "en" :"fr"
+      return termsService.getPrivacy(lang);
     },
     enabled: isOpen,
   });
