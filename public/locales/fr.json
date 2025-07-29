@@ -284,5 +284,6 @@
   "currency": "Devise",
   "rename": "Renommer",
   "delete": "Supprimer",
-  "upload": "Téléverser"
+  "upload": "Téléverser",
+  "tax_category": "Tax Category"
 }

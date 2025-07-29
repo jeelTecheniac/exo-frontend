@@ -282,5 +282,6 @@
   "profile_updated_successfully": "profile_updated_successfully",
   "project_id": "Project ID",
   "funded_by": "Funded By",
-  "currency": "Currency"
+  "currency": "Currency",
+  "tax_category": "Tax Category"
 }
